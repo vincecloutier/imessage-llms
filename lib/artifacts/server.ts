@@ -1,5 +1,4 @@
 import { imageDocumentHandler } from '@/artifacts/image/server';
-import { textDocumentHandler } from '@/artifacts/text/server';
 import { ArtifactKind } from '@/components/artifact';
 import { DataStreamWriter } from 'ai';
 import { Document } from '../db/schema';
@@ -88,7 +87,6 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
  * Use this array to define the document handlers for each artifact kind.
  */
 export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
-  textDocumentHandler,
   imageDocumentHandler,
 ];
 
