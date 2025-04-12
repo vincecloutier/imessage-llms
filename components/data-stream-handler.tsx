@@ -36,6 +36,11 @@ export function DataStreamHandler({ id }: { id: string }) {
           updatedMessages[updatedMessages.length - 1] = {
             ...lastMessage,
             content: lastMessage.content + delta.content,
+            parts: lastMessage.parts?.map(part => 
+              part.type === 'text' 
+                ? { ...part, text: part.text + delta.content }
+                : part
+            ) || [{ type: 'text', text: delta.content }]
           };
           return updatedMessages;
         });
