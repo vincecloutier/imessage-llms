@@ -109,6 +109,7 @@ const PurePreviewMessage = ({
                             message.role === 'user',
                         })}
                       >
+                        {part.text}
                       </div>
                     </div>
                   );
