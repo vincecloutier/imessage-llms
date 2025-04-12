@@ -90,11 +90,9 @@ type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage;
 type ResponseMessage = ResponseMessageWithoutId & { id: string };
 
 export function sanitizeResponseMessages({
-  messages,
-  reasoning,
+  messages
 }: {
   messages: Array<ResponseMessage>;
-  reasoning: string | undefined;
 }) {
   const toolResultIds: Array<string> = [];
 
@@ -120,11 +118,6 @@ export function sanitizeResponseMessages({
           ? content.text.length > 0
           : true,
     );
-
-    if (reasoning) {
-      // @ts-expect-error: reasoning message parts in sdk is wip
-      sanitizedContent.push({ type: 'reasoning', reasoning });
-    }
 
     return {
       ...message,
