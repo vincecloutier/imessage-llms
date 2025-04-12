@@ -17,7 +17,7 @@ export type DataStreamDelta = {
 };
 
 export function DataStreamHandler({ id }: { id: string }) {
-  const { data: dataStream } = useChat({ id });
+  const { data: dataStream, setMessages, messages } = useChat({ id });
   const lastProcessedIndex = useRef(-1);
 
   useEffect(() => {
@@ -27,11 +27,21 @@ export function DataStreamHandler({ id }: { id: string }) {
     lastProcessedIndex.current = dataStream.length - 1;
 
     (newDeltas as DataStreamDelta[]).forEach((delta: DataStreamDelta) => {
-      if (delta.type === 'image-delta') {
-        console.log(delta);
+      if (delta.type === 'text-delta' || delta.type === 'code-delta') {
+        setMessages((messages) => {
+          const lastMessage = messages[messages.length - 1];
+          if (!lastMessage) return messages;
+
+          const updatedMessages = [...messages];
+          updatedMessages[updatedMessages.length - 1] = {
+            ...lastMessage,
+            content: lastMessage.content + delta.content,
+          };
+          return updatedMessages;
+        });
       }
     });
-  }, [dataStream]);
+  }, [dataStream, setMessages, messages]);
 
   return null;
 }
