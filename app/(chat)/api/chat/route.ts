@@ -86,10 +86,7 @@ export async function POST(request: Request) {
           system: systemPrompt,
           messages,
           maxSteps: 5,
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
+          experimental_activeTools: [
                   'getWeather',
                   'createDocument',
                   'updateDocument',
@@ -150,7 +147,6 @@ export async function POST(request: Request) {
 
         result.consumeStream();
 
-        result.mergeIntoDataStream(dataStream, {
       },
       onError: () => {
         return 'Oops, an error occurred!';
