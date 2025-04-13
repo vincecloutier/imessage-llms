@@ -1,80 +1,49 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { auth } from '@/app/(auth)/auth';
-import { Chat } from '@/components/chat';
-import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
-import { DataStreamHandler } from '@/components/data-stream-handler';
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import { DBMessage } from '@/lib/db/schema';
-import { Attachment, UIMessage } from 'ai';
+import { DEFAULT_MODEL_NAME, models } from '@/ai/models';
+import { Chat as PreviewChat } from '@/components/custom/chat';
+import {
+  getChatById,
+  getMessagesByChatId,
+  getSession,
+} from '@/db/cached-queries';
+import { convertToUIMessages } from '@/lib/utils';
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
+export default async function Page(props: { params: Promise<any> }) {
   const params = await props.params;
   const { id } = params;
-  const chat = await getChatById({ id });
+  const chat = await getChatById(id);
 
   if (!chat) {
     notFound();
   }
 
-  const session = await auth();
+  const user = await getSession();
 
-  if (chat.visibility === 'private') {
-    if (!session || !session.user) {
-      return notFound();
-    }
-
-    if (session.user.id !== chat.userId) {
-      return notFound();
-    }
+  if (!user) {
+    return notFound();
   }
 
-  const messagesFromDb = await getMessagesByChatId({
-    id,
-  });
-
-  function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
-    return messages.map((message) => ({
-      id: message.id,
-      parts: message.parts as UIMessage['parts'],
-      role: message.role as UIMessage['role'],
-      // Note: content will soon be deprecated in @ai-sdk/react
-      content: '',
-      createdAt: message.createdAt,
-      experimental_attachments:
-        (message.attachments as Array<Attachment>) ?? [],
-    }));
+  if (user.id !== chat.user_id) {
+    return notFound();
   }
+
+  const messagesFromDb = await getMessagesByChatId(id);
 
   const cookieStore = await cookies();
-  const chatModelFromCookie = cookieStore.get('chat-model');
+  const modelIdFromCookie = cookieStore.get('model-id')?.value;
+  const selectedModelId =
+    models.find((model) => model.id === modelIdFromCookie)?.id ||
+    DEFAULT_MODEL_NAME;
 
-  if (!chatModelFromCookie) {
-    return (
-      <>
-        <Chat
-          id={chat.id}
-          initialMessages={convertToUIMessages(messagesFromDb)}
-          selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedVisibilityType={chat.visibility}
-          isReadonly={session?.user?.id !== chat.userId}
-        />
-        <DataStreamHandler id={id} />
-      </>
-    );
-  }
+  console.log(convertToUIMessages(messagesFromDb));
 
   return (
-    <>
-      <Chat
-        id={chat.id}
-        initialMessages={convertToUIMessages(messagesFromDb)}
-        selectedChatModel={chatModelFromCookie.value}
-        selectedVisibilityType={chat.visibility}
-        isReadonly={session?.user?.id !== chat.userId}
-      />
-      <DataStreamHandler id={id} />
-    </>
+    <PreviewChat
+      id={chat.id}
+      initialMessages={convertToUIMessages(messagesFromDb)}
+      selectedModelId={selectedModelId}
+    />
   );
 }

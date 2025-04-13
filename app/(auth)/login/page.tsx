@@ -2,71 +2,71 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
-import { toast } from '@/components/toast';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
-import { AuthForm } from '@/components/auth-form';
-import { SubmitButton } from '@/components/submit-button';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { signIn } from '@/db/auth';
 
-import { login, type LoginActionState } from '../actions';
-
-export default function Page() {
+export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [isSuccessful, setIsSuccessful] = useState(false);
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsLoading(true);
 
-  const [state, formAction] = useActionState<LoginActionState, FormData>(
-    login,
-    {
-      status: 'idle',
-    },
-  );
+    try {
+      const formData = new FormData(event.currentTarget);
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
 
-  useEffect(() => {
-    if (state.status === 'failed') {
-      toast({
-        type: 'error',
-        description: 'Invalid credentials!',
-      });
-    } else if (state.status === 'invalid_data') {
-      toast({
-        type: 'error',
-        description: 'Failed validating your submission!',
-      });
-    } else if (state.status === 'success') {
-      setIsSuccessful(true);
+      await signIn(email, password);
+      router.push('/');
       router.refresh();
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
-  }, [state.status]);
-
-  const handleSubmit = (formData: FormData) => {
-    setEmail(formData.get('email') as string);
-    formAction(formData);
-  };
+  }
 
   return (
-    <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign In</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Use your email and password to sign in
+    <div className="flex h-[calc(100vh-theme(spacing.16))] items-center justify-center py-10">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="space-y-2 text-center">
+          <h1 className="text-3xl font-bold">Login</h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            Enter your email below to login to your account
           </p>
         </div>
-        <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
-          <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {"Don't have an account? "}
-            <Link
-              href="/register"
-              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
-            >
-              Sign up
-            </Link>
-            {' for free.'}
-          </p>
-        </AuthForm>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              placeholder="m@example.com"
+              required
+              type="email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" name="password" required type="password" />
+          </div>
+          <Button className="w-full" disabled={isLoading}>
+            {isLoading ? 'Loading...' : 'Login'}
+          </Button>
+        </form>
+        <div className="text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link className="underline" href="/register">
+            Register
+          </Link>
+        </div>
       </div>
     </div>
   );

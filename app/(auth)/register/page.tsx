@@ -2,72 +2,71 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
-import { AuthForm } from '@/components/auth-form';
-import { SubmitButton } from '@/components/submit-button';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { signUp } from '@/db/auth';
 
-import { register, type RegisterActionState } from '../actions';
-import { toast } from '@/components/toast';
-
-export default function Page() {
+export default function RegisterPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [isSuccessful, setIsSuccessful] = useState(false);
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsLoading(true);
 
-  const [state, formAction] = useActionState<RegisterActionState, FormData>(
-    register,
-    {
-      status: 'idle',
-    },
-  );
+    try {
+      const formData = new FormData(event.currentTarget);
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
 
-  useEffect(() => {
-    if (state.status === 'user_exists') {
-      toast({ type: 'error', description: 'Account already exists!' });
-    } else if (state.status === 'failed') {
-      toast({ type: 'error', description: 'Failed to create account!' });
-    } else if (state.status === 'invalid_data') {
-      toast({
-        type: 'error',
-        description: 'Failed validating your submission!',
-      });
-    } else if (state.status === 'success') {
-      toast({ type: 'success', description: 'Account created successfully!' });
-
-      setIsSuccessful(true);
-      router.refresh();
+      await signUp(email, password);
+      toast.success('Check your email to confirm your account');
+      router.push('/login');
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
-  }, [state]);
-
-  const handleSubmit = (formData: FormData) => {
-    setEmail(formData.get('email') as string);
-    formAction(formData);
-  };
+  }
 
   return (
-    <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign Up</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Create an account with your email and password
+    <div className="flex h-[calc(100vh-theme(spacing.16))] items-center justify-center py-10">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="space-y-2 text-center">
+          <h1 className="text-3xl font-bold">Register</h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            Enter your information to create an account
           </p>
         </div>
-        <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign Up</SubmitButton>
-          <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {'Already have an account? '}
-            <Link
-              href="/login"
-              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
-            >
-              Sign in
-            </Link>
-            {' instead.'}
-          </p>
-        </AuthForm>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              placeholder="m@example.com"
+              required
+              type="email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" name="password" required type="password" />
+          </div>
+          <Button className="w-full" disabled={isLoading}>
+            {isLoading ? 'Loading...' : 'Register'}
+          </Button>
+        </form>
+        <div className="text-center text-sm">
+          Already have an account?{' '}
+          <Link className="underline" href="/login">
+            Login
+          </Link>
+        </div>
       </div>
     </div>
   );
