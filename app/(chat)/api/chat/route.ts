@@ -96,12 +96,14 @@ function formatMessageContent(message: CoreMessage): string {
             text: content.text,
           };
         }
-        return {
-          type: 'tool-call',
-          toolCallId: content.toolCallId,
-          toolName: content.toolName,
-          args: content.args,
-        };
+        if (content.type === 'tool-call') {
+          return {
+            type: 'tool-call',
+            toolCallId: content.toolCallId,
+            toolName: content.toolName,
+            args: content.args,
+          };
+        }
       })
     );
   }
@@ -219,50 +221,6 @@ export async function POST(request: Request) {
                 });
               }
             }
-
-            // Try to save with retries
-            // let attempts = 0;
-            // const maxAttempts = 3;
-            // let savedId: string | null = null;
-
-            // while (attempts < maxAttempts && !savedId) {
-            //   try {
-            //     await saveDocument({
-            //       id,
-            //       title,
-            //       content: draftText,
-            //       userId: user.id,
-            //     });
-            //     savedId = id;
-            //     break;
-            //   } catch (error) {
-            //     attempts++;
-            //     if (attempts === maxAttempts) {
-            //       // If original ID fails, try with a new ID
-            //       const newId = generateUUID();
-            //       try {
-            //         await saveDocument({
-            //           id: newId,
-            //           title,
-            //           content: draftText,
-            //           userId: user.id,
-            //         });
-            //         // Update the ID in the UI
-            //         streamingData.append({ type: 'id', content: newId });
-            //         savedId = newId;
-            //       } catch (finalError) {
-            //         console.error('Final attempt failed:', finalError);
-            //         return {
-            //           error:
-            //             'Failed to create document after multiple attempts',
-            //         };
-            //       }
-            //     }
-            //     await new Promise((resolve) =>
-            //       setTimeout(resolve, 100 * attempts)
-            //     );
-            //   }
-            // }
 
             streamingData.append({ type: 'finish', content: '' });
 
@@ -433,19 +391,6 @@ export async function POST(request: Request) {
               });
             }
 
-            // if (user && user.id) {
-            //   for (const suggestion of suggestions) {
-            //     await saveSuggestions({
-            //       documentId: suggestion.documentId,
-            //       documentCreatedAt: document.created_at,
-            //       originalText: suggestion.originalText,
-            //       suggestedText: suggestion.suggestedText,
-            //       description: suggestion.description,
-            //       userId: user.id,
-            //     });
-            //   }
-            // }
-
             return {
               id: documentId,
               title: document.title,
@@ -454,11 +399,11 @@ export async function POST(request: Request) {
           },
         },
       },
-      onFinish: async ({ responseMessages }) => {
+      onFinish: async ({ response }) => {
         if (user && user.id) {
           try {
             const responseMessagesWithoutIncompleteToolCalls =
-              sanitizeResponseMessages(responseMessages);
+              sanitizeResponseMessages(response.messages);
 
             await saveMessages({
               chatId: id,
