@@ -9,11 +9,10 @@ import { toast } from 'sonner';
 import useSWR from 'swr';
 
 import {
-  Folder,
+  UserRound,
   MoreHorizontal,
-  Share,
   Trash2,
-  type LucideIcon,
+  Plus,
 } from 'lucide-react';
 
 import {
@@ -147,27 +146,16 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     );
   }
 
-  if (!history || history.length === 0) {
-    return (
-      <SidebarGroup>
-        <SidebarGroupLabel>Personas</SidebarGroupLabel>
-        <div className="text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-          <div>Your conversations will appear here once you start personating!</div>
-        </div>
-      </SidebarGroup>
-    );
-  }
-
   return (
     <>
-      <SidebarGroup>
-        <SidebarGroupLabel>Personas</SidebarGroupLabel>
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroupLabel>Personas</SidebarGroupLabel>
         <SidebarMenu>
-          {history.map((persona) => (
+          {history?.map((persona) => (
             <SidebarMenuItem key={persona.id}>
               <SidebarMenuButton asChild>
                 <Link href={`/chat/${persona.id}`} onClick={() => setOpenMobile(false)}>
-                  <Folder />
+                  <UserRound />
                   <span>{persona.name || 'New persona'}</span>
                 </Link>
               </SidebarMenuButton>
@@ -183,15 +171,6 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                   side={isMobile ? 'bottom' : 'right'}
                   align={isMobile ? 'end' : 'start'}
                 >
-                  <DropdownMenuItem>
-                    <Folder className="text-muted-foreground" />
-                    <span>View Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Share className="text-muted-foreground" />
-                    <span>Share Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive"
                     onSelect={() => {
@@ -208,8 +187,8 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
           ))}
           <SidebarMenuItem>
             <SidebarMenuButton>
-              <MoreHorizontal />
-              <span>More</span>
+              <Plus/>
+              <span>Create New Persona</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
