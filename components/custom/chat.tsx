@@ -4,28 +4,24 @@ import { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { useState } from 'react';
 import { useSWRConfig } from 'swr';
-import { useWindowSize } from 'usehooks-ts';
 
 import { PreviewMessage, ThinkingMessage } from '@/components/custom/message';
 import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Button } from '../ui/button';
 
 import { MultimodalInput } from './multimodal-input';
-
 
 export function Chat({
   id,
   initialMessages,
-  // user,
 }: {
   id: string;
   initialMessages: Array<Message>;
-  // user: User;
 }) {
   const { mutate } = useSWRConfig();
-
   const {
     messages,
     setMessages,
@@ -53,7 +49,7 @@ export function Chat({
 
   return (
     <>
-        <header className="flex h-16 shrink-0 items-center gap-2">
+        <header className="flex justify-between h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
@@ -68,6 +64,9 @@ export function Chat({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+        </div>
+        <div className="flex items-center gap-2 px-4">
+          <Button variant="outline">Login</Button>
         </div>
       </header>
       <div className="flex flex-1 flex-col min-w-0, h-dvh gap-4 p-4 pt-0">
