@@ -11,7 +11,7 @@ import { BetterTooltip } from '@/components/ui/tooltip';
 import { PlusIcon, InvoiceIcon } from './icons';
 import { useSidebar } from '../ui/sidebar';
 
-export function ChatHeader({ selectedModelId }: { selectedModelId: string }) {
+export function ChatHeader() {
   const router = useRouter();
   const { open } = useSidebar();
 

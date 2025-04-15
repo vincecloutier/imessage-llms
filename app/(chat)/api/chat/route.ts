@@ -9,7 +9,6 @@ import {
 import { z } from 'zod';
 
 import { customModel } from '@/ai';
-import { models } from '@/ai/models';
 import { regularPrompt, systemPrompt } from '@/ai/prompts';
 import { getChatById, getSession } from '@/db/cached-queries';
 import {
@@ -25,7 +24,6 @@ import {
   sanitizeResponseMessages,
 } from '@/lib/utils';
 
-import { generateTitleFromUserMessage } from '../../actions';
 
 export const maxDuration = 60;
 
@@ -101,20 +99,13 @@ export async function POST(request: Request) {
   const {
     id,
     messages,
-    modelId,
-  }: { id: string; messages: Array<Message>; modelId: string } =
+  }: { id: string; messages: Array<Message>; } =
     await request.json();
 
   const user = await getUser();
 
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
-  }
-
-  const model = models.find((model) => model.id === modelId);
-
-  if (!model) {
-    return new Response('Model not found', { status: 404 });
   }
 
   const coreMessages = convertToCoreMessages(messages);
@@ -128,10 +119,7 @@ export async function POST(request: Request) {
     const chat = await getChatById(id);
 
     if (!chat) {
-      const title = await generateTitleFromUserMessage({
-        message: userMessage,
-      });
-      await saveChat({ id, userId: user.id, title });
+      await saveChat({ id, userId: user.id, title: "New Chat" });
     } else if (chat.user_id !== user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
@@ -152,7 +140,7 @@ export async function POST(request: Request) {
     const streamingData = new StreamData();
 
     const result = await streamText({
-      model: customModel(model.apiIdentifier),
+      model: customModel(),
       system: systemPrompt,
       messages: coreMessages,
       maxSteps: 5,

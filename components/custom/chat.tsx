@@ -20,11 +20,9 @@ import { Overview } from './overview';
 export function Chat({
   id,
   initialMessages,
-  selectedModelId,
 }: {
   id: string;
   initialMessages: Array<Message>;
-  selectedModelId: string;
 }) {
   const { mutate } = useSWRConfig();
 
@@ -39,7 +37,7 @@ export function Chat({
     stop,
     data: streamingData,
   } = useChat({
-    body: { id, modelId: selectedModelId },
+    body: { id },
     initialMessages,
     onFinish: () => {
       mutate('/api/history');
@@ -60,7 +58,7 @@ export function Chat({
   return (
     <>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
-        <ChatHeader selectedModelId={selectedModelId} />
+        <ChatHeader/>
         <div
           ref={messagesContainerRef}
           className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
