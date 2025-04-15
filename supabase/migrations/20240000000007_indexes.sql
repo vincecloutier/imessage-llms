@@ -27,12 +27,6 @@ CREATE INDEX IF NOT EXISTS idx_suggestions_user_id ON public.suggestions(user_id
 CREATE INDEX IF NOT EXISTS idx_suggestions_is_resolved ON public.suggestions(is_resolved);
 CREATE INDEX IF NOT EXISTS idx_suggestions_created_at ON public.suggestions(created_at);
 
--- Indexes for the votes table
-CREATE INDEX IF NOT EXISTS idx_votes_message_id ON public.votes(message_id);
-CREATE INDEX IF NOT EXISTS idx_votes_chat_id ON public.votes(chat_id);
-CREATE INDEX IF NOT EXISTS idx_votes_message_id ON public.votes(message_id);
-CREATE INDEX IF NOT EXISTS idx_votes_composite ON public.votes(message_id, chat_id);
-
 -- Add text search capabilities
 -- ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS search_vector tsvector;
 -- CREATE INDEX IF NOT EXISTS idx_documents_search_vector ON public.documents USING gin(search_vector);
