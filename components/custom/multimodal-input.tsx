@@ -82,7 +82,15 @@ export function MultimodalInput({
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 2}px`;
+      const newHeight = textareaRef.current.scrollHeight + 2;
+      const MAX_HEIGHT = 200; // maximum height in pixels
+      if (newHeight > MAX_HEIGHT) {
+        textareaRef.current.style.height = `${MAX_HEIGHT}px`;
+        textareaRef.current.style.overflowY = 'auto';
+      } else {
+        textareaRef.current.style.height = `${newHeight}px`;
+        textareaRef.current.style.overflowY = 'hidden';
+      }
     }
   };
 
@@ -123,7 +131,12 @@ export function MultimodalInput({
     });
 
     setAttachments([]);
+    setInput('');
     setLocalStorageInput('');
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
 
     if (width && width > 768) {
       textareaRef.current?.focus();
@@ -132,6 +145,7 @@ export function MultimodalInput({
     attachments,
     handleSubmit,
     setAttachments,
+    setInput,
     setLocalStorageInput,
     width,
     personaId,
@@ -241,7 +255,7 @@ export function MultimodalInput({
       />
 
       {(attachments.length > 0 || uploadQueue.length > 0) && (
-        <div className="flex flex-row gap-2 overflow-x-scroll items-end">
+        <div className="flex flex-row gap-2 overflow-x-scroll scrollbar-hide items-end">
           {attachments.map((attachment) => (
             <PreviewAttachment key={attachment.url} attachment={attachment} />
           ))}
@@ -266,7 +280,7 @@ export function MultimodalInput({
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-xl text-base bg-muted',
+          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-xl text-base bg-muted scrollbar-hide',
           className
         )}
         rows={3}
