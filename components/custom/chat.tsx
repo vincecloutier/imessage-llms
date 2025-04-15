@@ -14,7 +14,6 @@ import { Database } from '@/lib/supabase/types';
 import { fetcher } from '@/lib/utils';
 
 import { MultimodalInput } from './multimodal-input';
-import { Overview } from './overview';
 
 
 export function Chat({
@@ -63,7 +62,6 @@ export function Chat({
           ref={messagesContainerRef}
           className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
         >
-          {messages.length === 0 && <Overview />}
 
           {messages.map((message, index) => (
             <PreviewMessage
