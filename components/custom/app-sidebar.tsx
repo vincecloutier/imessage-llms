@@ -3,7 +3,7 @@
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
-import { SidebarHistory } from '@/components/custom/sidebar-history';
+import { SidebarHistory } from '@/components/custom/nav-personas';
 import {
   Sidebar,
   SidebarContent,
@@ -86,22 +86,21 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <div>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"> */}
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">April Intelligence</span>
                   <span className="truncate text-xs">AI-powered research</span>
                 </div>
-                </div>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarHistory user={user ?? undefined} />
-        </SidebarGroup>
+       <SidebarHistory user={user ?? undefined} />
        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
     </Sidebar>
