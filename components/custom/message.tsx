@@ -5,7 +5,6 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { Dispatch, SetStateAction } from 'react';
 
-import { Markdown } from './markdown';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
 
@@ -33,7 +32,8 @@ export const PreviewMessage = ({
 
         <div className="flex flex-col gap-2 w-full">
           <div className="prose dark:prose-invert group-data-[role=user]/message:text-primary-foreground">
-            <Markdown>{message.content}</Markdown>
+          {/* TODO: modify this so we split newlines */}
+          {message.content}
           </div>
 
           {message.toolInvocations && message.toolInvocations.length > 0 && (
