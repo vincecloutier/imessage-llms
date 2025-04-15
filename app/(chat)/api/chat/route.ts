@@ -36,10 +36,6 @@ const customModel = () => {
 
 export const maxDuration = 60;
 
-type AllowedTools = 'getWeather';
-
-const allTools: AllowedTools[] = [];
-
 async function getUser() {
   const supabase = await createClient();
   const {
@@ -47,7 +43,7 @@ async function getUser() {
     error,
   } = await supabase.auth.getUser();
 
-  if (error || !user) {
+  if (error || !user) { 
     throw new Error('Unauthorized');
   }
 
@@ -87,14 +83,6 @@ function formatMessageContent(message: CoreMessage): string {
           return {
             type: 'text',
             text: content.text,
-          };
-        }
-        if (content.type === 'tool-call') {
-          return {
-            type: 'tool-call',
-            toolCallId: content.toolCallId,
-            toolName: content.toolName,
-            args: content.args,
           };
         }
       })
@@ -153,24 +141,6 @@ export async function POST(request: Request) {
       system: systemPrompt,
       messages: coreMessages,
       maxSteps: 5,
-      experimental_activeTools: allTools,
-      tools: {
-        getWeather: {
-          description: 'Get the current weather at a location',
-          parameters: z.object({
-            latitude: z.number(),
-            longitude: z.number(),
-          }),
-          execute: async ({ latitude, longitude }) => {
-            const response = await fetch(
-              `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=temperature_2m&daily=sunrise,sunset&timezone=auto`
-            );
-
-            const weatherData = await response.json();
-            return weatherData;
-          },
-        },
-      },
       onFinish: async ({ response }) => {
         if (user && user.id) {
           try {

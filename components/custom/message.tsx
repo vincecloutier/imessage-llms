@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { Dispatch, SetStateAction } from 'react';
 
 import { PreviewAttachment } from './preview-attachment';
-import { Weather } from './weather';
 
 export const PreviewMessage = ({
   chatId,
@@ -35,41 +34,6 @@ export const PreviewMessage = ({
           {/* TODO: modify this so we split newlines */}
           {message.content}
           </div>
-
-          {message.toolInvocations && message.toolInvocations.length > 0 && (
-            <div className="flex flex-col gap-4">
-              {message.toolInvocations.map((toolInvocation) => {
-                const { toolName, toolCallId, state, args } = toolInvocation;
-
-                if (state === 'result') {
-                  const { result } = toolInvocation;
-
-                  return (
-                    <div key={toolCallId}>
-                      {toolName === 'getWeather' ? (
-                        <Weather weatherAtLocation={result} />
-                      ) : 
-                        <pre>{JSON.stringify(result, null, 2)}</pre>
-                      }
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div
-                      key={toolCallId}
-                      className={cx({
-                        skeleton: ['getWeather'].includes(toolName),
-                      })}
-                    >
-                      {toolName === 'getWeather' ? (
-                        <Weather />
-                      ) : null}
-                    </div>
-                  );
-                }
-              })}
-            </div>
-          )}
 
           {message.experimental_attachments && (
             <div className="flex flex-row gap-2">
