@@ -9,9 +9,6 @@ import {
   getUserQuery,
   getChatsByUserIdQuery,
   getMessagesByChatIdQuery,
-  getDocumentByIdQuery,
-  getDocumentsByIdQuery,
-  getSuggestionsByDocumentIdQuery,
   getSessionQuery,
   getUserByIdQuery,
   getChatWithMessagesQuery,
@@ -110,52 +107,6 @@ export const getMessagesByChatId = async (chatId: string) => {
   )();
 };
 
-export const getDocumentById = async (documentId: string) => {
-  const supabase = await getSupabase();
-
-  return unstable_cache(
-    async () => {
-      return getDocumentByIdQuery(supabase, { id: documentId });
-    },
-    ['document', documentId],
-    {
-      tags: [`document_${documentId}`],
-      revalidate: 10, // Cache for 10 seconds
-    }
-  )();
-};
-
-export const getDocumentsById = async (documentId: string) => {
-  const supabase = await getSupabase();
-
-  return unstable_cache(
-    async () => {
-      return getDocumentsByIdQuery(supabase, { id: documentId });
-    },
-    ['documents', documentId],
-    {
-      tags: [`document_${documentId}_versions`],
-      revalidate: 10, // Cache for 10 seconds
-    }
-  )();
-};
-
-export const getSuggestionsByDocumentId = async (documentId: string) => {
-  const supabase = await getSupabase();
-
-  return unstable_cache(
-    async () => {
-      return getSuggestionsByDocumentIdQuery(supabase, {
-        documentId: documentId,
-      });
-    },
-    ['suggestions', documentId],
-    {
-      tags: [`document_${documentId}_suggestions`],
-      revalidate: 10, // Cache for 10 seconds
-    }
-  )();
-};
 
 export const getChatWithMessages = async (chatId: string) => {
   const supabase = await getSupabase();

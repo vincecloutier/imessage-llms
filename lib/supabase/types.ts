@@ -43,38 +43,6 @@ export type Database = {
           },
         ];
       };
-      documents: {
-        Row: {
-          content: string | null;
-          created_at: string;
-          id: string;
-          title: string;
-          user_id: string;
-        };
-        Insert: {
-          content?: string | null;
-          created_at?: string;
-          id?: string;
-          title: string;
-          user_id: string;
-        };
-        Update: {
-          content?: string | null;
-          created_at?: string;
-          id?: string;
-          title?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'documents_user_id_fkey';
-            columns: ['user_id'];
-            isOneToOne: false;
-            referencedRelation: 'users';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       file_uploads: {
         Row: {
           bucket_id: string;
@@ -163,57 +131,6 @@ export type Database = {
           },
         ];
       };
-      suggestions: {
-        Row: {
-          created_at: string;
-          description: string | null;
-          document_created_at: string;
-          document_id: string;
-          id: string;
-          is_resolved: boolean;
-          original_text: string;
-          suggested_text: string;
-          user_id: string;
-        };
-        Insert: {
-          created_at?: string;
-          description?: string | null;
-          document_created_at: string;
-          document_id: string;
-          id?: string;
-          is_resolved?: boolean;
-          original_text: string;
-          suggested_text: string;
-          user_id: string;
-        };
-        Update: {
-          created_at?: string;
-          description?: string | null;
-          document_created_at?: string;
-          document_id?: string;
-          id?: string;
-          is_resolved?: boolean;
-          original_text?: string;
-          suggested_text?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'suggestions_document_id_document_created_at_fkey';
-            columns: ['document_id', 'document_created_at'];
-            isOneToOne: false;
-            referencedRelation: 'documents';
-            referencedColumns: ['id', 'created_at'];
-          },
-          {
-            foreignKeyName: 'suggestions_user_id_fkey';
-            columns: ['user_id'];
-            isOneToOne: false;
-            referencedRelation: 'users';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       users: {
         Row: {
           created_at: string;
@@ -240,25 +157,6 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      get_document_latest_version: {
-        Args: {
-          doc_id: string;
-        };
-        Returns: string;
-      };
-      get_latest_document: {
-        Args: {
-          doc_id: string;
-          auth_user_id: string;
-        };
-        Returns: {
-          id: string;
-          user_id: string;
-          title: string;
-          content: string;
-          created_at: string;
-        }[];
-      };
       get_next_file_version: {
         Args: {
           p_bucket_id: string;
@@ -481,11 +379,7 @@ export function handleDatabaseError(error: PostgrestError | null) {
   }
 }
 
-// Add Document type
-export type Document = Database['public']['Tables']['documents']['Row'];
 export type Chat = Database['public']['Tables']['chats']['Row'];
-
-export type Suggestion = Database['public']['Tables']['suggestions']['Row'];
 
 // Add DatabaseMessage type to match the database schema
 export interface DatabaseMessage {
