@@ -3,73 +3,107 @@
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
-import { PlusIcon } from '@/components/custom/icons';
 import { SidebarHistory } from '@/components/custom/sidebar-history';
-import { SidebarUserNav } from '@/components/custom/sidebar-user-nav';
-import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { BetterTooltip } from '@/components/ui/tooltip';
+import { BookOpen, Command, LifeBuoy, Send  } from 'lucide-react';
+import { NavSecondary } from '@/components/custom/nav-footer';
 
-export function AppSidebar({ user }: { user: User | null }) {
+
+const data = {
+    navSecondary: [
+      {
+        title: "Support",
+        url: "mailto:support@aprilintelligence.com",
+        icon: LifeBuoy,
+    },
+    {
+      title: "Feedback",
+      url: "mailto:info@aprilintelligence.com",
+      icon: Send,
+    },
+    {
+      title: "Privacy Policy",  
+      url: "/privacy",
+      icon: BookOpen,
+    },
+    // {
+    //   title: "Terms of Service",
+    //   url: "/terms",
+    //   icon: BookOpen,
+    // }
+  ]
+}
+// export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+//   return (
+//     <Sidebar variant="inset" {...props}>
+//       <SidebarHeader>
+//         <SidebarMenu>
+//           <SidebarMenuItem>
+//             <SidebarMenuButton size="lg" asChild>
+//               <a href="#">
+//                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+//                   <Command className="size-4" />
+//                 </div>
+//                 <div className="grid flex-1 text-left text-sm leading-tight">
+//                   <span className="truncate font-semibold">Acme Inc</span>
+//                   <span className="truncate text-xs">Enterprise</span>
+//                 </div>
+//               </a>
+//             </SidebarMenuButton>
+//           </SidebarMenuItem>
+//         </SidebarMenu>
+//       </SidebarHeader>
+//       <SidebarContent>
+//         <NavMain items={data.navMain} />
+//         <NavProjects projects={data.projects} />
+//         <NavSecondary items={data.navSecondary} className="mt-auto" />
+//       </SidebarContent>
+//       <SidebarFooter>
+//         <NavUser user={data.user} />
+//       </SidebarFooter>
+//     </Sidebar>
+//   )
+// }
+
+
+export function AppSidebar({ user, ...props }: { user: User | null } & React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
 
   return (
-    <Sidebar className="group-data-[side=left]:border-r-0">
+    <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <div className="flex flex-row justify-between items-center">
-            <div
-              onClick={() => {
-                setOpenMobile(false);
-                router.push('/');
-                router.refresh();
-              }}
-              className="flex flex-row gap-3 items-center"
-            >
-              <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
-                Chatbot
-              </span>
-            </div>
-            <BetterTooltip content="New Chat" align="start">
-              <Button
-                variant="ghost"
-                className="p-2 h-fit"
-                onClick={() => {
-                  setOpenMobile(false);
-                  router.push('/');
-                  router.refresh();
-                }}
-              >
-                <PlusIcon />
-              </Button>
-            </BetterTooltip>
-          </div>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <div>
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Command className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">April Intelligence</span>
+                  <span className="truncate text-xs">AI-powered research</span>
+                </div>
+                </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarHistory user={user ?? undefined} />
         </SidebarGroup>
+       <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter className="gap-0">
-        {user && (
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarUserNav user={user} />
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-      </SidebarFooter>
     </Sidebar>
   );
 }

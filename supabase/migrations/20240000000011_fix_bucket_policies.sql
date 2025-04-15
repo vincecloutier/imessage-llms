@@ -34,7 +34,7 @@ ON storage.objects
 FOR INSERT
 TO authenticated
 WITH CHECK (
-    bucket_id = 'chat_attachments'
+    bucket_id = 'persona_attachments'
 );
 
 CREATE POLICY "Allow authenticated updates"
@@ -42,7 +42,7 @@ ON storage.objects
 FOR UPDATE
 TO authenticated
 USING (
-    bucket_id = 'chat_attachments'
+    bucket_id = 'persona_attachments'
     AND (auth.uid() = (storage.foldername(name))[1]::uuid)
 );
 
@@ -51,7 +51,7 @@ ON storage.objects
 FOR DELETE
 TO authenticated
 USING (
-    bucket_id = 'chat_attachments'
+    bucket_id = 'persona_attachments'
     AND (auth.uid() = (storage.foldername(name))[1]::uuid)
 );
 
@@ -59,7 +59,7 @@ CREATE POLICY "Allow public downloads"
 ON storage.objects
 FOR SELECT
 TO public
-USING (bucket_id = 'chat_attachments');
+USING (bucket_id = 'persona_attachments');
 
 -- Ensure bucket exists with correct settings
 DO $$
@@ -69,13 +69,13 @@ BEGIN
         public = true,
         file_size_limit = 52428800,
         allowed_mime_types = ARRAY['image/*', 'application/pdf']::text[]
-    WHERE id = 'chat_attachments';
+    WHERE id = 'persona_attachments';
     
     IF NOT FOUND THEN
         INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
         VALUES (
-            'chat_attachments',
-            'chat_attachments',
+            'persona_attachments',
+            'persona_attachments',
             true,
             52428800,
             ARRAY['image/*', 'application/pdf']::text[]

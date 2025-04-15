@@ -5,13 +5,13 @@ import { unstable_cache } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
 import {
-  getChatByIdQuery,
+  getPersonaByIdQuery,
   getUserQuery,
-  getChatsByUserIdQuery,
-  getMessagesByChatIdQuery,
+  getPersonasByUserIdQuery,
+  getMessagesByPersonaIdQuery,
   getSessionQuery,
   getUserByIdQuery,
-  getChatWithMessagesQuery,
+  getPersonaWithMessagesQuery,
 } from '@/db/queries';
 
 const getSupabase = cache(() => createClient());
@@ -62,62 +62,62 @@ export const getUser = async (email: string) => {
   )();
 };
 
-export const getChatById = async (chatId: string) => {
+export const getPersonaById = async (personaId: string) => {
   const supabase = await getSupabase();
 
   return unstable_cache(
     async () => {
-      return getChatByIdQuery(supabase, { id: chatId });
+      return getPersonaByIdQuery(supabase, { id: personaId });
     },
-    ['chat', chatId],
+    ['persona', personaId],
     {
-      tags: [`chat_${chatId}`],
+      tags: [`persona_${personaId}`],
       revalidate: 10, // Cache for 10 seconds
     }
   )();
 };
 
-export const getChatsByUserId = async (userId: string) => {
+export const getPersonasByUserId = async (userId: string) => {
   const supabase = await getSupabase();
 
   return unstable_cache(
     async () => {
-      return getChatsByUserIdQuery(supabase, { id: userId });
+      return getPersonasByUserIdQuery(supabase, { id: userId });
     },
-    ['chats', userId],
+    ['personas', userId],
     {
-      tags: [`user_${userId}_chats`],
+      tags: [`user_${userId}_personas`],
       revalidate: 10, // Cache for 10 seconds
     }
   )();
 };
 
-export const getMessagesByChatId = async (chatId: string) => {
+export const getMessagesByPersonaId = async (personaId: string) => {
   const supabase = await getSupabase();
 
   return unstable_cache(
     async () => {
-      return getMessagesByChatIdQuery(supabase, { id: chatId });
+      return getMessagesByPersonaIdQuery(supabase, { id: personaId });
     },
-    ['messages', chatId],
+    ['messages', personaId],
     {
-      tags: [`chat_${chatId}_messages`],
+      tags: [`persona_${personaId}_messages`],
       revalidate: 10, // Cache for 10 seconds
     }
   )();
 };
 
 
-export const getChatWithMessages = async (chatId: string) => {
+export const getPersonaWithMessages = async (personaId: string) => {
   const supabase = await getSupabase();
 
   return unstable_cache(
     async () => {
-      return getChatWithMessagesQuery(supabase, { id: chatId });
+      return getPersonaWithMessagesQuery(supabase, { id: personaId });
     },
-    ['chat_with_messages', chatId],
+    ['persona_with_messages', personaId],
     {
-      tags: [`chat_${chatId}`, `chat_${chatId}_messages`],
+      tags: [`persona_${personaId}`, `persona_${personaId}_messages`],
       revalidate: 10, // Cache for 10 seconds
     }
   )();

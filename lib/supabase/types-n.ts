@@ -9,31 +9,31 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      chats: {
+      personas: {
         Row: {
           created_at: string;
           id: string;
-          title: string | null;
+          name: string | null;
           updated_at: string;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
-          title?: string | null;
+          name?: string | null;
           updated_at?: string;
           user_id: string;
         };
         Update: {
           created_at?: string;
           id?: string;
-          title?: string | null;
+          name?: string | null;
           updated_at?: string;
           user_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: 'chats_user_id_fkey';
+            foreignKeyName: 'personas_user_id_fkey';
             columns: ['user_id'];
             isOneToOne: false;
             referencedRelation: 'users';
@@ -44,7 +44,7 @@ export type Database = {
       file_uploads: {
         Row: {
           bucket_id: string;
-          chat_id: string;
+          persona_id: string;
           content_type: string;
           created_at: string;
           filename: string;
@@ -58,7 +58,7 @@ export type Database = {
         };
         Insert: {
           bucket_id?: string;
-          chat_id: string;
+          persona_id: string;
           content_type: string;
           created_at?: string;
           filename: string;
@@ -72,7 +72,7 @@ export type Database = {
         };
         Update: {
           bucket_id?: string;
-          chat_id?: string;
+          persona_id?: string;
           content_type?: string;
           created_at?: string;
           filename?: string;
@@ -86,17 +86,17 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'file_uploads_chat_id_fkey';
-            columns: ['chat_id'];
+            foreignKeyName: 'file_uploads_persona_id_fkey';
+            columns: ['persona_id'];
             isOneToOne: false;
-            referencedRelation: 'chats';
+            referencedRelation: 'personas';
             referencedColumns: ['id'];
           },
         ];
       };
       messages: {
         Row: {
-          chat_id: string;
+          persona_id: string;
           content: Json;
           created_at: string;
           id: string;
@@ -104,7 +104,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
-          chat_id: string;
+          persona_id: string;
           content: Json;
           created_at?: string;
           id?: string;
@@ -112,7 +112,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
-          chat_id?: string;
+          persona_id?: string;
           content?: Json;
           created_at?: string;
           id?: string;
@@ -121,10 +121,10 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'messages_chat_id_fkey';
-            columns: ['chat_id'];
+            foreignKeyName: 'messages_persona_id_fkey';
+            columns: ['persona_id'];
             isOneToOne: false;
-            referencedRelation: 'chats';
+            referencedRelation: 'personas';
             referencedColumns: ['id'];
           },
         ];

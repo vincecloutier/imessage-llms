@@ -13,22 +13,22 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const chatId = formData.get('chatId') as string;
+    const personaId = formData.get('personaId') as string;
 
     console.log('Upload request:', {
       fileName: file?.name,
       fileType: file?.type,
       fileSize: file?.size,
-      chatId,
+      personaId,
     });
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    if (!chatId) {
+    if (!personaId) {
       return NextResponse.json(
-        { error: 'No chatId provided' },
+        { error: 'No personaId provided' },
         { status: 400 }
       );
     }
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     try {
       // Create folder structure with user ID for RLS
       const sanitizedFileName = sanitizeFileName(file.name);
-      const filePath = [user.id, chatId, sanitizedFileName];
+      const filePath = [user.id, personaId, sanitizedFileName];
 
       console.log('Sanitized file details:', {
         originalName: file.name,
@@ -76,10 +76,10 @@ export async function POST(req: Request) {
       });
 
       // Create bucket if it doesn't exist
-      if (!buckets?.some((b) => b.id === 'chat_attachments')) {
+      if (!buckets?.some((b) => b.id === 'persona_attachments')) {
         console.log('Creating bucket...');
         const { error: createError } = await supabase.storage.createBucket(
-          'chat_attachments',
+          'persona_attachments',
           {
             public: true,
             fileSizeLimit: 52428800,
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
         .select('url')
         .match({
           user_id: user.id,
-          chat_id: chatId,
+          persona_id: personaId,
           storage_path: filePath.join('/'),
         })
         .order('version', { ascending: false })
@@ -122,8 +122,8 @@ export async function POST(req: Request) {
       // Insert new file record
       const { error: dbError } = await supabase.from('file_uploads').insert({
         user_id: user.id,
-        chat_id: chatId,
-        bucket_id: 'chat_attachments',
+        persona_id: personaId,
+        bucket_id: 'persona_attachments',
         storage_path: filePath.join('/'),
         filename: sanitizedFileName,
         original_name: file.name,

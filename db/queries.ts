@@ -47,44 +47,44 @@ export async function getUserQuery(client: Client, email: string) {
   return users;
 }
 
-export async function saveChatQuery(
+export async function savePersonaQuery(
   client: Client,
   {
     id,
     userId,
-    title,
+    name,
   }: {
     id: string;
     userId: string;
-    title: string;
+    name: string;
   }
 ) {
-  const { error } = await client.from('chats').insert({
+  const { error } = await client.from('personas').insert({
     id,
     user_id: userId,
-    title,
+    name,
   });
 
   if (error) throw error;
 }
 
-export async function getChatsByUserIdQuery(
+export async function getPersonasByUserIdQuery(
   client: Client,
   { id }: { id: string }
 ) {
-  const { data: chats, error } = await client
-    .from('chats')
+  const { data: personas, error } = await client
+    .from('personas')
     .select()
     .eq('user_id', id)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return chats;
+  return personas;
 }
 
-export async function getChatByIdQuery(client: Client, { id }: { id: string }) {
-  const { data: chat, error } = await client
-    .from('chats')
+export async function getPersonaByIdQuery(client: Client, { id }: { id: string }) {
+  const { data: persona, error } = await client
+    .from('personas')
     .select()
     .eq('id', id)
     .single();
@@ -95,17 +95,17 @@ export async function getChatByIdQuery(client: Client, { id }: { id: string }) {
     }
     throw error;
   }
-  return chat;
+  return persona;
 }
 
-export async function getMessagesByChatIdQuery(
+export async function getMessagesByPersonaIdQuery(
   client: Client,
   { id }: { id: string }
 ) {
   const { data: messages, error } = await client
     .from('messages')
     .select()
-    .eq('chat_id', id)
+    .eq('persona_id', id)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
@@ -115,50 +115,50 @@ export async function getMessagesByChatIdQuery(
 export async function saveMessagesQuery(
   client: Client,
   {
-    chatId,
+    personaId,
     messages,
   }: {
-    chatId: string;
+    personaId: string;
     messages: Tables['messages']['Insert'][];
   }
 ) {
-  const messagesWithChatId = messages.map((message) => ({
+  const messagesWithpersonaId = messages.map((message) => ({
     ...message,
-    chat_id: chatId,
+    persona_id: personaId,
   }));
 
-  const { error } = await client.from('messages').insert(messagesWithChatId);
+  const { error } = await client.from('messages').insert(messagesWithpersonaId);
 
   if (error) throw error;
 }
 
-export async function getChatWithMessagesQuery(
+export async function getPersonaWithMessagesQuery(
   client: Client,
   { id }: { id: string }
 ) {
-  const { data: chat, error: chatError } = await client
-    .from('chats')
+  const { data: persona, error: personaError } = await client
+    .from('personas')
     .select()
     .eq('id', id)
     .single();
 
-  if (chatError) {
-    if (chatError.code === 'PGRST116') {
+  if (personaError) {
+    if (personaError.code === 'PGRST116') {
       return null;
     }
-    throw chatError;
+    throw personaError;
   }
 
   const { data: messages, error: messagesError } = await client
     .from('messages')
     .select()
-    .eq('chat_id', id)
+    .eq('persona_id', id)
     .order('created_at', { ascending: true });
 
   if (messagesError) throw messagesError;
 
   return {
-    ...chat,
+    ...persona,
     messages: messages || [],
   };
 }

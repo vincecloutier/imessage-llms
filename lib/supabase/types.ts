@@ -11,31 +11,31 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      chats: {
+      personas: {
         Row: {
           created_at: string;
           id: string;
-          title: string | null;
+          name: string | null;
           updated_at: string;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
-          title?: string | null;
+          name?: string | null;
           updated_at?: string;
           user_id: string;
         };
         Update: {
           created_at?: string;
           id?: string;
-          title?: string | null;
+          name?: string | null;
           updated_at?: string;
           user_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: 'chats_user_id_fkey';
+            foreignKeyName: 'personas_user_id_fkey';
             columns: ['user_id'];
             isOneToOne: false;
             referencedRelation: 'users';
@@ -46,7 +46,7 @@ export type Database = {
       file_uploads: {
         Row: {
           bucket_id: string;
-          chat_id: string;
+          persona_id: string;
           content_type: string;
           created_at: string;
           filename: string;
@@ -60,7 +60,7 @@ export type Database = {
         };
         Insert: {
           bucket_id?: string;
-          chat_id: string;
+          persona_id: string;
           content_type: string;
           created_at?: string;
           filename: string;
@@ -74,7 +74,7 @@ export type Database = {
         };
         Update: {
           bucket_id?: string;
-          chat_id?: string;
+          persona_id?: string;
           content_type?: string;
           created_at?: string;
           filename?: string;
@@ -88,17 +88,17 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'file_uploads_chat_id_fkey';
-            columns: ['chat_id'];
+            foreignKeyName: 'file_uploads_persona_id_fkey';
+            columns: ['persona_id'];
             isOneToOne: false;
-            referencedRelation: 'chats';
+            referencedRelation: 'personas';
             referencedColumns: ['id'];
           },
         ];
       };
       messages: {
         Row: {
-          chat_id: string;
+          persona_id: string;
           content: Json;
           created_at: string;
           id: string;
@@ -106,7 +106,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
-          chat_id: string;
+          persona_id: string;
           content: Json;
           created_at?: string;
           id?: string;
@@ -114,7 +114,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
-          chat_id?: string;
+          persona_id?: string;
           content?: Json;
           created_at?: string;
           id?: string;
@@ -123,10 +123,10 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'messages_chat_id_fkey';
-            columns: ['chat_id'];
+            foreignKeyName: 'messages_persona_id_fkey';
+            columns: ['persona_id'];
             isOneToOne: false;
-            referencedRelation: 'chats';
+            referencedRelation: 'personas';
             referencedColumns: ['id'];
           },
         ];
@@ -337,7 +337,7 @@ export interface MessageAnnotation {
 // Update Message interface to match AI library format
 export interface Message {
   id: string;
-  chat_id: string;
+  persona_id: string;
   role: MessageRole;
   content: string | Record<string, unknown>;
   created_at: string;
@@ -362,8 +362,8 @@ export function handleDatabaseError(error: PostgrestError | null) {
       if (error.message.includes('messages_pkey')) {
         throw new Error('Message ID already exists');
       }
-      if (error.message.includes('chats_pkey')) {
-        throw new Error('Chat ID already exists');
+      if (error.message.includes('personas_pkey')) {
+        throw new Error('persona ID already exists');
       }
       throw new Error('Unique constraint violation');
     case '23503': // Foreign key violation
@@ -379,12 +379,12 @@ export function handleDatabaseError(error: PostgrestError | null) {
   }
 }
 
-export type Chat = Database['public']['Tables']['chats']['Row'];
+export type persona = Database['public']['Tables']['personas']['Row'];
 
 // Add DatabaseMessage type to match the database schema
 export interface DatabaseMessage {
   id: string;
-  chat_id: string;
+  persona_id: string;
   role: string;
   content: string; // Always stored as string in database
   created_at: string;
@@ -413,7 +413,7 @@ export function convertToDBMessage(message: Message): DatabaseMessage {
 
   return {
     id: message.id,
-    chat_id: message.chat_id,
+    persona_id: message.persona_id,
     role: message.role,
     content: content as string,
     created_at: message.created_at,
@@ -457,7 +457,7 @@ export function parseDBMessage(dbMessage: DatabaseMessage): Message {
 export interface FileUpload {
   id: string;
   created_at: string;
-  chat_id: string;
+  persona_id: string;
   file_path: string;
   file_name: string;
   file_type: string;

@@ -13,7 +13,7 @@ CREATE TRIGGER handle_users_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
-CREATE TRIGGER handle_chats_updated_at
-    BEFORE UPDATE ON public.chats
+CREATE TRIGGER handle_personas_updated_at
+    BEFORE UPDATE ON public.personas
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();

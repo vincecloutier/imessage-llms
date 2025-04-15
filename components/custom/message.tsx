@@ -8,11 +8,11 @@ import { Dispatch, SetStateAction } from 'react';
 import { PreviewAttachment } from './preview-attachment';
 
 export const PreviewMessage = ({
-  chatId,
+  personaId,
   message,
   isLoading,
 }: {
-  chatId: string;
+  personaId: string;
   message: Message;
   isLoading: boolean;
 }) => {

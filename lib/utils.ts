@@ -25,68 +25,10 @@ export function generateUUID(): string {
   });
 }
 
-function parseToolContent(content: string): ToolContent {
-  try {
-    const parsed = JSON.parse(content);
-    return parsed.map((item: any) => ({
-      type: item.type || 'tool-result',
-      toolCallId: item.toolCallId,
-      toolName: item.toolName,
-      result: item.result,
-    }));
-  } catch (e) {
-    console.error('Failed to parse tool content:', e);
-    return [];
-  }
-}
-
-function addToolMessageToChat({
-  toolMessage,
-  messages,
-}: {
-  toolMessage: DBMessage;
-  messages: Array<Message>;
-}): Array<Message> {
-  return messages.map((message) => {
-    if (message.toolInvocations) {
-      const toolContent = parseToolContent(
-        toolMessage.content?.toString() ?? ''
-      );
-
-      return {
-        ...message,
-        toolInvocations: message.toolInvocations.map((toolInvocation) => {
-          const toolResult = toolContent.find(
-            (tool) => tool.toolCallId === toolInvocation.toolCallId
-          );
-
-          if (toolResult) {
-            return {
-              ...toolInvocation,
-              state: 'result',
-              result: toolResult.result,
-            };
-          }
-
-          return toolInvocation;
-        }),
-      };
-    }
-
-    return message;
-  });
-}
-
 export function convertToUIMessages(
   messages: Array<DBMessage>
 ): Array<Message> {
-  return messages.reduce((chatMessages: Array<Message>, message) => {
-    if (message.role === 'tool') {
-      return addToolMessageToChat({
-        toolMessage: message,
-        messages: chatMessages,
-      });
-    }
+  return messages.reduce((personaMessages: Array<Message>, message) => {
 
     let textContent = '';
     let toolInvocations: Array<ToolInvocation> = [];
@@ -115,14 +57,14 @@ export function convertToUIMessages(
       textContent = message.content?.toString() ?? '';
     }
 
-    chatMessages.push({
+    personaMessages.push({
       id: message.id,
       role: message.role as Message['role'],
       content: textContent,
       toolInvocations: toolInvocations.length > 0 ? toolInvocations : undefined,
     });
 
-    return chatMessages;
+    return personaMessages;
   }, []);
 }
 

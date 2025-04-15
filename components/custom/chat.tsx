@@ -18,9 +18,11 @@ import { MultimodalInput } from './multimodal-input';
 export function Chat({
   id,
   initialMessages,
+  // user,
 }: {
   id: string;
   initialMessages: Array<Message>;
+  // user: User;
 }) {
   const { mutate } = useSWRConfig();
 
@@ -77,7 +79,7 @@ export function Chat({
           {messages.map((message, index) => (
             <PreviewMessage
               key={message.id}
-              chatId={id}
+              personaId={id}
               message={message}
               isLoading={isLoading && messages.length - 1 === index}
             />
@@ -96,7 +98,7 @@ export function Chat({
         </div>
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
           <MultimodalInput
-            chatId={id}
+            personaId={id}
             input={input}
             setInput={setInput}
             handleSubmit={handleSubmit}

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export const BUCKET_NAME = 'chat_attachments';
+export const BUCKET_NAME = 'persona_attachments';
 
 async function ensureBucketExists(client: SupabaseClient) {
   const { data: buckets } = await client.storage.listBuckets();

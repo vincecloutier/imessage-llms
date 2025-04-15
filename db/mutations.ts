@@ -23,58 +23,58 @@ async function mutateQuery<T extends any[]>(
   }
 }
 
-export async function saveChat({
+export async function savePersona({
   id,
   userId,
-  title,
+  name,
 }: {
   id: string;
   userId: string;
-  title: string;
+  name: string;
 }) {
   await mutateQuery(
-    async (client, { id, userId, title }) => {
+    async (client, { id, userId, name }) => {
       const now = new Date().toISOString();
-      const { error } = await client.from('chats').insert({
+      const { error } = await client.from('personas').insert({
         id,
         user_id: userId,
-        title,
+        name,
         created_at: now,
         updated_at: now,
       });
       if (error) throw error;
     },
-    [{ id, userId, title }],
-    [`user_${userId}_chats`, `chat_${id}`, 'chats']
+    [{ id, userId, name }],
+    [`user_${userId}_personas`, `persona_${id}`, 'personas']
   );
 }
 
-export async function deleteChatById(chatId: string, userId: string) {
+export async function deletePersonaById(personaId: string, userId: string) {
   await mutateQuery(
     async (client, id) => {
       // Messages will be automatically deleted due to CASCADE
-      const { error } = await client.from('chats').delete().eq('id', id);
+      const { error } = await client.from('personas').delete().eq('id', id);
       if (error) throw error;
     },
-    [chatId],
+    [personaId],
     [
-      `chat_${chatId}`, // Invalidate specific chat
-      `user_${userId}_chats`, // Invalidate user's chat list
-      `chat_${chatId}_messages`, // Invalidate chat messages
-      'chats', // Invalidate all chats cache
+      `persona_${personaId}`, // Invalidate specific persona
+      `user_${userId}_personas`, // Invalidate user's persona list
+      `persona_${personaId}_messages`, // Invalidate persona messages
+      'personas', // Invalidate all personas cache
     ]
   );
 }
 
 export async function saveMessages({
-  chatId,
+  personaId,
   messages,
 }: {
-  chatId: string;
+  personaId: string;
   messages: Message[];
 }) {
   await mutateQuery(
-    async (client, { chatId, messages }) => {
+    async (client, { personaId, messages }) => {
       const formattedMessages = messages.map((message) => {
         // Handle tool invocations and content
         let content = message.content;
@@ -99,7 +99,7 @@ export async function saveMessages({
 
         return {
           id: message.id,
-          chat_id: chatId,
+          persona_id: personaId,
           role: message.role,
           content: content,
           created_at: message.created_at || new Date().toISOString(),
@@ -109,7 +109,7 @@ export async function saveMessages({
       const { error } = await client.from('messages').insert(formattedMessages);
       if (error) throw error;
     },
-    [{ chatId, messages }],
-    [`chat_${chatId}_messages`, `chat_${chatId}`]
+    [{ personaId, messages }],
+    [`persona_${personaId}_messages`, `persona_${personaId}`]
   );
 }

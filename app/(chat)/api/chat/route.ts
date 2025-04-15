@@ -8,11 +8,11 @@ import {
 } from 'ai';
 import { z } from 'zod';
 
-import { getChatById, getSession } from '@/db/cached-queries';
+import { getPersonaById, getSession } from '@/db/cached-queries';
 import {
-  saveChat,
+  savePersona,
   saveMessages,
-  deleteChatById,
+  deletePersonaById,
 } from '@/db/mutations';
 import { createClient } from '@/lib/supabase/server';
 import { MessageRole } from '@/lib/supabase/types';
@@ -113,20 +113,20 @@ export async function POST(request: Request) {
   }
 
   try {
-    const chat = await getChatById(id);
+    const persona = await getPersonaById(id);
 
-    if (!chat) {
-      await saveChat({ id, userId: user.id, title: "New Chat" });
-    } else if (chat.user_id !== user.id) {
+    if (!persona) {
+      await savePersona({ id, userId: user.id, name: "New Persona" });
+    } else if (persona.user_id !== user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
 
     await saveMessages({
-      chatId: id,
+      personaId: id,
       messages: [
         {
           id: generateUUID(),
-          chat_id: id,
+          persona_id: id,
           role: userMessage.role as MessageRole,
           content: formatMessageContent(userMessage),
           created_at: new Date().toISOString(),
@@ -148,7 +148,7 @@ export async function POST(request: Request) {
               sanitizeResponseMessages(response.messages);
 
             await saveMessages({
-              chatId: id,
+              personaId: id,
               messages: responseMessagesWithoutIncompleteToolCalls.map(
                 (message) => {
                   const messageId = generateUUID();
@@ -161,7 +161,7 @@ export async function POST(request: Request) {
 
                   return {
                     id: messageId,
-                    chat_id: id,
+                    persona_id: id,
                     role: message.role as MessageRole,
                     content: formatMessageContent(message),
                     created_at: new Date().toISOString(),
@@ -186,15 +186,15 @@ export async function POST(request: Request) {
       data: streamingData,
     });
   } catch (error) {
-    console.error('Error in chat route:', error);
-    if (error instanceof Error && error.message === 'Chat ID already exists') {
-      // If chat already exists, just continue with the message saving
+    console.error('Error in persona route:', error);
+    if (error instanceof Error && error.message === 'persona ID already exists') {
+      // If persona already exists, just continue with the message saving
       await saveMessages({
-        chatId: id,
+        personaId: id,
         messages: [
           {
             id: generateUUID(),
-            chat_id: id,
+            persona_id: id,
             role: userMessage.role as MessageRole,
             content: formatMessageContent(userMessage),
             created_at: new Date().toISOString(),
@@ -218,21 +218,21 @@ export async function DELETE(request: Request) {
   const user = await getUser();
 
   try {
-    const chat = await getChatById(id);
+    const persona = await getPersonaById(id);
 
-    if (!chat) {
-      return new Response('Chat not found', { status: 404 });
+    if (!persona) {
+      return new Response('persona not found', { status: 404 });
     }
 
-    if (chat.user_id !== user.id) {
+    if (persona.user_id !== user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    await deleteChatById(id, user.id);
+    await deletePersonaById(id, user.id);
 
-    return new Response('Chat deleted', { status: 200 });
+    return new Response('persona deleted', { status: 200 });
   } catch (error) {
-    console.error('Error deleting chat:', error);
+    console.error('Error deleting persona:', error);
     return new Response('An error occurred while processing your request', {
       status: 500,
     });

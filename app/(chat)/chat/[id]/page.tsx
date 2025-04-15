@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation';
 
 import { Chat as PreviewChat } from '@/components/custom/chat';
 import {
-  getChatById,
-  getMessagesByChatId,
+  getPersonaById,
+  getMessagesByPersonaId,
   getSession,
 } from '@/db/cached-queries';
 import { convertToUIMessages } from '@/lib/utils';
@@ -12,9 +12,9 @@ import { convertToUIMessages } from '@/lib/utils';
 export default async function Page(props: { params: Promise<any> }) {
   const params = await props.params;
   const { id } = params;
-  const chat = await getChatById(id);
+  const persona = await getPersonaById(id);
 
-  if (!chat) {
+  if (!persona) {
     notFound();
   }
 
@@ -24,17 +24,17 @@ export default async function Page(props: { params: Promise<any> }) {
     return notFound();
   }
 
-  if (user.id !== chat.user_id) {
+  if (user.id !== persona.user_id) {
     return notFound();
   }
 
-  const messagesFromDb = await getMessagesByChatId(id);
+  const messagesFromDb = await getMessagesByPersonaId(id);
 
   console.log(convertToUIMessages(messagesFromDb));
 
   return (
     <PreviewChat
-      id={chat.id}
+      id={persona.id}
       initialMessages={convertToUIMessages(messagesFromDb)}
     />
   );

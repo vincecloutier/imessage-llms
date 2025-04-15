@@ -8,8 +8,8 @@ DROP TABLE IF EXISTS public.file_uploads;
 CREATE TABLE public.file_uploads (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    chat_id UUID NOT NULL REFERENCES public.chats(id) ON DELETE CASCADE,
-    bucket_id TEXT NOT NULL DEFAULT 'chat_attachments',
+    persona_id UUID NOT NULL REFERENCES public.personas(id) ON DELETE CASCADE,
+    bucket_id TEXT NOT NULL DEFAULT 'persona_attachments',
     storage_path TEXT NOT NULL,
     filename TEXT NOT NULL,
     original_name TEXT NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE public.file_uploads (
 
     -- Composite unique constraints
     CONSTRAINT file_uploads_unique_version UNIQUE (bucket_id, storage_path, version),
-    CONSTRAINT file_uploads_unique_per_chat UNIQUE (user_id, chat_id, filename, version)
+    CONSTRAINT file_uploads_unique_per_persona UNIQUE (user_id, persona_id, filename, version)
 );
 
 -- Enable RLS
@@ -45,7 +45,7 @@ USING (auth.uid() = user_id);
 
 -- Create indexes for better performance
 CREATE INDEX file_uploads_user_id_idx ON public.file_uploads(user_id);
-CREATE INDEX file_uploads_chat_id_idx ON public.file_uploads(chat_id);
+CREATE INDEX file_uploads_persona_id_idx ON public.file_uploads(persona_id);
 CREATE INDEX file_uploads_created_at_idx ON public.file_uploads(created_at);
 CREATE INDEX file_uploads_bucket_path_idx ON public.file_uploads(bucket_id, storage_path);
 
@@ -90,11 +90,11 @@ BEGIN
     -- Ensure storage schema is properly configured
     ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
     
-    -- Create or update the chat_attachments bucket
+    -- Create or update the persona_attachments bucket
     INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
     VALUES (
-        'chat_attachments',
-        'chat_attachments',
+        'persona_attachments',
+        'persona_attachments',
         true,
         52428800, -- 50MB
         ARRAY['image/*', 'application/pdf']::text[]
@@ -116,7 +116,7 @@ BEGIN
     ON storage.objects FOR INSERT
     TO authenticated
     WITH CHECK (
-        bucket_id = 'chat_attachments'
+        bucket_id = 'persona_attachments'
         AND (auth.uid() = (storage.foldername(name))[1]::uuid)
     );
 
@@ -124,7 +124,7 @@ BEGIN
     ON storage.objects FOR UPDATE
     TO authenticated
     USING (
-        bucket_id = 'chat_attachments'
+        bucket_id = 'persona_attachments'
         AND (auth.uid() = (storage.foldername(name))[1]::uuid)
     );
 
@@ -132,14 +132,14 @@ BEGIN
     ON storage.objects FOR DELETE
     TO authenticated
     USING (
-        bucket_id = 'chat_attachments'
+        bucket_id = 'persona_attachments'
         AND (auth.uid() = (storage.foldername(name))[1]::uuid)
     );
 
     CREATE POLICY "Allow public downloads"
     ON storage.objects FOR SELECT
     TO public
-    USING (bucket_id = 'chat_attachments');
+    USING (bucket_id = 'persona_attachments');
 END $$;
 
 -- Grant necessary permissions

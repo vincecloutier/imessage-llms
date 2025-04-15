@@ -9,13 +9,13 @@ export async function GET() {
     return Response.json('Unauthorized!', { status: 401 });
   }
 
-  const { data: chats, error } = await supabase
-    .from('chats')
+  const { data: personas, error } = await supabase
+    .from('personas')
     .select()
     .eq('user_id', user.id!)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
 
-  return Response.json(chats);
+  return Response.json(personas);
 }

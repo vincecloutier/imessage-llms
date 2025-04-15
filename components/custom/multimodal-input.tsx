@@ -36,7 +36,7 @@ const suggestedActions = [
 ];
 
 export function MultimodalInput({
-  chatId,
+  personaId,
   input,
   setInput,
   isLoading,
@@ -49,7 +49,7 @@ export function MultimodalInput({
   handleSubmit,
   className,
 }: {
-  chatId: string;
+  personaId: string;
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;
@@ -116,7 +116,7 @@ export function MultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
-    window.history.replaceState({}, '', `/chat/${chatId}`);
+    window.history.replaceState({}, '', `/chat/${personaId}`);
 
     handleSubmit(undefined, {
       experimental_attachments: attachments,
@@ -134,13 +134,13 @@ export function MultimodalInput({
     setAttachments,
     setLocalStorageInput,
     width,
-    chatId,
+    personaId,
   ]);
 
-  const uploadFile = async (file: File, chatId: string) => {
+  const uploadFile = async (file: File, personaId: string) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('chatId', chatId);
+    formData.append('personaId', personaId);
 
     try {
       const response = await fetch(`/api/files/upload`, {
@@ -173,7 +173,7 @@ export function MultimodalInput({
       setUploadQueue(files.map((file) => file.name));
 
       try {
-        const uploadPromises = files.map((file) => uploadFile(file, chatId));
+        const uploadPromises = files.map((file) => uploadFile(file, personaId));
         const uploadedAttachments = await Promise.all(uploadPromises);
         const successfullyUploadedAttachments = uploadedAttachments.filter(
           (attachment): attachment is NonNullable<typeof attachment> =>
@@ -191,7 +191,7 @@ export function MultimodalInput({
         setUploadQueue([]);
       }
     },
-    [setAttachments, chatId]
+    [setAttachments, personaId]
   );
 
   return (
@@ -212,7 +212,7 @@ export function MultimodalInput({
                 <Button
                   variant="ghost"
                   onClick={async () => {
-                    window.history.replaceState({}, '', `/chat/${chatId}`);
+                    window.history.replaceState({}, '', `/chat/${personaId}`);
 
                     append({
                       role: 'user',
