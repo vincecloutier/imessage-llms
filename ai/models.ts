@@ -14,12 +14,6 @@ export const models: Array<Model> = [
     apiIdentifier: 'google/gemini-2.0-flash-001',
     description: 'Small model for fast, lightweight tasks',
   },
-  {
-    id: 'gemini-2.5-pro',
-    label: 'Gemini 2.5 Pro',
-    apiIdentifier: 'google/gemini-2.5-pro-preview-03-25',
-    description: 'For complex, multi-step tasks',
-  },
 ] as const;
 
 export const DEFAULT_MODEL_NAME: string = 'gemini-2.0-flash';
