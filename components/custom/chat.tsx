@@ -18,7 +18,6 @@ import { BlockStreamHandler } from './block-stream-handler';
 import { MultimodalInput } from './multimodal-input';
 import { Overview } from './overview';
 
-type Vote = Database['public']['Tables']['votes']['Row'];
 
 export function Chat({
   id,
@@ -66,10 +65,6 @@ export function Chat({
     },
   });
 
-  const { data: votes } = useSWR<Array<Vote>>(
-    `/api/vote?chatId=${id}`,
-    fetcher
-  );
 
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -96,11 +91,6 @@ export function Chat({
               block={block}
               setBlock={setBlock}
               isLoading={isLoading && messages.length - 1 === index}
-              vote={
-                votes
-                  ? votes.find((vote) => vote.message_id === message.id)
-                  : undefined
-              }
             />
           ))}
 
@@ -148,7 +138,6 @@ export function Chat({
             setBlock={setBlock}
             messages={messages}
             setMessages={setMessages}
-            votes={votes}
           />
         )}
       </AnimatePresence>

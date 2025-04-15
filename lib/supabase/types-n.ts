@@ -233,39 +233,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      votes: {
-        Row: {
-          chat_id: string;
-          is_upvoted: boolean;
-          message_id: string;
-        };
-        Insert: {
-          chat_id: string;
-          is_upvoted: boolean;
-          message_id: string;
-        };
-        Update: {
-          chat_id?: string;
-          is_upvoted?: boolean;
-          message_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'votes_chat_id_fkey';
-            columns: ['chat_id'];
-            isOneToOne: false;
-            referencedRelation: 'chats';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'votes_message_id_fkey';
-            columns: ['message_id'];
-            isOneToOne: false;
-            referencedRelation: 'messages';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
     };
     Views: {
       [_ in never]: never;

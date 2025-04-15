@@ -34,7 +34,7 @@ import { VersionFooter } from './version-footer';
 import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
-import type { Document, Suggestion, Vote } from '@/lib/supabase/types';
+import type { Document, Suggestion } from '@/lib/supabase/types';
 
 export interface UIBlock {
   title: string;
@@ -137,7 +137,6 @@ export function Block({
   setBlock,
   messages,
   setMessages,
-  votes,
 }: {
   chatId: string;
   input: string;
@@ -150,7 +149,6 @@ export function Block({
   setBlock: Dispatch<SetStateAction<UIBlock>>;
   messages: Array<Message>;
   setMessages: Dispatch<SetStateAction<Array<Message>>>;
-  votes: Array<Vote> | undefined;
   append: (
     message: Message | CreateMessage,
     chatRequestOptions?: ChatRequestOptions
@@ -463,11 +461,6 @@ export function Block({
                   block={block}
                   setBlock={setBlock}
                   isLoading={isLoading && index === messages.length - 1}
-                  vote={
-                    votes
-                      ? votes.find((vote) => vote.message_id === message.id)
-                      : undefined
-                  }
                 />
               ))}
 

@@ -132,56 +132,6 @@ export async function saveMessagesQuery(
   if (error) throw error;
 }
 
-export async function voteMessageQuery(
-  client: Client,
-  {
-    chatId,
-    messageId,
-    isUpvoted,
-  }: {
-    chatId: string;
-    messageId: string;
-    isUpvoted: boolean;
-  }
-) {
-  const { data: message, error: messageError } = await client
-    .from('messages')
-    .select('id')
-    .eq('id', messageId)
-    .eq('chat_id', chatId)
-    .single();
-
-  if (messageError || !message) {
-    throw new Error('Message not found or does not belong to this chat');
-  }
-
-  const { error } = await client.from('votes').upsert(
-    {
-      chat_id: chatId,
-      message_id: messageId,
-      is_upvoted: isUpvoted,
-    },
-    {
-      onConflict: 'chat_id,message_id',
-    }
-  );
-
-  if (error) throw error;
-}
-
-export async function getVotesByChatIdQuery(
-  client: Client,
-  { id }: { id: string }
-) {
-  const { data: votes, error } = await client
-    .from('votes')
-    .select()
-    .eq('chat_id', id);
-
-  if (error) throw error;
-  return votes;
-}
-
 export async function getDocumentByIdQuery(
   client: Client,
   { id }: { id: string }

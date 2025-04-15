@@ -9,7 +9,6 @@ import {
   getUserQuery,
   getChatsByUserIdQuery,
   getMessagesByChatIdQuery,
-  getVotesByChatIdQuery,
   getDocumentByIdQuery,
   getDocumentsByIdQuery,
   getSuggestionsByDocumentIdQuery,
@@ -106,21 +105,6 @@ export const getMessagesByChatId = async (chatId: string) => {
     ['messages', chatId],
     {
       tags: [`chat_${chatId}_messages`],
-      revalidate: 10, // Cache for 10 seconds
-    }
-  )();
-};
-
-export const getVotesByChatId = async (chatId: string) => {
-  const supabase = await getSupabase();
-
-  return unstable_cache(
-    async () => {
-      return getVotesByChatIdQuery(supabase, { id: chatId });
-    },
-    ['votes', chatId],
-    {
-      tags: [`chat_${chatId}_votes`],
       revalidate: 10, // Cache for 10 seconds
     }
   )();
