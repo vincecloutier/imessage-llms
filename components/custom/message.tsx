@@ -5,9 +5,6 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { Dispatch, SetStateAction } from 'react';
 
-
-import { UIBlock } from './block';
-import { DocumentToolCall, DocumentToolResult } from './document';
 import { Markdown } from './markdown';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
@@ -15,14 +12,10 @@ import { Weather } from './weather';
 export const PreviewMessage = ({
   chatId,
   message,
-  block,
-  setBlock,
   isLoading,
 }: {
   chatId: string;
   message: Message;
-  block: UIBlock;
-  setBlock: Dispatch<SetStateAction<UIBlock>>;
   isLoading: boolean;
 }) => {
   return (
@@ -55,30 +48,9 @@ export const PreviewMessage = ({
                     <div key={toolCallId}>
                       {toolName === 'getWeather' ? (
                         <Weather weatherAtLocation={result} />
-                      ) : toolName === 'createDocument' ? (
-                        <DocumentToolResult
-                          type="create"
-                          result={result}
-                          block={block}
-                          setBlock={setBlock}
-                        />
-                      ) : toolName === 'updateDocument' ? (
-                        <DocumentToolResult
-                          type="update"
-                          result={result}
-                          block={block}
-                          setBlock={setBlock}
-                        />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolResult
-                          type="request-suggestions"
-                          result={result}
-                          block={block}
-                          setBlock={setBlock}
-                        />
-                      ) : (
+                      ) : 
                         <pre>{JSON.stringify(result, null, 2)}</pre>
-                      )}
+                      }
                     </div>
                   );
                 } else {
@@ -91,15 +63,6 @@ export const PreviewMessage = ({
                     >
                       {toolName === 'getWeather' ? (
                         <Weather />
-                      ) : toolName === 'createDocument' ? (
-                        <DocumentToolCall type="create" args={args} />
-                      ) : toolName === 'updateDocument' ? (
-                        <DocumentToolCall type="update" args={args} />
-                      ) : toolName === 'requestSuggestions' ? (
-                        <DocumentToolCall
-                          type="request-suggestions"
-                          args={args}
-                        />
                       ) : null}
                     </div>
                   );
