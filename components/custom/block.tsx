@@ -22,13 +22,9 @@ import {
 
 import { fetcher } from '@/lib/utils';
 
-import { DiffView } from './diffview';
-import { DocumentSkeleton } from './document-skeleton';
-import { Editor } from './editor';
 import { CopyIcon, CrossIcon, DeltaIcon, RedoIcon, UndoIcon } from './icons';
 import { PreviewMessage } from './message';
 import { MultimodalInput } from './multimodal-input';
-import { Toolbar } from './toolbar';
 import { useScrollToBottom } from './use-scroll-to-bottom';
 import { VersionFooter } from './version-footer';
 import { Button } from '../ui/button';
@@ -62,54 +58,6 @@ const StreamingIndicator = memo(function StreamingIndicator() {
     </div>
   );
 });
-
-// Memoize the Editor component wrapper with optimized streaming
-const EditorWrapper = memo(
-  function EditorWrapper({
-    content,
-    isCurrentVersion,
-    currentVersionIndex,
-    status,
-    saveContent,
-    suggestions,
-  }: {
-    content: string;
-    isCurrentVersion: boolean;
-    currentVersionIndex: number;
-    status: 'streaming' | 'idle';
-    saveContent: (content: string, debounce: boolean) => void;
-    suggestions: Suggestion[];
-  }) {
-    // Use a ref to track content updates
-    const contentRef = useRef(content);
-    useEffect(() => {
-      contentRef.current = content;
-    }, [content]);
-
-    return (
-      <div className="relative w-full">
-        <Editor
-          content={content}
-          isCurrentVersion={isCurrentVersion}
-          currentVersionIndex={currentVersionIndex}
-          status={status}
-          saveContent={saveContent}
-          suggestions={suggestions}
-        />
-        {status === 'streaming' && <StreamingIndicator />}
-      </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    // Custom comparison to prevent unnecessary re-renders
-    return (
-      prevProps.content === nextProps.content &&
-      prevProps.status === nextProps.status &&
-      prevProps.isCurrentVersion === nextProps.isCurrentVersion &&
-      prevProps.currentVersionIndex === nextProps.currentVersionIndex
-    );
-  }
-);
 
 // Memoize the document content getter
 const useDocumentContent = (
@@ -702,45 +650,6 @@ export function Block({
                 <p>Toggle mode to {mode === 'diff' ? 'edit' : 'diff'}</p>
               </TooltipContent>
             </Tooltip>
-          </div>
-        </div>
-
-        <div className="prose dark:prose-invert dark:bg-muted bg-background h-full overflow-y-scroll px-4 py-8 md:p-20 !max-w-full pb-40 items-center">
-          <div className="flex flex-row max-w-[600px] mx-auto">
-            {isDocumentsFetching && !block.content ? (
-              <DocumentSkeleton />
-            ) : mode === 'edit' ? (
-              <EditorWrapper
-                content={displayContent}
-                isCurrentVersion={isCurrentVersion}
-                currentVersionIndex={currentVersionIndex}
-                status={block.status}
-                saveContent={saveContent}
-                suggestions={isCurrentVersion ? (suggestions ?? []) : []}
-              />
-            ) : (
-              <DiffView
-                oldContent={getDocumentContentById(currentVersionIndex - 1)}
-                newContent={getDocumentContentById(currentVersionIndex)}
-              />
-            )}
-
-            {suggestions ? (
-              <div className="md:hidden h-dvh w-12 shrink-0" />
-            ) : null}
-
-            <AnimatePresence>
-              {isCurrentVersion && (
-                <Toolbar
-                  isToolbarVisible={isToolbarVisible}
-                  setIsToolbarVisible={setIsToolbarVisible}
-                  append={append}
-                  isLoading={isLoading}
-                  stop={stop}
-                  setMessages={setMessages}
-                />
-              )}
-            </AnimatePresence>
           </div>
         </div>
 
