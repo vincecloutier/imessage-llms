@@ -1,6 +1,6 @@
 import { Attachment } from 'ai';
 
-import { LoaderIcon } from './icons';
+import { Loader } from 'lucide-react';
 
 export const PreviewAttachment = ({
   attachment,
@@ -33,7 +33,7 @@ export const PreviewAttachment = ({
 
         {isUploading && (
           <div className="animate-spin absolute text-zinc-500">
-            <LoaderIcon />
+            <Loader />
           </div>
         )}
       </div>

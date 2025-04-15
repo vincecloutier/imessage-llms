@@ -17,7 +17,7 @@ import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { sanitizeUIMessages } from '@/lib/utils';
 
-import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
+import { ArrowUp, Paperclip, Pause } from 'lucide-react';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
@@ -293,7 +293,7 @@ export function MultimodalInput({
             setMessages((messages) => sanitizeUIMessages(messages));
           }}
         >
-          <StopIcon size={14} />
+          <Pause size={14} />
         </Button>
       ) : (
         <Button
@@ -304,7 +304,7 @@ export function MultimodalInput({
           }}
           disabled={input.length === 0 || uploadQueue.length > 0}
         >
-          <ArrowUpIcon size={14} />
+          <ArrowUp size={14} />
         </Button>
       )}
 
@@ -317,7 +317,7 @@ export function MultimodalInput({
         variant="outline"
         disabled={isLoading}
       >
-        <PaperclipIcon size={14} />
+        <Paperclip size={14} />
       </Button>
     </div>
   );
