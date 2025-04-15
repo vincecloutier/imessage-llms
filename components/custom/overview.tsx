@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 
 import { MessageIcon} from './icons';
 
@@ -18,47 +17,8 @@ export const Overview = () => {
           <MessageIcon size={32} />
         </p>
         <p>
-          This is an{' '}
-          <Link
-            className="font-medium underline underline-offset-4"
-            href="https://github.com/vercel/ai-chatbot"
-            target="_blank"
-          >
-            open source
-          </Link>{' '}
-          chatbot template built with Next.js, the AI SDK by Vercel, and
-          Supabase. It uses the{' '}
-          <code className="rounded-md bg-muted px-1 py-0.5">streamText</code>{' '}
-          function in the server and the{' '}
-          <code className="rounded-md bg-muted px-1 py-0.5">useChat</code> hook
-          on the client to create a seamless chat experience, with{' '}
-          <Link
-            className="font-medium underline underline-offset-4"
-            href="https://supabase.com"
-            target="_blank"
-          >
-            Supabase
-          </Link>{' '}
-          providing real-time data storage and authentication.
-        </p>
-        <p>
-          Learn more about the{' '}
-          <Link
-            className="font-medium underline underline-offset-4"
-            href="https://sdk.vercel.ai/docs"
-            target="_blank"
-          >
-            AI SDK
-          </Link>{' '}
-          and{' '}
-          <Link
-            className="font-medium underline underline-offset-4"
-            href="https://supabase.com/docs"
-            target="_blank"
-          >
-            Supabase
-          </Link>{' '}
-          in their respective documentation.
+          This is an open source chatbot template built with Next.js, the AI SDK
+          by Vercel, and Supabase.
         </p>
       </div>
     </motion.div>
