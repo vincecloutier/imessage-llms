@@ -8,8 +8,6 @@ import {
 } from 'ai';
 import { z } from 'zod';
 
-import { customModel } from '@/ai';
-import { regularPrompt, systemPrompt } from '@/ai/prompts';
 import { getChatById, getSession } from '@/db/cached-queries';
 import {
   saveChat,
@@ -24,6 +22,17 @@ import {
   sanitizeResponseMessages,
 } from '@/lib/utils';
 
+
+const systemPrompt = 'You are a friendly assistant! Keep your responses concise and helpful.';
+
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+
+const customModel = () => {
+  const openrouter = createOpenRouter({
+    apiKey: process.env.OPENROUTER_API_KEY,
+  });
+  return openrouter.chat("google/gemini-2.0-flash-001");
+};
 
 export const maxDuration = 60;
 
