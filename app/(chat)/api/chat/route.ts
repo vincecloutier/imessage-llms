@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     const persona = await getPersonaById(id);
 
     if (!persona) {
-      await savePersona({id, userId: user.id, name: "April Dougan" });
+      return new Response('Persona not found', { status: 404 });
     } else if (persona.user_id !== user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
@@ -233,6 +233,29 @@ export async function DELETE(request: Request) {
     return new Response('Persona deleted', { status: 200 });
   } catch (error) {
     console.error('Error deleting persona:', error);
+    return new Response('An error occurred while processing your request', {
+      status: 500,
+    });
+  }
+}
+
+// create/update persona
+export async function PUT(request: Request) {
+  const { id, persona } = await request.json();
+
+  const user = await getUser();
+
+  try {
+    if (!user) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+  await savePersona(id, user.id, persona);
+
+  return new Response('Persona updated', { status: 200 });
+
+  } catch (error) {
+    console.error('Error updating persona:', error);
     return new Response('An error occurred while processing your request', {
       status: 500,
     });

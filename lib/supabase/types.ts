@@ -18,6 +18,17 @@ export type Database = {
           name: string | null;
           updated_at: string;
           user_id: string;
+          sex: string;
+          eye_color: string;
+          ethnicity: string;
+          hair_color: string;
+          haircut: string;
+          relationship: string;
+          dob: string;
+          height: number;
+          weight: number;
+          location: string;
+          occupation: string;
         };
         Insert: {
           created_at?: string;

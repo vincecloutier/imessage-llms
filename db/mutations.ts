@@ -5,6 +5,7 @@ import {
   PostgrestError,
   type Client,
   type Message,
+  type persona
 } from '@/lib/supabase/types';
 
 const getSupabase = async () => createClient();
@@ -23,28 +24,17 @@ async function mutateQuery<T extends any[]>(
   }
 }
 
-export async function savePersona({
-  id,
-  userId,
-  name,
-}: {
-  id: string;
-  userId: string;
-  name: string;
-}) {
+export async function savePersona(id: string, userId: string, persona: persona) {
+  const p = { id, user_id: userId, ...persona as any };
   await mutateQuery(
-    async (client, { id, userId, name }) => {
+    async (client) => {
       const now = new Date().toISOString();
-      const { error } = await client.from('personas').insert({
-        id,
-        user_id: userId,
-        name,
-        created_at: now,
-        updated_at: now,
-      });
+      const { error } = await client
+        .from('personas')
+        .upsert({ ...p, updated_at: now }, { onConflict: 'id' });
       if (error) throw error;
     },
-    [{ id, userId, name }],
+    [],
     [`user_${userId}_personas`, `persona_${id}`, 'personas']
   );
 }
