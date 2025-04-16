@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     const persona = await getPersonaById(id);
 
     if (!persona) {
-      await savePersona({ id, userId: user.id, name: "New Persona" });
+      await savePersona({id, userId: user.id, name: "April Dougan" });
     } else if (persona.user_id !== user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
