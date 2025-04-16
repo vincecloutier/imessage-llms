@@ -13,7 +13,8 @@ import {
   MoreHorizontal,
   Trash2,
   Plus,
-  ChevronRight
+  ChevronRight,
+  Pencil
 } from 'lucide-react';
 
 import {
@@ -60,6 +61,7 @@ import {
 
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/lib/supabase/types';
+import PersonaForm from './persona-form';
 
 // Type for a persona record from Supabase
 // Adjust properties as needed; here we assume a persona has at least an id and a title
@@ -173,30 +175,10 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                   <span>{persona.name || 'New persona'}</span>
                 </Link>
               </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48"
-                  side={isMobile ? 'bottom' : 'right'}
-                  align={isMobile ? 'end' : 'start'}
-                >
-                  <DropdownMenuItem
-                    className="cursor-pointer text-destructive focus:bg-destructive/15 focus:text-destructive"
-                    onSelect={() => {
-                      setDeleteId(persona.id);
-                      setShowDeleteDialog(true);
-                    }}
-                  >
-                    <Trash2 className="text-muted-foreground" />
-                    <span>Delete Project</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <PersonaForm persona={persona} trigger={<SidebarMenuAction showOnHover>
+                <MoreHorizontal />
+                <span className="sr-only">More</span>
+              </SidebarMenuAction>} />
             </SidebarMenuItem>
           ))}
           <SidebarMenuItem>
