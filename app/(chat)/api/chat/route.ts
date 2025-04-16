@@ -221,7 +221,7 @@ export async function DELETE(request: Request) {
     const persona = await getPersonaById(id);
 
     if (!persona) {
-      return new Response('persona not found', { status: 404 });
+      return new Response('Persona not found', { status: 404 });
     }
 
     if (persona.user_id !== user.id) {
@@ -230,7 +230,7 @@ export async function DELETE(request: Request) {
 
     await deletePersonaById(id, user.id);
 
-    return new Response('persona deleted', { status: 200 });
+    return new Response('Persona deleted', { status: 200 });
   } catch (error) {
     console.error('Error deleting persona:', error);
     return new Response('An error occurred while processing your request', {
