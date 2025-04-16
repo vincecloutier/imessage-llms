@@ -41,13 +41,14 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
 
   const onSubmit: SubmitHandler<persona> = async (data) => {
     try {
-      alert("Saving persona...");
-      await fetch(`/api/chat?id=${persona.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ id: persona.id, persona: data }),
-      });
-      console.log("Persona saved:", data);
-      setOpen(false); // Close dialog after successful save
+      if (JSON.stringify(persona) !== JSON.stringify(data)) {
+        await fetch(`/api/chat?id=${persona.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ id: persona.id, persona: data }),
+        });
+        console.log("Persona saved:", data);  
+      }
+      setOpen(false);
     } catch (error) {
       console.error(error);
     }
