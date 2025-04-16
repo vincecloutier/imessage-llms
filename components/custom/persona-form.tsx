@@ -77,6 +77,24 @@ export default function PersonaForm({ personaId }: { personaId: string }) {
           </Select>
         </div>
 
+        {/* Ethnicity */}
+        <div className="flex flex-col space-y-1">
+          <Label htmlFor="ethnicity">Ethnicity</Label>
+          <Select {...register("ethnicity", { required: true })}>
+            <SelectTrigger id="ethnicity">
+              <SelectValue placeholder="Select Ethnicity" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Asian">Asian</SelectItem>
+              <SelectItem value="Black">Black</SelectItem>
+              <SelectItem value="Hispanic">Hispanic</SelectItem>
+              <SelectItem value="White">White</SelectItem>
+              <SelectItem value="Mixed">Mixed</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Location */}
         <div className="flex flex-col space-y-1">
           <Label htmlFor="location">Location</Label>
@@ -84,6 +102,16 @@ export default function PersonaForm({ personaId }: { personaId: string }) {
             id="location"
             placeholder="Enter location"
             {...register("location", { required: true })}
+          />
+        </div>
+
+        {/* Occupation */}
+        <div className="flex flex-col space-y-1">
+          <Label htmlFor="occupation">Occupation</Label>
+          <Input
+            id="occupation"
+            placeholder="Enter Occupation"
+            {...register("occupation", { required: true })}
           />
         </div>
 
@@ -124,6 +152,25 @@ export default function PersonaForm({ personaId }: { personaId: string }) {
               <SelectItem value="Red">Red</SelectItem>
               <SelectItem value="Black">Black</SelectItem>
               <SelectItem value="White">White</SelectItem>
+              <SelectItem value="Grey">Grey</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Haircut */}
+        <div className="flex flex-col space-y-1">
+          <Label htmlFor="haircut">Haircut</Label>
+          <Select {...register("haircut", { required: true })}>
+            <SelectTrigger id="haircut">
+              <SelectValue placeholder="Select Haircut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Long">Long</SelectItem>
+              <SelectItem value="Medium">Medium</SelectItem>
+              <SelectItem value="Short">Short</SelectItem>
+              <SelectItem value="Buzzcut">Buzzcut</SelectItem>
+              <SelectItem value="Bald">Bald</SelectItem>
+              <SelectItem value="Ponytail">Mohawk</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -136,7 +183,7 @@ export default function PersonaForm({ personaId }: { personaId: string }) {
               <SelectValue placeholder="Select Relationship" />
             </SelectTrigger>
             <SelectContent>
-            <SelectItem value="Friend">Friend</SelectItem>
+              <SelectItem value="Friend">Friend</SelectItem>
               <SelectItem value="Girlfriend">Girlfriend</SelectItem>
               <SelectItem value="Boyfriend">Boyfriend</SelectItem>
               <SelectItem value="Wife">Wife</SelectItem>
@@ -154,23 +201,23 @@ export default function PersonaForm({ personaId }: { personaId: string }) {
 
         {/* Height */}
         <div className="flex flex-col space-y-1">
-          <Label htmlFor="height">Height (cm)</Label>
+          <Label htmlFor="height">Height (inches)</Label>
           <Input
             id="height"
             type="number"
-            step="0.1"
-            {...register("height", { valueAsNumber: true })}
+            step="1"
+            {...register("height", { valueAsNumber: true, required: true })}
           />
         </div>
 
         {/* Weight */}
         <div className="flex flex-col space-y-1">
-          <Label htmlFor="weight">Weight (kg)</Label>
+          <Label htmlFor="weight">Weight (lbs)</Label>
           <Input
             id="weight"
             type="number"
-            step="0.1"
-            {...register("weight", { valueAsNumber: true })}
+            step="1"
+            {...register("weight", { valueAsNumber: true, required: true })}
           />
         </div>
       </div>
