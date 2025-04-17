@@ -25,7 +25,10 @@ export const PreviewMessage = ({
     >
       <div
         className={cx(
-          'group-data-[role=user]/message:bg-primary group-data-[role=user]/message:text-primary-foreground flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl'
+          'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
+          message.role === 'user'
+            ? 'bg-primary text-primary-foreground mr-auto'
+            : 'ml-auto bg-muted'
         )}
       >
 

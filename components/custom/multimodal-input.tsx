@@ -274,65 +274,75 @@ export function MultimodalInput({
         </div>
       )}
 
-      <Textarea
-        ref={textareaRef}
-        placeholder="Send a message..."
-        value={input}
-        onChange={handleInput}
-        className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-xl text-base bg-muted scrollbar-hide',
-          className
-        )}
-        rows={3}
-        autoFocus
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
+      {/* Container for Textarea and Buttons */}
+      <div className="relative w-full">
+        <Textarea
+          ref={textareaRef}
+          placeholder="Send a message..."
+          value={input}
+          onChange={handleInput}
+          className={cx(
+            'min-h-[52px] max-h-[calc(75dvh)] overflow-y-auto resize-none w-full rounded-xl text-base bg-transparent border border-input focus:border-ring focus:ring-1 focus:ring-ring pl-12 pr-20 py-3 scrollbar-hide',
+            className
+          )}
+          rows={1} // Start with 1 row, auto-adjust height
+          autoFocus
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault();
 
-            if (isLoading) {
-              toast.error('Please wait for the model to finish its response!');
-            } else {
-              submitForm();
+              if (isLoading) {
+                toast.error('Please wait for the model to finish its response!');
+              } else {
+                submitForm();
+              }
             }
-          }
-        }}
-      />
+          }}
+        />
 
-      {isLoading ? (
+        {/* Buttons positioned inside the Textarea container */}
+        <div className="absolute bottom-2 right-2 flex items-center gap-2">
+          {isLoading ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full p-1.5 h-8 w-8"
+              onClick={(event) => {
+                event.preventDefault();
+                stop();
+                setMessages((messages) => sanitizeUIMessages(messages));
+              }}
+            >
+              <Pause size={16} />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full p-1.5 h-8 w-8"
+              onClick={(event) => {
+                event.preventDefault();
+                submitForm();
+              }}
+              disabled={input.length === 0 || uploadQueue.length > 0}
+            >
+              <ArrowUp size={16} />
+            </Button>
+          )}
+        </div>
         <Button
-          className="rounded-full p-1.5 h-fit absolute bottom-2 right-2 m-0.5 border dark:border-zinc-600"
+          variant="ghost"
+          size="icon"
+          className="rounded-full p-1.5 h-8 w-8 absolute bottom-2 left-2"
           onClick={(event) => {
             event.preventDefault();
-            stop();
-            setMessages((messages) => sanitizeUIMessages(messages));
+            fileInputRef.current?.click();
           }}
+          disabled={isLoading}
         >
-          <Pause size={14} />
+          <Paperclip size={16} />
         </Button>
-      ) : (
-        <Button
-          className="rounded-full p-1.5 h-fit absolute bottom-2 right-2 m-0.5 border dark:border-zinc-600"
-          onClick={(event) => {
-            event.preventDefault();
-            submitForm();
-          }}
-          disabled={input.length === 0 || uploadQueue.length > 0}
-        >
-          <ArrowUp size={14} />
-        </Button>
-      )}
-
-      <Button
-        className="rounded-full p-1.5 h-fit absolute bottom-2 right-11 m-0.5 dark:border-zinc-700"
-        onClick={(event) => {
-          event.preventDefault();
-          fileInputRef.current?.click();
-        }}
-        variant="outline"
-        disabled={isLoading}
-      >
-        <Paperclip size={14} />
-      </Button>
+      </div>
     </div>
   );
 }

@@ -2,8 +2,11 @@
 
 import { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
-import { useState } from 'react';
+import { useState, useRef, DragEvent } from 'react';
 import { useSWRConfig } from 'swr';
+import { Bot, User } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 
 import { PreviewMessage, ThinkingMessage } from '@/components/custom/message';
 import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
@@ -40,15 +43,99 @@ export function Chat({
     },
   });
 
-  const [messagesContainerRef, messagesEndRef] =
-    useScrollToBottom<HTMLDivElement>();
-
+  const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
+  const [files, setFiles] = useState<FileList | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  console.log(messages);
+  // File handling functions
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const droppedFiles = event.dataTransfer.files;
+    const droppedFilesArray = Array.from(droppedFiles);
+    if (droppedFilesArray.length > 0) {
+      const validFiles = droppedFilesArray.filter((file) => file.type.startsWith("image/"));
+      if (validFiles.length === droppedFilesArray.length) {
+        const dataTransfer = new DataTransfer();
+        validFiles.forEach((file) => dataTransfer.items.add(file));
+        setFiles(dataTransfer.files);
+      } else {
+        toast.error("Only image files are allowed!");
+      }
+    }
+    setIsDragging(false);
+  };
+
+  const handlePaste = (event: React.ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (items) {
+      const files = Array.from(items)
+        .map((item) => item.getAsFile())
+        .filter((file): file is File => file !== null);
+
+      if (files.length > 0) {
+        const validFiles = files.filter((file) => file.type.startsWith("image/"));
+        if (validFiles.length === files.length) {
+          const dataTransfer = new DataTransfer();
+          validFiles.forEach((file) => dataTransfer.items.add(file));
+          setFiles(dataTransfer.files);
+        } else {
+          toast.error("Only image files are allowed");
+        }
+      }
+    }
+  };
+
+  // Function to handle files selected from the file dialog
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles) {
+      const validFiles = Array.from(selectedFiles).filter(
+        (file) => file.type.startsWith("image/")
+      );
+
+      if (validFiles.length === selectedFiles.length) {
+        const dataTransfer = new DataTransfer();
+        validFiles.forEach((file) => dataTransfer.items.add(file));
+        setFiles(dataTransfer.files);
+      } else {
+        toast.error("Only image files are allowed");
+      }
+    }
+  };
 
   return (
     <>
+      <div className="relative h-dvh" ref={containerRef} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+        <AnimatePresence>
+          {isDragging && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none dark:bg-zinc-900/90 z-10 flex flex-col gap-1 justify-center items-center bg-zinc-100/90 rounded-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div>Drag and drop files here</div>
+              <div className="text-sm dark:text-zinc-400 text-zinc-500">
+                {"(images only)"}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <header className="flex justify-between h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
@@ -64,52 +151,108 @@ export function Chat({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-        </div>
-        <div className="flex items-center gap-2 px-4">
-          <Button variant="outline">Login</Button>
-        </div>
-      </header>
-      <div className="flex flex-1 flex-col min-w-0, h-dvh gap-4 p-4 pt-0">
-        <div
-          ref={messagesContainerRef}
-          className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 scrollbar-hide "
-        >
+          </div>
+          <div className="flex items-center gap-2 px-4">
+            <Button variant="outline">Login</Button>
+          </div>
+        </header>
 
-          {messages.map((message, index) => (
-            <PreviewMessage
-              key={message.id}
-              personaId={id}
-              message={message}
-              isLoading={isLoading && messages.length - 1 === index}
-            />
-          ))}
-
-          {isLoading &&
-            messages.length > 0 &&
-            messages[messages.length - 1].role === 'user' && (
-              <ThinkingMessage />
-            )}
-
+        <div className="flex flex-1 flex-col min-w-0 h-[calc(100%-4rem)] gap-4 px-4 pt-0">
           <div
-            ref={messagesEndRef}
-            className="shrink-0 min-w-[24px] min-h-[24px]"
-          />
+            ref={messagesContainerRef}
+            className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 scrollbar-hide"
+          >
+            {messages.map((message, index) => (
+              <PreviewMessage
+                key={message.id}
+                personaId={id}
+                message={message}
+                isLoading={isLoading && messages.length - 1 === index}
+              />
+            ))}
+
+            {isLoading &&
+              messages.length > 0 &&
+              messages[messages.length - 1].role === 'user' && (
+                <ThinkingMessage />
+              )}
+
+            <div
+              ref={messagesEndRef}
+              className="shrink-0 min-w-[24px] min-h-[24px]"
+            />
+          </div>
+
+          <div className="relative">
+            {/* Hidden file input */}
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            <AnimatePresence>
+              {files && files.length > 0 && (
+                <motion.div 
+                  className="flex flex-row gap-2 absolute -top-16 left-4 right-4 z-10"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                >
+                  {Array.from(files).map((file) =>
+                    file.type.startsWith("image") ? (
+                      <div key={file.name}>
+                        <motion.img
+                          src={URL.createObjectURL(file)}
+                          alt={file.name}
+                          className="rounded-md w-16 h-16 object-cover border border-zinc-200 dark:border-zinc-700"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ y: -10, scale: 1.1, opacity: 0, transition: { duration: 0.2 } }}
+                        />
+                      </div>
+                    ) : null
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <form 
+              className="flex mx-auto px-4 bg-background md:pb-6 gap-2 w-full md:max-w-3xl"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (files && files.length > 0) {
+                  const options = { experimental_attachments: files };
+                  handleSubmit(e, options);
+                  setFiles(null);
+                } else {
+                  handleSubmit(e);
+                }
+              }}
+            >
+              <MultimodalInput
+                personaId={id}
+                input={input}
+                setInput={setInput}
+                handleSubmit={(e) => {
+                  const options = files ? { experimental_attachments: files } : {};
+                  handleSubmit(e, options);
+                  setFiles(null);
+                }}
+                isLoading={isLoading}
+                stop={stop}
+                attachments={attachments}
+                setAttachments={setAttachments}
+                messages={messages}
+                setMessages={setMessages}
+                append={append}
+              />
+            </form>
+          </div>
         </div>
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
-          <MultimodalInput
-            personaId={id}
-            input={input}
-            setInput={setInput}
-            handleSubmit={handleSubmit}
-            isLoading={isLoading}
-            stop={stop}
-            attachments={attachments}
-            setAttachments={setAttachments}
-            messages={messages}
-            setMessages={setMessages}
-            append={append}
-          />
-        </form>
       </div>
     </>
   );
