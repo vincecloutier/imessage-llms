@@ -28,7 +28,7 @@ export const PreviewMessage = ({
           'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
           message.role === 'user'
             ? 'bg-primary text-primary-foreground mr-auto'
-            : 'ml-auto bg-muted'
+            : 'ml-auto'
         )}
       >
 

@@ -177,51 +177,8 @@ export function Chat({
                 <ThinkingMessage />
               )}
 
-            <div
-              ref={messagesEndRef}
-              className="shrink-0 min-w-[24px] min-h-[24px]"
-            />
-          </div>
-
-          <div className="relative">
-            {/* Hidden file input */}
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileChange}
-            />
-
-            <AnimatePresence>
-              {files && files.length > 0 && (
-                <motion.div 
-                  className="flex flex-row gap-2 absolute -top-16 left-4 right-4 z-10"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                >
-                  {Array.from(files).map((file) =>
-                    file.type.startsWith("image") ? (
-                      <div key={file.name}>
-                        <motion.img
-                          src={URL.createObjectURL(file)}
-                          alt={file.name}
-                          className="rounded-md w-16 h-16 object-cover border border-zinc-200 dark:border-zinc-700"
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ y: -10, scale: 1.1, opacity: 0, transition: { duration: 0.2 } }}
-                        />
-                      </div>
-                    ) : null
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <form 
-              className="flex mx-auto px-4 bg-background md:pb-6 gap-2 w-full md:max-w-3xl"
+            <form
+              className="w-full md:max-w-3xl mx-auto px-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 if (files && files.length > 0) {
@@ -233,6 +190,32 @@ export function Chat({
                 }
               }}
             >
+              <AnimatePresence>
+                {files && files.length > 0 && (
+                  <motion.div
+                    className="flex flex-row gap-2 mb-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                  >
+                    {Array.from(files).map((file) =>
+                      file.type.startsWith("image") ? (
+                        <div key={file.name}>
+                          <motion.img
+                            src={URL.createObjectURL(file)}
+                            alt={file.name}
+                            className="rounded-md w-16 h-16 object-cover border border-zinc-200 dark:border-zinc-700"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ y: -10, scale: 1.1, opacity: 0, transition: { duration: 0.2 } }}
+                          />
+                        </div>
+                      ) : null
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <MultimodalInput
                 personaId={id}
                 input={input}
@@ -251,7 +234,21 @@ export function Chat({
                 append={append}
               />
             </form>
+
+            <div
+              ref={messagesEndRef}
+              className="shrink-0 min-w-[24px] min-h-[24px]"
+            />
           </div>
+
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleFileChange}
+          />
         </div>
       </div>
     </>
