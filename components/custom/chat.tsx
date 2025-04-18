@@ -6,14 +6,12 @@ import { useState, useRef, DragEvent } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 
-import { PreviewMessage, ThinkingMessage } from '@/components/custom/message';
+import { InputMessage, PreviewMessage, ThinkingMessage } from '@/components/custom/message';
 import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Button } from '../ui/button';
-
-import { MultimodalInput } from './multimodal-input';
 
 export function Chat({ id, initialMessages }: { id: string; initialMessages: Array<Message> }) {
   const { messages, handleSubmit, input, setInput, status } = useChat({body: { id }, initialMessages});
@@ -188,7 +186,7 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
                 )}
               </AnimatePresence>
 
-              <MultimodalInput
+              <InputMessage
                 personaId={id}
                 input={input}
                 setInput={setInput}
@@ -199,7 +197,6 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
                 }}
                 isLoading={status === 'submitted'}
                 attachments={attachments}
-                setAttachments={setAttachments}
               />
             </form>
 
