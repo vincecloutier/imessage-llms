@@ -7,15 +7,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { PreviewAttachment } from './preview-attachment';
 
-export const PreviewMessage = ({
-  personaId,
-  message,
-  isLoading,
-}: {
-  personaId: string;
-  message: Message;
-  isLoading: boolean;
-}) => {
+export const PreviewMessage = ({message, isLoading}: {message: Message, isLoading: boolean}) => {
   return (
     <motion.div
       className="w-full mx-auto max-w-3xl px-4 group/message"
@@ -54,15 +46,13 @@ export const PreviewMessage = ({
   );
 };
 
-export const ThinkingMessage = () => {
-  const role = 'assistant';
-
+export const ThinkingMessage = () => {  
   return (
     <motion.div
       className="w-full mx-auto max-w-3xl px-4 group/message"
       initial={{ y: 5, opacity: 0 }}
-      animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
-      data-role={role}
+      animate={{ y: 0, opacity: 1}}
+      data-role="assistant"
     >
       <div
         className={cx(
