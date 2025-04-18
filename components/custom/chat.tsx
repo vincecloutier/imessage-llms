@@ -3,7 +3,6 @@
 import { Attachment, Message } from 'ai';
 import { useChat } from '@ai-sdk/react';
 import { useState, useRef, DragEvent } from 'react';
-import { useSWRConfig } from 'swr';
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -16,34 +15,13 @@ import { Button } from '../ui/button';
 
 import { MultimodalInput } from './multimodal-input';
 
-export function Chat({
-  id,
-  initialMessages,
-}: {
-  id: string;
-  initialMessages: Array<Message>;
-}) {
-  const { mutate } = useSWRConfig();
-  const {
-    messages,
-    handleSubmit,
-    input,
-    setInput,
-    status,
-  } = useChat({
-    body: { id },
-    initialMessages,
-    onFinish: () => {
-      mutate('/api/history');
-    },
-  });
-
+export function Chat({ id, initialMessages }: { id: string; initialMessages: Array<Message> }) {
+  const { messages, handleSubmit, input, setInput, status } = useChat({body: { id }, initialMessages});
   const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const [files, setFiles] = useState<FileList | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // File handling functions
