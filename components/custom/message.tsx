@@ -27,13 +27,13 @@ export const PreviewMessage = ({
         className={cx(
           'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
           message.role === 'user'
-            ? 'bg-primary text-primary-foreground mr-auto'
+            ? 'mr-auto'
             : 'ml-auto'
         )}
       >
 
         <div className="flex flex-col gap-2 w-full">
-          <div className="prose dark:prose-invert group-data-[role=user]/message:text-primary-foreground">
+          <div className="prose dark:prose-invert">
           {/* TODO: modify this so we split newlines */}
           {message.content}
           </div>
@@ -66,10 +66,8 @@ export const ThinkingMessage = () => {
     >
       <div
         className={cx(
-          'flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl',
-          {
-            'group-data-[role=user]/message:bg-muted': true,
-          }
+          'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
+          'ml-auto'
         )}
       >
         <div className="flex flex-col gap-2 w-full">
