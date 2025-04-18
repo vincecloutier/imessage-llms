@@ -15,25 +15,9 @@ import React, {
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
-import { sanitizeUIMessages } from '@/lib/utils';
-
-import { ArrowUp, Paperclip, Pause } from 'lucide-react';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-
-const suggestedActions = [
-  {
-    title: 'What is the weather',
-    label: 'in San Francisco?',
-    action: 'What is the weather in San Francisco?',
-  },
-  {
-    title: 'Help me draft an essay',
-    label: 'about Silicon Valley',
-    action: 'Help me draft a short essay about Silicon Valley',
-  },
-];
 
 export function MultimodalInput({
   personaId,
@@ -210,41 +194,6 @@ export function MultimodalInput({
 
   return (
     <div className="relative w-full flex flex-col gap-4">
-      {messages.length === 0 &&
-        attachments.length === 0 &&
-        uploadQueue.length === 0 && (
-          <div className="grid sm:grid-cols-2 gap-2 w-full">
-            {suggestedActions.map((suggestedAction, index) => (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ delay: 0.05 * index }}
-                key={index}
-                className={index > 1 ? 'hidden sm:block' : 'block'}
-              >
-                <Button
-                  variant="ghost"
-                  onClick={async () => {
-                    window.history.replaceState({}, '', `/chat/${personaId}`);
-
-                    append({
-                      role: 'user',
-                      content: suggestedAction.action,
-                    });
-                  }}
-                  className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
-                >
-                  <span className="font-medium">{suggestedAction.title}</span>
-                  <span className="text-muted-foreground">
-                    {suggestedAction.label}
-                  </span>
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-        )}
-
       <input
         type="file"
         className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
@@ -290,58 +239,18 @@ export function MultimodalInput({
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
               event.preventDefault();
-
-              if (isLoading) {
+              if (input.length === 0) {
+                return;
+              } else if (uploadQueue.length > 0) {
+                toast.error('Please wait for the uploads to finish!');
+              } else if (isLoading) {
                 toast.error('Please wait for the model to finish its response!');
               } else {
                 submitForm();
               }
             }
           }}
-        />
-
-        {/* Buttons positioned inside the Textarea container */}
-        <div className="absolute bottom-2 right-2 flex items-center gap-2">
-          {isLoading ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full p-1.5 h-8 w-8"
-              onClick={(event) => {
-                event.preventDefault();
-                stop();
-                setMessages((messages) => sanitizeUIMessages(messages));
-              }}
-            >
-              <Pause size={16} />
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full p-1.5 h-8 w-8"
-              onClick={(event) => {
-                event.preventDefault();
-                submitForm();
-              }}
-              disabled={input.length === 0 || uploadQueue.length > 0}
-            >
-              <ArrowUp size={16} />
-            </Button>
-          )}
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full p-1.5 h-8 w-8 absolute bottom-2 left-2"
-          onClick={(event) => {
-            event.preventDefault();
-            fileInputRef.current?.click();
-          }}
-          disabled={isLoading}
-        >
-          <Paperclip size={16} />
-        </Button>
+        />       
       </div>
     </div>
   );
