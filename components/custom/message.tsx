@@ -148,27 +148,73 @@ export function InputMessage({
   }, [input, attachments, isLoading, handleSubmit, width]);
 
   return (
-      <div className="relative w-full">
-        <Textarea
-          ref={textareaRef}
-          placeholder="Send a message..."
-          value={input}
-          onChange={handleInput}
-          className={cx(
-            'min-h-[48px] max-h-[200px] overflow-y-auto resize-none w-full rounded-xl text-base  pl-3 pr-3 py-2.5 scrollbar-hide',
-            className
+    <motion.div
+      className="w-full mx-auto max-w-3xl px-4 group/message"
+      initial={{ y: 5, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      data-role="user"
+    >
+      <div
+        className={cx(
+          'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
+          'mr-auto'
+        )}
+      >
+        <div className="flex flex-col gap-2 w-full">
+          <Textarea
+            ref={textareaRef}
+            placeholder="Send a message..."
+            value={input}
+            onChange={handleInput}
+            className={cx(
+              'prose dark:prose-invert min-h-[48px] max-h-[200px] overflow-y-auto resize-none rounded-xl text-base scrollbar-hide',
+              'bg-transparent border-none focus:ring-0 focus:outline-none p-0',
+              className
+            )}
+            rows={1}
+            autoFocus
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey) {
+                submit(event);
+              }
+            }}
+          />
+          {attachments && attachments.length > 0 && (
+            <div className="flex flex-row gap-2 mt-2">
+              {attachments.map((attachment) => (
+                <PreviewAttachment
+                  key={attachment.url || attachment.name}
+                  attachment={attachment}
+                />
+              ))}
+            </div>
           )}
-          rows={1}
-          autoFocus
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              submit(event);
-            }
-          }}
-        />
+        </div>
       </div>
+    </motion.div>
   );
 }
+
+//       <div className="flex flex-col gap-2 w-full">
+//         <div className="prose dark:prose-invert">
+//         {/* TODO: modify this so we split newlines */}
+//         {message.content}
+//         </div>
+
+//         {message.experimental_attachments && (
+//           <div className="flex flex-row gap-2">
+//             {message.experimental_attachments.map((attachment) => (
+//               <PreviewAttachment
+//                 key={attachment.url}
+//                 attachment={attachment}
+//               />
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   </motion.div>
+// );
 
 
 export const ThinkingMessage = () => {  

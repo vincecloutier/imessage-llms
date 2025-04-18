@@ -13,14 +13,42 @@ import { Separator } from '../ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Button } from '../ui/button';
 
+// Helper function to convert File to Attachment with data URL
+const fileToAttachment = async (file: File): Promise<Attachment> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      resolve({
+        name: file.name,
+        contentType: file.type,
+        url: event.target?.result as string, // Use data URL for preview
+      });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export function Chat({ id, initialMessages }: { id: string; initialMessages: Array<Message> }) {
   const { messages, handleSubmit, input, setInput, status } = useChat({body: { id }, initialMessages});
   const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
-  const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const [files, setFiles] = useState<FileList | null>(null);
+  const [previewAttachments, setPreviewAttachments] = useState<Array<Attachment>>([]); // New state for previews
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Function to update both files and previewAttachments state
+  const updateFilesAndPreviews = async (newFiles: FileList | null) => {
+    setFiles(newFiles);
+    if (newFiles && newFiles.length > 0) {
+      const attachmentPromises = Array.from(newFiles).map(fileToAttachment);
+      const resolvedAttachments = await Promise.all(attachmentPromises);
+      setPreviewAttachments(resolvedAttachments);
+    } else {
+      setPreviewAttachments([]); // Clear previews if files are cleared
+    }
+  };
 
   // File handling functions
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
@@ -35,6 +63,7 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragging(false); // Moved inside to handle state update correctly
     const droppedFiles = event.dataTransfer.files;
     const droppedFilesArray = Array.from(droppedFiles);
     if (droppedFilesArray.length > 0) {
@@ -42,29 +71,30 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
       if (validFiles.length === droppedFilesArray.length) {
         const dataTransfer = new DataTransfer();
         validFiles.forEach((file) => dataTransfer.items.add(file));
-        setFiles(dataTransfer.files);
+        updateFilesAndPreviews(dataTransfer.files); // Use helper
       } else {
         toast.error("Only image files are allowed!");
+        updateFilesAndPreviews(null); // Clear invalid files
       }
     }
-    setIsDragging(false);
   };
 
   const handlePaste = (event: React.ClipboardEvent) => {
     const items = event.clipboardData?.items;
     if (items) {
-      const files = Array.from(items)
+      const filesFromPaste = Array.from(items)
         .map((item) => item.getAsFile())
         .filter((file): file is File => file !== null);
 
-      if (files.length > 0) {
-        const validFiles = files.filter((file) => file.type.startsWith("image/"));
-        if (validFiles.length === files.length) {
+      if (filesFromPaste.length > 0) {
+        const validFiles = filesFromPaste.filter((file) => file.type.startsWith("image/"));
+        if (validFiles.length === filesFromPaste.length) {
           const dataTransfer = new DataTransfer();
           validFiles.forEach((file) => dataTransfer.items.add(file));
-          setFiles(dataTransfer.files);
+          updateFilesAndPreviews(dataTransfer.files); // Use helper
         } else {
           toast.error("Only image files are allowed");
+          updateFilesAndPreviews(null); // Clear invalid files
         }
       }
     }
@@ -81,16 +111,23 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
       if (validFiles.length === selectedFiles.length) {
         const dataTransfer = new DataTransfer();
         validFiles.forEach((file) => dataTransfer.items.add(file));
-        setFiles(dataTransfer.files);
+        updateFilesAndPreviews(dataTransfer.files); // Use helper
       } else {
         toast.error("Only image files are allowed");
+        updateFilesAndPreviews(null); // Clear invalid files
+        // Also clear the file input value
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
+    } else {
+       updateFilesAndPreviews(null); // Clear if selection is cancelled
     }
   };
 
   return (
     <>
-      <div className="relative h-dvh" ref={containerRef} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+      <div className="relative h-dvh" ref={containerRef} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onPaste={handlePaste}>
         <AnimatePresence>
           {isDragging && (
             <motion.div
@@ -154,38 +191,12 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
                 if (files && files.length > 0) {
                   const options = { experimental_attachments: files };
                   handleSubmit(e, options);
-                  setFiles(null);
+                  updateFilesAndPreviews(null); // Clear files and previews on submit
                 } else {
                   handleSubmit(e);
                 }
               }}
             >
-              <AnimatePresence>
-                {files && files.length > 0 && (
-                  <motion.div
-                    className="flex flex-row gap-2 mb-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                  >
-                    {Array.from(files).map((file) =>
-                      file.type.startsWith("image") ? (
-                        <div key={file.name}>
-                          <motion.img
-                            src={URL.createObjectURL(file)}
-                            alt={file.name}
-                            className="rounded-md w-16 h-16 object-cover border border-zinc-200 dark:border-zinc-700"
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ y: -10, scale: 1.1, opacity: 0, transition: { duration: 0.2 } }}
-                          />
-                        </div>
-                      ) : null
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               <InputMessage
                 personaId={id}
                 input={input}
@@ -193,10 +204,10 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
                 handleSubmit={(e) => {
                   const options = files ? { experimental_attachments: files } : {};
                   handleSubmit(e, options);
-                  setFiles(null);
+                  updateFilesAndPreviews(null); // Clear files and previews on submit via Enter key
                 }}
                 isLoading={status === 'submitted'}
-                attachments={attachments}
+                attachments={previewAttachments}
               />
             </form>
 
