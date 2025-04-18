@@ -25,7 +25,7 @@ export const PreviewMessage = ({message, isLoading}: {message: Message, isLoadin
     >
       <div
         className={cx(
-          'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
+          'flex gap-4 px-3 py-2 w-fit max-w-[85%]',
           message.role === 'user'
             ? 'mr-auto'
             : 'ml-auto'
@@ -79,7 +79,6 @@ export function InputMessage({
 
   useEffect(() => {
     if (textareaRef.current) {
-      adjustHeight();
     }
   }, []);
 
@@ -136,7 +135,7 @@ export function InputMessage({
 
     handleSubmit(event);
 
-    if (width && width > 768) {
+    if (textareaRef.current) {
       textareaRef.current?.focus();
     }
     if (textareaRef.current) {
@@ -155,7 +154,7 @@ export function InputMessage({
     >
       <div
         className={cx(
-          'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
+          'flex gap-4 px-3 py-2 rounded-xl max-w-[85%]',
           'mr-auto'
         )}
       >
@@ -170,7 +169,6 @@ export function InputMessage({
               className
             )}
             rows={1}
-            autoFocus
             onKeyDown={(event) => {
               if (event.key === 'Enter' && !event.shiftKey) {
                 submit(event);

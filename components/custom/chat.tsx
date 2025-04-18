@@ -185,7 +185,7 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
               )}
 
             <form
-              className="w-full md:max-w-3xl mx-auto px-4"
+              className="w-full mx-auto px-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 if (files && files.length > 0) {
