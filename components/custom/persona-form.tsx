@@ -24,7 +24,7 @@ import {
 import { persona } from "@/lib/supabase/types";
 
 interface PersonaFormProps {
-  persona: persona;
+  persona?: persona;
   trigger?: React.ReactNode;
 }
 
@@ -35,16 +35,16 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
   useEffect(() => {
     reset({
       ...persona,
-      dob: persona.dob.split("T")[0] || "",
+      dob: persona?.dob?.split("T")[0] || "",
     });
   }, [persona, reset]);
 
   const onSubmit: SubmitHandler<persona> = async (data) => {
     try {
       if (JSON.stringify(persona) !== JSON.stringify(data)) {
-        await fetch(`/api/chat?id=${persona.id}`, {
+        await fetch(`/api/chat?id=${persona?.id}`, {
           method: 'PUT',
-          body: JSON.stringify({ id: persona.id, persona: data }),
+          body: JSON.stringify({ id: persona?.id, persona: data }),
         });
         console.log("Persona saved:", data);  
       }
@@ -71,7 +71,7 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Input
                 id="name"
                 placeholder="Enter Persona Name"
-                defaultValue={persona.name || ""}
+                defaultValue={persona?.name || ""}
                 {...register("name", { required: true })}
               />
             </div>
@@ -81,9 +81,9 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Label htmlFor="sex">Sex</Label>
               <Select {...register("sex", { required: true })}>
                 <SelectTrigger id="sex">
-                  <SelectValue placeholder={persona.sex} />
+                  <SelectValue placeholder={persona?.sex || ""} />
                 </SelectTrigger>
-                <SelectContent defaultValue={persona.sex}>
+                <SelectContent defaultValue={persona?.sex || ""}>
                   <SelectItem value="Male">Male</SelectItem>
                   <SelectItem value="Female">Female</SelectItem>
                 </SelectContent>
@@ -111,9 +111,9 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Label htmlFor="eye_color">Eye Color</Label>
               <Select {...register("eye_color", { required: true })}>
                 <SelectTrigger id="eye_color">
-                  <SelectValue placeholder={persona.eye_color} />
+                  <SelectValue placeholder={persona?.eye_color || ""} />
                 </SelectTrigger>
-                <SelectContent defaultValue={persona.eye_color}>
+                <SelectContent defaultValue={persona?.eye_color || ""}>
                   <SelectItem value="Blue">Blue</SelectItem>
                   <SelectItem value="Green">Green</SelectItem>
                   <SelectItem value="Brown">Brown</SelectItem>
@@ -128,9 +128,9 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Label htmlFor="hair_color">Hair Color</Label>
               <Select {...register("hair_color", { required: true })}>
                 <SelectTrigger id="hair_color">
-                  <SelectValue placeholder={persona.hair_color} />
+                  <SelectValue placeholder={persona?.hair_color || ""} />
                 </SelectTrigger>
-                <SelectContent defaultValue={persona.hair_color}>
+                <SelectContent defaultValue={persona?.hair_color || ""}>
                   <SelectItem value="Brown">Brown</SelectItem>
                   <SelectItem value="Blonde">Blonde</SelectItem>
                   <SelectItem value="Red">Red</SelectItem>
@@ -146,9 +146,9 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Label htmlFor="haircut">Haircut</Label>
               <Select {...register("haircut", { required: true })}>
                 <SelectTrigger id="haircut">
-                  <SelectValue placeholder={persona.haircut} />
+                  <SelectValue placeholder={persona?.haircut || ""} />
                 </SelectTrigger>
-                <SelectContent defaultValue={persona.haircut}>
+                <SelectContent defaultValue={persona?.haircut || ""}>
                   <SelectItem value="Long">Long</SelectItem>
                   <SelectItem value="Medium">Medium</SelectItem>
                   <SelectItem value="Short">Short</SelectItem>
@@ -164,9 +164,9 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Label htmlFor="ethnicity">Ethnicity</Label>
               <Select {...register("ethnicity", { required: true })}>
                 <SelectTrigger id="ethnicity">
-                  <SelectValue placeholder={persona.ethnicity} />
+                  <SelectValue placeholder={persona?.ethnicity || ""} />
                 </SelectTrigger>
-                <SelectContent defaultValue={persona.ethnicity}>
+                <SelectContent defaultValue={persona?.ethnicity || ""}>
                   <SelectItem value="Asian">Asian</SelectItem>
                   <SelectItem value="Black">Black</SelectItem>
                   <SelectItem value="Hispanic">Hispanic</SelectItem>
@@ -182,9 +182,9 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Label htmlFor="relationship">Relationship</Label>
               <Select {...register("relationship", { required: true })}>
                 <SelectTrigger id="relationship">
-                  <SelectValue placeholder={persona.relationship} />
+                  <SelectValue placeholder={persona?.relationship || ""} />
                 </SelectTrigger>
-                <SelectContent defaultValue={persona.relationship}>
+                <SelectContent defaultValue={persona?.relationship || ""}>
                   <SelectItem value="Friend">Friend</SelectItem>
                   <SelectItem value="Girlfriend">Girlfriend</SelectItem>
                   <SelectItem value="Boyfriend">Boyfriend</SelectItem>
@@ -201,7 +201,7 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
               <Input
                 id="occupation"
                 placeholder="Enter Occupation"
-                defaultValue={persona.occupation || ""}
+                defaultValue={persona?.occupation || ""}
                 {...register("occupation", { required: true })}
               />
             </div>
@@ -213,7 +213,7 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
                 id="height"
                 type="number"
                 step="1"
-                defaultValue={persona.height || 0}
+                defaultValue={persona?.height || 0}
                 {...register("height", { valueAsNumber: true, required: true })}
               />
             </div>
@@ -225,7 +225,7 @@ export default function PersonaForm({ persona, trigger }: PersonaFormProps) {
                 id="weight"
                 type="number"
                 step="1"
-                defaultValue={persona.weight || 0}
+                defaultValue={persona?.weight || 0}
                 {...register("weight", { valueAsNumber: true, required: true })}
               />
             </div>

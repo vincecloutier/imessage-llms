@@ -121,10 +121,10 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
             </SidebarMenuItem>
           ))}
           <SidebarMenuItem>
-            <SidebarMenuButton>
+            <PersonaForm trigger={<SidebarMenuButton>
               <Plus/>
               <span>Create New Persona</span>
-            </SidebarMenuButton>
+            </SidebarMenuButton>} />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
