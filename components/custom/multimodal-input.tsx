@@ -1,8 +1,7 @@
 'use client';
 
-import { Attachment, ChatRequestOptions, CreateMessage, Message } from 'ai';
+import { Attachment, ChatRequestOptions } from 'ai';
 import cx from 'classnames';
-import { motion } from 'framer-motion';
 import React, {
   useRef,
   useEffect,
@@ -16,7 +15,6 @@ import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
 
 import { PreviewAttachment } from './preview-attachment';
-import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 
 export function MultimodalInput({
@@ -24,12 +22,8 @@ export function MultimodalInput({
   input,
   setInput,
   isLoading,
-  stop,
   attachments,
   setAttachments,
-  messages,
-  setMessages,
-  append,
   handleSubmit,
   className,
 }: {
@@ -37,15 +31,8 @@ export function MultimodalInput({
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;
-  stop: () => void;
   attachments: Array<Attachment>;
   setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
-  messages: Array<Message>;
-  setMessages: Dispatch<SetStateAction<Array<Message>>>;
-  append: (
-    message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions
-  ) => Promise<string | null | undefined>;
   handleSubmit: (
     event?: {
       preventDefault?: () => void;

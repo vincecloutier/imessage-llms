@@ -1,10 +1,9 @@
 'use client';
 
 import { Attachment, Message } from 'ai';
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { useState, useRef, DragEvent } from 'react';
 import { useSWRConfig } from 'swr';
-import { Bot, User } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -27,14 +26,10 @@ export function Chat({
   const { mutate } = useSWRConfig();
   const {
     messages,
-    setMessages,
     handleSubmit,
     input,
     setInput,
-    append,
-    isLoading,
-    stop,
-    data: streamingData,
+    status,
   } = useChat({
     body: { id },
     initialMessages,
@@ -165,13 +160,12 @@ export function Chat({
             {messages.map((message, index) => (
               <PreviewMessage
                 key={message.id}
-                personaId={id}
                 message={message}
-                isLoading={isLoading && messages.length - 1 === index}
+                isLoading={status === 'submitted' && messages.length - 1 === index}
               />
             ))}
 
-            {isLoading &&
+            {status === 'submitted' &&
               messages.length > 0 &&
               messages[messages.length - 1].role === 'user' && (
                 <ThinkingMessage />
@@ -225,13 +219,9 @@ export function Chat({
                   handleSubmit(e, options);
                   setFiles(null);
                 }}
-                isLoading={isLoading}
-                stop={stop}
+                isLoading={status === 'submitted'}
                 attachments={attachments}
                 setAttachments={setAttachments}
-                messages={messages}
-                setMessages={setMessages}
-                append={append}
               />
             </form>
 
