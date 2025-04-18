@@ -75,25 +75,13 @@ export function InputMessage({
   className?: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { width } = useWindowSize();
-
-  useEffect(() => {
-    if (textareaRef.current) {
-    }
-  }, []);
 
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      const newHeight = textareaRef.current.scrollHeight + 2;
-      const MAX_HEIGHT = 200; // maximum height in pixels
-      if (newHeight > MAX_HEIGHT) {
-        textareaRef.current.style.height = `${MAX_HEIGHT}px`;
-        textareaRef.current.style.overflowY = 'auto';
-      } else {
-        textareaRef.current.style.height = `${newHeight}px`;
-        textareaRef.current.style.overflowY = 'hidden';
-      }
+      const newHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${newHeight}px`;
+      textareaRef.current.style.overflowY = textareaRef.current.scrollHeight > textareaRef.current.clientHeight ? 'auto' : 'hidden';
     }
   };
 
@@ -105,20 +93,22 @@ export function InputMessage({
   useEffect(() => {
     if (textareaRef.current) {
       const domValue = textareaRef.current.value;
-      // Prefer DOM value over localStorage to handle hydration
       const finalValue = domValue || localStorageInput || '';
-      setInput(finalValue);
-      adjustHeight();
+      if (input !== finalValue) {
+          setInput(finalValue);
+      } else {
+          adjustHeight();
+      }
     }
-  }, []);
+  }, [localStorageInput, setInput]);
 
   useEffect(() => {
     setLocalStorageInput(input);
+    adjustHeight();
   }, [input, setLocalStorageInput]);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
-    adjustHeight();
   };
 
   const submit = useCallback((event?: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -136,14 +126,11 @@ export function InputMessage({
     handleSubmit(event);
 
     if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
       textareaRef.current?.focus();
     }
-    if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-        adjustHeight();
-    }
 
-  }, [input, attachments, isLoading, handleSubmit, width]);
+  }, [input, attachments, isLoading, handleSubmit]);
 
   return (
     <motion.div
@@ -163,8 +150,9 @@ export function InputMessage({
             ref={textareaRef}
             value={input}
             onChange={handleInput}
+            maxLength={500}
             className={cx(
-              'prose dark:prose-invert min-h-[1em] max-h-[200px] overflow-auto resize-none scrollbar-hide',
+              'prose dark:prose-invert min-h-[1em] resize-none scrollbar-hide',
               'border-none focus:ring-0 focus:outline-none p-0',
               className
             )}
