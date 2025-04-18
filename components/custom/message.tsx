@@ -14,7 +14,6 @@ import React, {
 } from 'react';
 import { toast } from 'sonner';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
-import { Textarea } from '../ui/textarea';
 
 export const PreviewMessage = ({message, isLoading}: {message: Message, isLoading: boolean}) => {
   return (
@@ -161,14 +160,13 @@ export function InputMessage({
         )}
       >
         <div className="flex flex-col gap-2 w-full">
-          <Textarea
+          <textarea
             ref={textareaRef}
-            placeholder="Send a message..."
             value={input}
             onChange={handleInput}
             className={cx(
-              'prose dark:prose-invert min-h-[48px] max-h-[200px] overflow-y-auto resize-none rounded-xl text-base scrollbar-hide',
-              'bg-transparent border-none focus:ring-0 focus:outline-none p-0',
+              'prose dark:prose-invert min-h-[1em] max-h-[200px] overflow-auto resize-none scrollbar-hide',
+              'border-none focus:ring-0 focus:outline-none p-0',
               className
             )}
             rows={1}
@@ -180,7 +178,7 @@ export function InputMessage({
             }}
           />
           {attachments && attachments.length > 0 && (
-            <div className="flex flex-row gap-2 mt-2">
+            <div className="flex flex-row gap-2">
               {attachments.map((attachment) => (
                 <PreviewAttachment
                   key={attachment.url || attachment.name}
