@@ -191,27 +191,6 @@ export function InputMessage({
   );
 }
 
-//       <div className="flex flex-col gap-2 w-full">
-//         <div className="prose dark:prose-invert">
-//         {/* TODO: modify this so we split newlines */}
-//         {message.content}
-//         </div>
-
-//         {message.experimental_attachments && (
-//           <div className="flex flex-row gap-2">
-//             {message.experimental_attachments.map((attachment) => (
-//               <PreviewAttachment
-//                 key={attachment.url}
-//                 attachment={attachment}
-//               />
-//             ))}
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   </motion.div>
-// );
-
 
 export const ThinkingMessage = () => {  
   return (
