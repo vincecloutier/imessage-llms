@@ -165,10 +165,9 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col min-w-0 h-[calc(100%-4rem)] gap-4 px-4 pt-0">
           <div
             ref={messagesContainerRef}
-            className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 scrollbar-hide"
+            className="flex flex-1 flex-col min-w-0 h-[calc(100%-4rem)] gap-6 pt-4 overflow-y-scroll scrollbar-hide"
           >
             {messages.map((message, index) => (
               <PreviewMessage
@@ -226,7 +225,6 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
             onChange={handleFileChange}
           />
         </div>
-      </div>
     </>
   );
 }
