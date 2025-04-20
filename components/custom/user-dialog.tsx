@@ -32,6 +32,8 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
+  DialogHeader,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import {
   Sidebar,
@@ -43,6 +45,11 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { toast } from "sonner"
+import { signIn } from "@/db/auth"
+import { useRouter } from "next/navigation"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 const data = {
   nav: [
@@ -107,7 +114,7 @@ export function UserDialog() {
                 <Breadcrumb>
                   <BreadcrumbList>
                     <BreadcrumbItem className="hidden md:block">
-                      <BreadcrumbLink href="#">Settings</BreadcrumbLink>
+                      Settings
                     </BreadcrumbItem>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>
@@ -129,5 +136,108 @@ export function UserDialog() {
         </SidebarProvider>
       </DialogContent>
     </Dialog>
+  )
+}
+
+// TODO: button passes to either a login dialog, or user dialog
+// TODO: log in dialog should be used everywhere practically.
+export function LoginDialog() {
+  const router = useRouter();
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    try {
+      const formData = new FormData(event.currentTarget);
+      const email = formData.get('email') as string;
+      await signIn(email);
+      router.push('/');
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  }
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Login</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Login</DialogTitle>
+          <DialogDescription>
+            Enter your email below to login to your account
+          </DialogDescription>
+        </DialogHeader>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            placeholder="m@example.com"
+            required
+            type="email"
+          />
+          <DialogFooter>
+            <Button type="submit">Login</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+// TODO: BRING BACK NAV USER
+// TODO: PUT LOG IN HERE
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { SidebarInput } from "@/components/ui/sidebar"
+
+export function SidebarOptInForm() {
+  const router = useRouter();
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    try {
+      const formData = new FormData(event.currentTarget);
+      const email = formData.get('email') as string;
+      await signIn(email);
+      router.push('/');
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  }
+  
+  return (
+    <Card className="shadow-none">
+      <form onSubmit={handleSubmit}>
+        <CardHeader className="p-4 pb-0">
+          <CardTitle className="text-sm">Connect with April</CardTitle>
+          <CardDescription>
+          Enter your email below to login or sign up to your account. Then check your email for a verification link.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-2.5 p-4">
+          <Label htmlFor="email">Email</Label>
+          <SidebarInput type="email" placeholder="Email" name="email" required />
+          <Button 
+            className="w-full bg-sidebar-primary text-sidebar-primary-foreground shadow-none"
+            size="sm"
+            type="submit"
+          >
+            Connect
+          </Button>
+        </CardContent>
+      </form>
+    </Card>
   )
 }

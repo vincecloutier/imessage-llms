@@ -73,7 +73,7 @@ const fetcher = async (): Promise<persona[]> => {
   }
 };
 
-export function SidebarHistory({ user }: { user: User | undefined }) {
+export function SidebarHistory({ user }: { user: User | null }) {
   const { setOpenMobile, isMobile } = useSidebar();
   const { id } = useParams();
   const pathname = usePathname();
