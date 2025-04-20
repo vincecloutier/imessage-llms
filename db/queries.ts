@@ -132,37 +132,6 @@ export async function saveMessagesQuery(
   if (error) throw error;
 }
 
-export async function getPersonaWithMessagesQuery(
-  client: Client,
-  { id }: { id: string }
-) {
-  const { data: persona, error: personaError } = await client
-    .from('personas')
-    .select()
-    .eq('id', id)
-    .single();
-
-  if (personaError) {
-    if (personaError.code === 'PGRST116') {
-      return null;
-    }
-    throw personaError;
-  }
-
-  const { data: messages, error: messagesError } = await client
-    .from('messages')
-    .select()
-    .eq('persona_id', id)
-    .order('created_at', { ascending: true });
-
-  if (messagesError) throw messagesError;
-
-  return {
-    ...persona,
-    messages: messages || [],
-  };
-}
-
 type PostgrestError = {
   code: string;
   message: string;

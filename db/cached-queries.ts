@@ -11,7 +11,6 @@ import {
   getMessagesByPersonaIdQuery,
   getSessionQuery,
   getUserByIdQuery,
-  getPersonaWithMessagesQuery,
 } from '@/db/queries';
 
 const getSupabase = cache(() => createClient());
@@ -102,22 +101,6 @@ export const getMessagesByPersonaId = async (personaId: string) => {
     ['messages', personaId],
     {
       tags: [`persona_${personaId}_messages`],
-      revalidate: 10, // Cache for 10 seconds
-    }
-  )();
-};
-
-
-export const getPersonaWithMessages = async (personaId: string) => {
-  const supabase = await getSupabase();
-
-  return unstable_cache(
-    async () => {
-      return getPersonaWithMessagesQuery(supabase, { id: personaId });
-    },
-    ['persona_with_messages', personaId],
-    {
-      tags: [`persona_${personaId}`, `persona_${personaId}_messages`],
       revalidate: 10, // Cache for 10 seconds
     }
   )();
