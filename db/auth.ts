@@ -1,10 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
 
-export type AuthError = {
-  message: string;
-  status: number;
-};
-
 export async function signIn(email: string) {
   const supabase = createClient();
   const { data, error } = await supabase.auth.signInWithOtp({
@@ -17,7 +12,7 @@ export async function signIn(email: string) {
     throw {
       message: error.message,
       status: error.status || 500,
-    } as AuthError;
+    };
   }
   return data;
 }
@@ -25,11 +20,10 @@ export async function signIn(email: string) {
 export async function signOut() {
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
-
   if (error) {
     throw {
       message: error.message,
       status: error.status || 500,
-    } as AuthError;
+    };
   }
 }
