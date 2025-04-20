@@ -6,7 +6,6 @@ import {
   streamObject,
   streamText,
 } from 'ai';
-import { z } from 'zod';
 
 import { getPersonaById, getSession } from '@/db/cached-queries';
 import {
@@ -57,18 +56,6 @@ function formatMessageContent(message: CoreMessage): string {
     return typeof message.content === 'string'
       ? message.content
       : JSON.stringify(message.content);
-  }
-
-  // For tool messages, format as array of tool results
-  if (message.role === 'tool') {
-    return JSON.stringify(
-      message.content.map((content) => ({
-        type: content.type || 'tool-result',
-        toolCallId: content.toolCallId,
-        toolName: content.toolName,
-        result: content.result,
-      }))
-    );
   }
 
   // For assistant messages, format as array of text and tool calls
@@ -250,12 +237,12 @@ export async function PUT(request: Request) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-  await savePersona(id, user.id, persona);
-
-  return new Response('Persona updated', { status: 200 });
-
+  await savePersona(id || generateUUID(), user.id, persona);
+  
+  return new Response('Persona Saved', { status: 200 });
+  
   } catch (error) {
-    console.error('Error updating persona:', error);
+    console.error('Error saving persona:', error);
     return new Response('An error occurred while processing your request', {
       status: 500,
     });
