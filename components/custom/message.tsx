@@ -44,6 +44,7 @@ export const PreviewMessage = ({message, isLoading}: {message: Message, isLoadin
                 <PreviewAttachment
                   key={attachment.url}
                   attachment={attachment}
+                  onRemove={() => {}}
                 />
               ))}
             </div>
@@ -63,7 +64,7 @@ export function InputMessage({
   className,
   attachments,
 }: {
-  personaId: string;
+  personaId: string | null;
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;
@@ -86,7 +87,7 @@ export function InputMessage({
   };
 
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
-    `input-${personaId}`,
+    `input-${personaId || 'null'}`,
     ''
   );
 
@@ -169,6 +170,7 @@ export function InputMessage({
                 <PreviewAttachment
                   key={attachment.url || attachment.name}
                   attachment={attachment}
+                  onRemove={() => {}}
                 />
               ))}
             </div>
