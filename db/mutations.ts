@@ -28,10 +28,9 @@ export async function savePersona(id: string, userId: string, persona: persona) 
   const p = { id, user_id: userId, ...persona as any };
   await mutateQuery(
     async (client) => {
-      const now = new Date().toISOString();
       const { error } = await client
         .from('personas')
-        .upsert({ ...p, updated_at: now }, { onConflict: 'id' });
+        .upsert({ ...p, updated_at: new Date().toISOString() }, { onConflict: 'id' });
       if (error) throw error;
     },
     [],
