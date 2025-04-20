@@ -109,7 +109,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
           {history?.map((persona) => (
             <SidebarMenuItem key={persona.id}>
               <SidebarMenuButton asChild>
-                <Link href={`/chat/${persona.id}`} onClick={() => setOpenMobile(false)}>
+                <Link href={`/?id=${persona.id}`} onClick={() => setOpenMobile(false)}>
                   <UserRound />
                   <span>{persona.name || 'New persona'}</span>
                 </Link>
