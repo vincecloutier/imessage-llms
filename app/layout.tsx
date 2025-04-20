@@ -2,6 +2,9 @@ import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
 import { ThemeProvider } from '@/components/custom/theme-provider';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/custom/app-sidebar';
+import { getSession } from '@/db/cached-queries';
 
 import './globals.css';
 
@@ -40,6 +43,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getSession();
+
   return (
     <html
       lang="en"
@@ -65,7 +70,10 @@ export default async function RootLayout({
         >
           {/* <AuthProvider> */}
           <Toaster position="top-center" />
-          {children}
+          <SidebarProvider>
+            <AppSidebar user={user} />
+            <SidebarInset>{children}</SidebarInset>
+          </SidebarProvider>
           {/* </AuthProvider> */}
         </ThemeProvider>
       </body>
