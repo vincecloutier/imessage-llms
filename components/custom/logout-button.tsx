@@ -1,27 +1,37 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { User } from '@supabase/supabase-js';
 
-import { Button } from '@/components/ui/button';
-import { signOut } from '@/db/auth';
-
-export function LogoutButton() {
+export default function AuthButton() {
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
-  async function handleLogout() {
-    try {
-      await signOut();
-      router.push('/login');
-      router.refresh();
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  }
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user || null);
+    };
 
-  return (
-    <Button variant="ghost" onClick={handleLogout}>
+    getUser();
+  }, []);
+
+  const logout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.refresh();
+  };
+
+  return user ? (
+    <button onClick={logout} className="text-sm text-red-600 hover:underline">
       Logout
-    </Button>
+    </button>
+  ) : (
+    <a href="/login" className="text-sm text-blue-600 hover:underline">
+      Login
+    </a>
   );
 }

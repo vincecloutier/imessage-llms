@@ -11,8 +11,7 @@ import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Button } from '../ui/button';
-
+import AuthButton from './logout-button';
 // Helper function to convert File to Attachment with data URL
 const fileToAttachment = async (file: File): Promise<Attachment> => {
   return new Promise((resolve, reject) => {
@@ -161,7 +160,7 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
             </Breadcrumb>
           </div>
           <div className="flex items-center gap-2 px-4">
-            <Button variant="outline">Login</Button>
+            <AuthButton />
           </div>
         </header>
 
