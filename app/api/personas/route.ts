@@ -1,6 +1,5 @@
 import { getPersonaById } from "@/db/cached-queries";
 import { deletePersonaById } from "@/db/mutations";
-import { generateUUID } from "@/lib/utils";
 import { getSession } from "@/db/cached-queries";
 import { savePersona } from "@/db/mutations";
 
