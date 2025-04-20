@@ -28,7 +28,7 @@ const fileToAttachment = async (file: File): Promise<Attachment> => {
   });
 };
 
-export function Chat({ id, initialMessages }: { id: string; initialMessages: Array<Message> }) {
+export function Chat({ id, initialMessages }: { id: string | null; initialMessages: Array<Message> }) {
   const { messages, handleSubmit, input, setInput, status } = useChat({body: { id }, initialMessages});
   const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
   const [files, setFiles] = useState<FileList | null>(null);
@@ -49,6 +49,25 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
     }
   };
 
+  // New helper function to process files
+  const processFiles = (filesArray: File[]): boolean => {
+    if (filesArray.length === 0) {
+        updateFilesAndPreviews(null);
+        return true; // No files to process is not an error state
+    }
+    const validFiles = filesArray.filter((file) => file.type.startsWith("image/"));
+    if (validFiles.length === filesArray.length) {
+      const dataTransfer = new DataTransfer();
+      validFiles.forEach((file) => dataTransfer.items.add(file));
+      updateFilesAndPreviews(dataTransfer.files);
+      return true;
+    } else {
+      toast.error("Only image files are allowed!");
+      updateFilesAndPreviews(null);
+      return false;
+    }
+  };
+
   // File handling functions
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -62,20 +81,8 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    setIsDragging(false); // Moved inside to handle state update correctly
-    const droppedFiles = event.dataTransfer.files;
-    const droppedFilesArray = Array.from(droppedFiles);
-    if (droppedFilesArray.length > 0) {
-      const validFiles = droppedFilesArray.filter((file) => file.type.startsWith("image/"));
-      if (validFiles.length === droppedFilesArray.length) {
-        const dataTransfer = new DataTransfer();
-        validFiles.forEach((file) => dataTransfer.items.add(file));
-        updateFilesAndPreviews(dataTransfer.files); // Use helper
-      } else {
-        toast.error("Only image files are allowed!");
-        updateFilesAndPreviews(null); // Clear invalid files
-      }
-    }
+    setIsDragging(false);
+    processFiles(Array.from(event.dataTransfer.files));
   };
 
   const handlePaste = (event: React.ClipboardEvent) => {
@@ -84,43 +91,19 @@ export function Chat({ id, initialMessages }: { id: string; initialMessages: Arr
       const filesFromPaste = Array.from(items)
         .map((item) => item.getAsFile())
         .filter((file): file is File => file !== null);
-
-      if (filesFromPaste.length > 0) {
-        const validFiles = filesFromPaste.filter((file) => file.type.startsWith("image/"));
-        if (validFiles.length === filesFromPaste.length) {
-          const dataTransfer = new DataTransfer();
-          validFiles.forEach((file) => dataTransfer.items.add(file));
-          updateFilesAndPreviews(dataTransfer.files); // Use helper
-        } else {
-          toast.error("Only image files are allowed");
-          updateFilesAndPreviews(null); // Clear invalid files
-        }
-      }
+      processFiles(filesFromPaste);
     }
   };
 
-  // Function to handle files selected from the file dialog
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
     if (selectedFiles) {
-      const validFiles = Array.from(selectedFiles).filter(
-        (file) => file.type.startsWith("image/")
-      );
-
-      if (validFiles.length === selectedFiles.length) {
-        const dataTransfer = new DataTransfer();
-        validFiles.forEach((file) => dataTransfer.items.add(file));
-        updateFilesAndPreviews(dataTransfer.files); // Use helper
-      } else {
-        toast.error("Only image files are allowed");
-        updateFilesAndPreviews(null); // Clear invalid files
-        // Also clear the file input value
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+      const success = processFiles(Array.from(selectedFiles));
+      if (!success && fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
     } else {
-       updateFilesAndPreviews(null); // Clear if selection is cancelled
+      updateFilesAndPreviews(null); // Clear if selection is cancelled
     }
   };
 
