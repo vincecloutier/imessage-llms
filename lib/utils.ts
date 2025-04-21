@@ -25,9 +25,7 @@ export function generateUUID(): string {
   });
 }
 
-export function convertToUIMessages(
-  messages: Array<DBMessage>
-): Array<Message> {
+export function convertToUIMessages(messages: Array<DBMessage>): Array<Message> {
   return messages.reduce((personaMessages: Array<Message>, message) => {
 
     let textContent = '';
@@ -107,44 +105,10 @@ export function sanitizeResponseMessages(
   );
 }
 
-export function sanitizeUIMessages(messages: Array<Message>): Array<Message> {
-  const messagesBySanitizedToolInvocations = messages.map((message) => {
-    if (message.role !== 'assistant') return message;
-
-    if (!message.toolInvocations) return message;
-
-    let toolResultIds: Array<string> = [];
-
-    for (const toolInvocation of message.toolInvocations) {
-      if (toolInvocation.state === 'result') {
-        toolResultIds.push(toolInvocation.toolCallId);
-      }
-    }
-
-    const sanitizedToolInvocations = message.toolInvocations.filter(
-      (toolInvocation) =>
-        toolInvocation.state === 'result' ||
-        toolResultIds.includes(toolInvocation.toolCallId)
-    );
-
-    return {
-      ...message,
-      toolInvocations: sanitizedToolInvocations,
-    };
-  });
-
-  return messagesBySanitizedToolInvocations.filter(
-    (message) =>
-      message.content.length > 0 ||
-      (message.toolInvocations && message.toolInvocations.length > 0)
-  );
-}
-
 export function getMostRecentUserMessage(messages: Array<CoreMessage>) {
   const userMessages = messages.filter((message) => message.role === 'user');
   return userMessages.at(-1);
 }
-
 
 // Add fetcher function for SWR
 export async function fetcher<T = any>(
@@ -158,21 +122,4 @@ export async function fetcher<T = any>(
   }
 
   return response.json();
-}
-
-// Add type for message annotations
-interface MessageAnnotation {
-  messageIdFromServer?: string;
-}
-
-// Update getMessageIdFromAnnotations to use proper typing
-export function getMessageIdFromAnnotations(message: Message) {
-  if (!message.annotations) return message.id;
-
-  const annotations = message.annotations as MessageAnnotation[];
-  const [annotation] = annotations;
-
-  if (!annotation?.messageIdFromServer) return message.id;
-
-  return annotation.messageIdFromServer;
 }
