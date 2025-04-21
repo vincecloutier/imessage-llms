@@ -61,12 +61,8 @@ function formatMessageContent(message: CoreMessage): string {
 }
 
 export async function POST(request: Request) {
-  const {
-    id,
-    messages,
-  }: { id: string; messages: Array<Message>; } =
-    await request.json();
-
+  const {id, messages} = await request.json();
+  console.log('messages', messages);
   const user = await getUser();
 
   if (!user) {
@@ -80,97 +76,76 @@ export async function POST(request: Request) {
     return new Response('No user message found', { status: 400 });
   }
 
-  try {
-    const persona = await getPersonaById(id);
+  const persona = await getPersonaById(id);
 
-    if (!persona) {
-      return new Response('Persona not found', { status: 404 });
-    } else if (persona.user_id !== user.id) {
-      return new Response('Unauthorized', { status: 401 });
-    }
-
-    await saveMessages({
-      personaId: id,
-      messages: [
-        {
-          id: generateUUID(),
-          persona_id: id,
-          role: userMessage.role as MessageRole,
-          content: formatMessageContent(userMessage),
-          created_at: new Date().toISOString(),
-        },
-      ],
-    });
-
-    const streamingData = new StreamData();
-
-    const result = await streamText({
-      model: customModel(),
-      system: systemPrompt,
-      messages: coreMessages,
-      maxSteps: 5,
-      onFinish: async ({ response }) => {
-        if (user && user.id) {
-          try {
-            const responseMessagesWithoutIncompleteToolCalls =
-              sanitizeResponseMessages(response.messages);
-
-            await saveMessages({
-              personaId: id,
-              messages: responseMessagesWithoutIncompleteToolCalls.map(
-                (message) => {
-                  const messageId = generateUUID();
-
-                  if (message.role === 'assistant') {
-                    streamingData.appendMessageAnnotation({
-                      messageIdFromServer: messageId,
-                    });
-                  }
-
-                  return {
-                    id: messageId,
-                    persona_id: id,
-                    role: message.role as MessageRole,
-                    content: formatMessageContent(message),
-                    created_at: new Date().toISOString(),
-                  };
-                }
-              ),
-            });
-          } catch (error) {
-            console.error('Failed to save chat:', error);
-          }
-        }
-
-        streamingData.close();
-      },
-      experimental_telemetry: {
-        isEnabled: true,
-        functionId: 'stream-text',
-      },
-    });
-
-    return result.toDataStreamResponse({
-      data: streamingData,
-    });
-  } catch (error) {
-    console.error('Error in persona route:', error);
-    if (error instanceof Error && error.message === 'persona ID already exists') {
-      // If persona already exists, just continue with the message saving
-      await saveMessages({
-        personaId: id,
-        messages: [
-          {
-            id: generateUUID(),
-            persona_id: id,
-            role: userMessage.role as MessageRole,
-            content: formatMessageContent(userMessage),
-            created_at: new Date().toISOString(),
-          },
-        ],
-      });
-    } else {
-      throw error; // Re-throw other errors
-    }
+  if (!persona) {
+    return new Response('Persona not found', { status: 404 });
+  } else if (persona.user_id !== user.id) {
+    return new Response('Unauthorized', { status: 401 });
   }
+
+  await saveMessages({
+    personaId: id,
+    messages: [
+      {
+        id: generateUUID(),
+        persona_id: id,
+        role: userMessage.role as MessageRole,
+        content: formatMessageContent(userMessage),
+        created_at: new Date().toISOString(),
+      },
+    ],
+  });
+
+  const streamingData = new StreamData();
+
+  const result = await streamText({
+    model: customModel(),
+    system: systemPrompt,
+    messages: coreMessages,
+    maxSteps: 5,
+    onFinish: async ({ response }) => {
+      if (user && user.id) {
+        try {
+          const responseMessagesWithoutIncompleteToolCalls =
+            sanitizeResponseMessages(response.messages);
+
+          await saveMessages({
+            personaId: id,
+            messages: responseMessagesWithoutIncompleteToolCalls.map(
+              (message) => {
+                const messageId = generateUUID();
+
+                if (message.role === 'assistant') {
+                  streamingData.appendMessageAnnotation({
+                    messageIdFromServer: messageId,
+                  });
+                }
+
+                return {
+                  id: messageId,
+                  persona_id: id,
+                  role: message.role as MessageRole,
+                  content: formatMessageContent(message),
+                  created_at: new Date().toISOString(),
+                };
+              }
+            ),
+          });
+        } catch (error) {
+          console.error('Failed to save chat:', error);
+        }
+      }
+
+      streamingData.close();
+    },
+    experimental_telemetry: {
+      isEnabled: true,
+      functionId: 'stream-text',
+    },
+  });
+  console.log('result', result);
+  return result.toDataStreamResponse({
+    data: streamingData,
+  });
 }
