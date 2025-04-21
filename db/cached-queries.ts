@@ -9,44 +9,21 @@ import {
   getUserQuery,
   getPersonasByUserIdQuery,
   getMessagesByPersonaIdQuery,
-  getSessionQuery,
-  getUserByIdQuery,
 } from '@/db/queries';
 
 const getSupabase = cache(() => createClient());
 
-export const getSession = async () => {
+export const getUser = async () => {
   const supabase = await getSupabase();
-
-  return unstable_cache(
-    async () => {
-      return getSessionQuery(supabase);
-    },
-    ['session'],
-    {
-      tags: [`session`],
-      revalidate: 10, // Cache for 10 seconds
-    }
-  )();
+  const {data: { user }, error} = await supabase.auth.getUser();
+  if (error || !user) {
+    console.error(error);
+    return null;
+  }
+  return user;
 };
 
-export const getUserById = async (id: string) => {
-  const supabase = await getSupabase();
-
-  return unstable_cache(
-    async () => {
-      return getUserByIdQuery(supabase, id);
-    },
-    [`user_by_id`, id.slice(2, 12)],
-    {
-      tags: [`user_by_id_${id.slice(2, 12)}`],
-
-      revalidate: 10, // Cache for 10 seconds
-    }
-  )();
-};
-
-export const getUser = async (email: string) => {
+export const getUserByEmail = async (email: string) => {
   const supabase = await getSupabase();
 
   return unstable_cache(

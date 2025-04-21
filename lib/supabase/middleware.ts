@@ -32,17 +32,12 @@ export const updateSession = async (request: NextRequest) => {
       }
     );
 
-    const user = await supabase.auth.getUser();
+    // const user = await supabase.auth.getUser();
 
-    // Protected routes
-    if (request.nextUrl.pathname === '/' && user.error) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-
-    // Redirect logged in users from login pages
-    if (request.nextUrl.pathname === '/login' && !user.error) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+    // // Protected routes
+    // if (request.nextUrl.pathname !== '/' && user.error) {
+    //   return NextResponse.redirect(new URL('/', request.url));
+    // }
     
     return response;
   } catch (e) {

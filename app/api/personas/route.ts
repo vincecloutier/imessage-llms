@@ -1,6 +1,6 @@
 import { getPersonaById } from "@/db/cached-queries";
 import { deletePersonaById } from "@/db/mutations";
-import { getSession } from "@/db/cached-queries";
+import { getUser } from "@/db/cached-queries";
 import { savePersona } from "@/db/mutations";
 
 export async function DELETE(request: Request) {
@@ -11,7 +11,7 @@ export async function DELETE(request: Request) {
       return new Response('Not Found', { status: 404 });
     }
   
-    const user = await getSession();
+    const user = await getUser();
   
     try {
       const persona = await getPersonaById(id);
@@ -39,7 +39,7 @@ export async function DELETE(request: Request) {
 export async function POST(request: Request) {
     const { id, persona } = await request.json();
   
-    const user = await getSession();
+    const user = await getUser();
   
     try {
       if (!user) {

@@ -7,9 +7,8 @@ import {
   streamText,
 } from 'ai';
 
-import { getPersonaById, getSession } from '@/db/cached-queries';
+import { getPersonaById, getUser } from '@/db/cached-queries';
 import { saveMessages } from '@/db/mutations';
-import { createClient } from '@/lib/supabase/server';
 import { MessageRole } from '@/lib/supabase/types';
 import {
   generateUUID,
@@ -30,20 +29,6 @@ const customModel = () => {
 };
 
 export const maxDuration = 60;
-
-async function getUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) { 
-    throw new Error('Unauthorized');
-  }
-
-  return user;
-}
 
 // Add helper function to format message content for database storage
 function formatMessageContent(message: CoreMessage): string {

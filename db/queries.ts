@@ -3,39 +3,6 @@ import type { Client, Database } from '../lib/supabase/types';
 
 type Tables = Database['public']['Tables'];
 
-export async function getSessionQuery(client: Client) {
-  const {
-    data: { user },
-    error,
-  } = await client.auth.getUser();
-
-  if (error) {
-    throw {
-      message: error.message,
-      status: error.status || 500,
-    } as AuthError;
-  }
-
-  return user;
-}
-
-export async function getUserByIdQuery(client: Client, id: string) {
-  const { data: user, error } = await client
-    .from('users')
-    .select()
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    throw {
-      message: error.message,
-      status: error?.code ? 400 : 500,
-    } as AuthError;
-  }
-
-  return user;
-}
-
 export async function getUserQuery(client: Client, email: string) {
   const { data: users, error } = await client
     .from('users')
