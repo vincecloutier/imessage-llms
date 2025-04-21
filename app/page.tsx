@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { Chat as PreviewChat } from '@/components/custom/chat';
+import { Chat } from '@/components/custom/chat';
 import {
   getPersonaById,
   getMessagesByPersonaId,
@@ -38,11 +38,9 @@ export default async function Home({ searchParams }: { searchParams: { id?: stri
   }
 
   const messagesFromDb = id ? await getMessagesByPersonaId(id) : [];
-
-  console.log(convertToUIMessages(messagesFromDb));
-
+  
   return (
-    <PreviewChat
+    <Chat
       id={persona.id}
       initialMessages={convertToUIMessages(messagesFromDb)}
     />
