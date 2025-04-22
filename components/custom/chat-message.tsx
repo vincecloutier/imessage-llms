@@ -23,31 +23,28 @@ type Message = {
 }
 
 export const PreviewMessage = ({message}: {message: Message}) => {
-  console.log('PreviewMessage rendering. Message:', message);
-  console.log('PreviewMessage - Attachment value:', message.file_path);
-
   return (
     <div className="w-full mx-auto max-w-3xl px-4 group/message" data-role={message.role}>
-      <div className={cx('flex gap-4 px-3 py-2 w-fit max-w-[85%]', message.role === 'user' ? 'mr-auto' : 'ml-auto bg-muted/50 rounded-xl')}>
-        <div className="flex flex-col gap-2 w-full">
-          {message.content && (
-             <div className="prose dark:prose-invert max-w-none"> 
-               {message.content}
-             </div>
-          )}
-          {message.file_path && (
-            <div className="mt-2">
-              <ImagePreview
-                source={message.file_path}
-                alt={message.content || "Attachment"}
-              />
-            </div>
-          )}
-        </div>
+      <div className={cx('flex flex-col gap-2 px-3 py-2 w-fit max-w-[85%]', message.role === 'user' ? 'mr-auto' : 'ml-auto bg-muted/50 rounded-xl' )}>
+          <div className="prose dark:prose-invert max-w-none"> 
+            {message.content}
+          </div>
+        {message.file_path && (<ImagePreview source={message.file_path} alt={message.content || "Attachment"} />)}
       </div>
     </div>
   );
 };
+
+export const ThinkingMessage = () => {
+  return (
+    <div className="w-full mx-auto max-w-3xl px-4 group/message" data-role="assistant">
+      <div className={cx('px-3 py-2 w-fit max-w-[85%] ml-auto text-muted-foreground')}>
+        Typing...
+      </div>
+    </div>
+  );
+};
+
 
 export function InputMessage({
   personaId,
@@ -201,17 +198,3 @@ export function InputMessage({
      </div>
   );
 }
-
-export const ThinkingMessage = () => {  
-  return (
-    <div className="w-full mx-auto max-w-3xl px-4 group/message" data-role="assistant">
-      <div className={cx('flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%] ml-auto')}>
-        <div className="flex flex-col gap-2 w-full">
-          <div className="flex flex-col gap-4 text-muted-foreground">
-            Typing...
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
