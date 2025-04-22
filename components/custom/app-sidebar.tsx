@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/sidebar';
 import { BookOpen, Command, LifeBuoy, Send } from 'lucide-react';
 import { NavSecondary } from '@/components/custom/nav-footer';
-import { LoginDialog, SidebarOptInForm } from './user-dialog';
 
 const data = {
     navSecondary: [
@@ -56,7 +55,7 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {user ? <SidebarHistory user={user} /> : <SidebarOptInForm />}
+       <SidebarHistory user={user} />
        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
     </Sidebar>

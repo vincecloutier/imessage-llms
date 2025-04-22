@@ -100,9 +100,11 @@ export function SidebarHistory({ user }: { user: User | null }) {
     return (
       <SidebarGroup>
         <SidebarGroupLabel>Personas</SidebarGroupLabel>
-        <div className="text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-          <div>Login to save and revisit previous personas!</div>
-        </div>
+        {/* <SidebarMenu>
+          <SidebarMenuItem> */}
+            <div className="px-2 py-1 text-xs text-sidebar-foreground/50">Login to save and revisit previous personas!</div>
+          {/* </SidebarMenuItem>
+        </SidebarMenu> */}
       </SidebarGroup>
     );
   }
