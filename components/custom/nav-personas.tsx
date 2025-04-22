@@ -24,14 +24,17 @@ SidebarGroup,
 
 
 import { createClient } from '@/lib/supabase/client';
-import { Database } from '@/lib/supabase/types';
 import GenericForm, { GenericFormProps } from './generic-form';
 import { savePersona, deletePersona } from '@/lib/actions';
 
 // Type for a persona record from Supabase
 // Adjust properties as needed; here we assume a persona has at least an id and a title
 
-type persona = Database['public']['Tables']['personas']['Row'];
+type persona = {
+  id: string;
+  attributes: Record<string, unknown>;
+  sender_address: string;
+}
 
 const attributesSchema: GenericFormProps['attributesSchema'] = [
   { name: 'name', label: 'Name', type: 'text', required: true },
