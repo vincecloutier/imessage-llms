@@ -17,11 +17,8 @@ export function Chat({ user_id, id, initialMessages }: { user_id: string | null;
 
   const sendMessage = async (message: string) => {
     if (!id || !message.trim()) return;
-
-    const userMessage = {role: 'user', content: message };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, {role: 'user', content: message }]);
     setIsLoading(true);
-
     try {
       const response = await fetch('http://localhost:3001/api/frontend', {
         method: 'POST',
@@ -34,17 +31,12 @@ export function Chat({ user_id, id, initialMessages }: { user_id: string | null;
           persona_id: id,
           message: message,
           attachment: null,
-        }),
+        })
       });
-
       const result = await response.json();
-      const aiMessage = {
-        role: 'assistant',
-        content: result.message?.content || 'Error: No response',
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content}]);
     } catch (err) {
-      setMessages((prev) => [...prev, { id: 'error', role: 'assistant', content: 'Something went wrong: ' + err }]);
+      setMessages((prev) => [...prev, {role: 'assistant', content: err}]);
     } finally {
       setIsLoading(false);
     }
