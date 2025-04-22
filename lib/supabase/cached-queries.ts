@@ -1,6 +1,4 @@
 
-import { cache } from 'react';
-
 import { createClient } from '@/lib/supabase/server';
 
 export const getUser = async () => {
@@ -38,71 +36,3 @@ export const getMessagesByPersonaId = async (personaId: string) => {
   if (error) throw error;
   return messages;
 };
-
-const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour - adjust as needed
-
-export const createSignedAttachmentUrl = cache(async (filePath: string) => {
-  if (!filePath) {
-    return { error: 'File path is required.', signedUrl: null };
-  }
-
-  const supabase = await createClient();
-
-  try {
-    // 1. Check cache first
-    const { data: cachedData, error: cacheError } = await supabase
-      .from('cached_signed_urls')
-      .select('signed_url, expires_at')
-      .eq('file_path', filePath)
-      .single();
-
-    if (cacheError && cacheError.code !== 'PGRST116') { // Ignore 'PGRST116' (Row not found)
-      console.error('Error checking cache:', cacheError);
-      // Decide if you want to proceed without cache or return error
-      // Proceeding for now, but logging the error
-    }
-
-    if (cachedData?.signed_url && new Date(cachedData.expires_at) > new Date()) {
-      console.log(`Using cached signed URL for path: [${filePath}]`);
-      return { error: null, signedUrl: cachedData.signed_url };
-    }
-
-    // 2. If not in cache or expired, generate new URL
-    console.log(`Generating new signed URL for path: [${filePath}]`);
-    const { data: storageData, error: storageError } = await supabase.storage
-      .from('attachments')
-      .createSignedUrl(filePath, SIGNED_URL_EXPIRY_SECONDS);
-
-    if (storageError) {
-      console.error('Error creating signed URL:', storageError);
-      return { error: storageError.message, signedUrl: null };
-    }
-
-    if (!storageData?.signedUrl) {
-      return { error: 'Failed to generate signed URL.', signedUrl: null };
-    }
-
-    // 3. Store the new URL in the cache
-    const expiresAt = new Date();
-    expiresAt.setSeconds(expiresAt.getSeconds() + SIGNED_URL_EXPIRY_SECONDS);
-
-    const { error: upsertError } = await supabase
-      .from('cached_signed_urls')
-      .upsert({
-        file_path: filePath,
-        signed_url: storageData.signedUrl,
-        expires_at: expiresAt.toISOString(),
-      });
-
-    if (upsertError) {
-      console.error('Error saving signed URL to cache:', upsertError);
-      // Return the generated URL anyway, even if caching failed
-    }
-
-    return { error: null, signedUrl: storageData.signedUrl };
-
-  } catch (e: any) {
-    console.error('Unexpected error generating signed URL:', e);
-    return { error: e.message || 'An unexpected error occurred.', signedUrl: null };
-  }
-});

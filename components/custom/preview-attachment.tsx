@@ -5,7 +5,7 @@ import { X, Image as ImageIcon, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog"
 import Image from "next/image"
-import { createSignedAttachmentUrl } from "@/lib/supabase/actions" // Updated import path
+import { createSignedAttachmentUrl } from "@/lib/actions" // Updated import path
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface ImagePreviewProps {
