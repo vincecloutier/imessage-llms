@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { Chat } from '@/components/custom/chat-main';
@@ -7,7 +6,6 @@ import {
   getMessagesByPersonaId,
   getUser,
 } from '@/lib/supabase/cached-queries';
-import { convertToUIMessages } from '@/lib/utils';
 
 export default async function Page(props: { params: Promise<any> }) {
   const params = await props.params;
@@ -35,7 +33,7 @@ export default async function Page(props: { params: Promise<any> }) {
       <Chat
       user_id={user.id}
       id={persona.id}
-      initialMessages={convertToUIMessages(messagesFromDb)}
+      initialMessages={messagesFromDb}
     />
   );
 }
