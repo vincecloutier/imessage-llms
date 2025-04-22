@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog"
 import Image from "next/image"
 import { createSignedAttachmentUrl } from "@/lib/actions" // Updated import path
 import { Skeleton } from "@/components/ui/skeleton"
+import { DialogTitle } from "@radix-ui/react-dialog"
 
 interface ImagePreviewProps {
   source: string | null | undefined // Can be blob URL, https URL, or file_path
@@ -131,6 +132,9 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
 
       {/* Image preview dialog - Only allow opening if URL resolved successfully */} 
       <Dialog open={isOpen && !!resolvedUrl && !error} onOpenChange={setIsOpen}>
+        <DialogTitle>
+          {alt}
+        </DialogTitle>
         <DialogOverlay className="bg-black/50" />
         <DialogContent className="max-w-3xl p-0 overflow-hidden bg-transparent border-0 shadow-none">
           {resolvedUrl && (
