@@ -157,13 +157,9 @@ export function InputMessage({
 
   }, [input, attachmentFile, isLoading, handleSubmit]);
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
   return (
-     <div className="w-full mx-auto max-w-3xl px-4 pb-4 sticky bottom-0 bg-background">
-       <div className="flex items-end gap-2 border rounded-xl p-2">
+     <div className="w-full mx-auto max-w-3xl px-4">
+       <div className="flex gap-4 px-3 py-2 w-fit max-w-[85%]">
          <input
            type="file"
            ref={fileInputRef}
@@ -171,17 +167,6 @@ export function InputMessage({
            className="hidden"
            accept="image/*"
          />
-
-         <Button
-           variant="ghost"
-           size="icon"
-           onClick={triggerFileInput}
-           disabled={isLoading || !!attachmentFile}
-           aria-label="Attach image"
-         >
-           <Paperclip className="h-5 w-5" />
-         </Button>
-
          <div className="flex flex-col gap-2 w-full">
            {previewUrl && (
              <div className="ml-1 mb-1">
@@ -202,7 +187,6 @@ export function InputMessage({
                'w-full resize-none scrollbar-hide border-none focus:ring-0 focus:outline-none p-0 bg-transparent',
                'leading-tight'
              )}
-             placeholder="Type your message..."
              rows={1}
              onKeyDown={(event) => {
                if (event.key === 'Enter' && !event.shiftKey) {
