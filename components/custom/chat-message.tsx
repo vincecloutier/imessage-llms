@@ -1,7 +1,6 @@
 'use client';
 
 import cx from 'classnames';
-import Image from 'next/image';
 
 import { ImagePreview } from './preview-attachment';
 
@@ -12,9 +11,6 @@ import React, {
   useState,
 } from 'react';
 import { toast } from 'sonner';
-import { useLocalStorage } from 'usehooks-ts';
-import { Button } from '@/components/ui/button';
-import { Paperclip } from 'lucide-react';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -25,7 +21,7 @@ type Message = {
 export const PreviewMessage = ({message}: {message: Message}) => {
   return (
     <div className="w-full mx-auto max-w-3xl px-4 group/message" data-role={message.role}>
-      <div className={cx('flex flex-col gap-2 px-3 py-2 w-fit max-w-[85%]', message.role === 'user' ? 'mr-auto' : 'ml-auto bg-muted/50 rounded-xl' )}>
+      <div className={cx('flex flex-col gap-2 px-3 py-2 w-fit max-w-[85%]', message.role === 'user' ? 'mr-auto' : 'ml-auto' )}>
           <div className="prose dark:prose-invert max-w-none"> 
             {message.content}
           </div>
@@ -47,23 +43,22 @@ export const ThinkingMessage = () => {
 
 
 export function InputMessage({
-  personaId,
   input,
   setInput,
   isLoading,
   handleSubmit,
   attachmentFile,
   setAttachmentFile,
-}: {
-  personaId: string | null;
+  textareaRef
+}:{
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;
   handleSubmit: () => void;
   attachmentFile: File | null;
   setAttachmentFile: (file: File | null) => void;
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
 }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -82,7 +77,7 @@ export function InputMessage({
     return () => URL.revokeObjectURL(objectUrl);
   }, [attachmentFile]);
 
-  const adjustHeight = () => {
+  const adjustHeight = useCallback(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       const scrollHeight = textareaRef.current.scrollHeight;
@@ -90,25 +85,9 @@ export function InputMessage({
       textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
       textareaRef.current.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden';
     }
-  };
+  }, [textareaRef]);
 
-  const [localStorageInput, setLocalStorageInput] = useLocalStorage(`input-${personaId || 'null'}`, '');
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      const domValue = textareaRef.current.value;
-      const finalValue = domValue || localStorageInput || '';
-      if (input !== finalValue) {
-          setInput(finalValue);
-      }
-      requestAnimationFrame(adjustHeight);
-    }
-  }, [localStorageInput]);
-
-  useEffect(() => {
-    setLocalStorageInput(input);
-    adjustHeight();
-  }, [input, setLocalStorageInput]);
+  useEffect(() => {adjustHeight();}, [input, adjustHeight]);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -134,7 +113,8 @@ export function InputMessage({
 
   const handleDeleteAttachment = useCallback(() => {
     setAttachmentFile(null);
-  }, [setAttachmentFile]);
+    textareaRef.current?.focus();
+  }, [setAttachmentFile, textareaRef]);
 
   const submit = useCallback(() => {
     if (input.trim().length === 0 && !attachmentFile) {
@@ -149,52 +129,50 @@ export function InputMessage({
 
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current?.focus();
+      textareaRef.current.focus();
     }
 
-  }, [input, attachmentFile, isLoading, handleSubmit]);
+  }, [input, attachmentFile, isLoading, handleSubmit, textareaRef]);
 
   return (
-     <div className="w-full mx-auto max-w-3xl px-4">
+    <div className="w-full mx-auto max-w-3xl px-4">
        <div className="flex gap-4 px-3 py-2 w-fit max-w-[85%]">
-         <input
-           type="file"
-           ref={fileInputRef}
-           onChange={handleFileChange}
-           className="hidden"
-           accept="image/*"
-         />
-         <div className="flex flex-col gap-2 w-full">
-           {previewUrl && (
-             <div className="ml-1 mb-1">
-               <ImagePreview
-                 source={previewUrl}
-                 onDelete={handleDeleteAttachment}
-                 alt={attachmentFile?.name || "Selected image"}
-               />
-             </div>
-           )}
-           <textarea
-             ref={textareaRef}
-             value={input}
-             onChange={handleInput}
-             maxLength={500}
-             className={cx(
-               'prose dark:prose-invert',
-               'w-full resize-none scrollbar-hide border-none focus:ring-0 focus:outline-none p-0 bg-transparent',
-               'leading-tight'
-             )}
-             rows={1}
-             onKeyDown={(event) => {
-               if (event.key === 'Enter' && !event.shiftKey) {
-                 event.preventDefault();
-                 submit();
-               }
-             }}
-             disabled={isLoading}
-           />
-         </div>
-       </div>
-     </div>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+        accept="image/*"
+      />
+      <div className="flex flex-col gap-2 w-full">
+        <textarea
+          ref={textareaRef}
+          value={input}
+          onChange={handleInput}
+          maxLength={1000}
+          className={cx(
+            'w-full resize-none scrollbar-hide border-none focus:ring-0 focus:outline-none p-0 bg-transparent',
+            'leading-tight text-sm md:text-base',
+            'min-h-[24px]'
+          )}
+          rows={1}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault();
+              submit();
+            }
+          }}
+          disabled={isLoading}
+        />
+        {previewUrl && attachmentFile && (
+            <ImagePreview
+              source={previewUrl}
+              onDelete={handleDeleteAttachment}
+              alt={attachmentFile.name || "Selected image"}
+            />
+        )}
+      </div>
+    </div>
+    </div>
   );
 }
