@@ -26,7 +26,7 @@ SidebarGroup,
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/lib/supabase/types';
 import GenericForm, { GenericFormProps } from './generic-form';
-import { savePersona } from '@/lib/actions';
+import { savePersona, deletePersona } from '@/lib/actions';
 
 // Type for a persona record from Supabase
 // Adjust properties as needed; here we assume a persona has at least an id and a title
@@ -144,6 +144,13 @@ export function SidebarHistory({ user }: { user: User | null }) {
                 attributesSchema={attributesSchema}
                 entityLabel="Persona"
                 saveAction={savePersona}
+                destructiveAction={async (id?: string) => {
+                  if (!id) {
+                    console.error("Delete action called without an ID.");
+                    return { success: false }; // Indicate failure
+                  }
+                  return deletePersona(id);
+                }}
               />
             </SidebarMenuItem>
           ))}
