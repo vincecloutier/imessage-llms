@@ -14,27 +14,6 @@ export async function getUserQuery(client: Client, email: string) {
   return users;
 }
 
-export async function savePersonaQuery(
-  client: Client,
-  {
-    id,
-    userId,
-    name,
-  }: {
-    id: string;
-    userId: string;
-    name: string;
-  }
-) {
-  const { error } = await client.from('personas').insert({
-    id,
-    user_id: userId,
-    name,
-  });
-
-  if (error) throw error;
-}
-
 export async function getPersonasByUserIdQuery(
   client: Client,
   { id }: { id: string }
@@ -77,26 +56,6 @@ export async function getMessagesByPersonaIdQuery(
 
   if (error) throw error;
   return messages;
-}
-
-export async function saveMessagesQuery(
-  client: Client,
-  {
-    personaId,
-    messages,
-  }: {
-    personaId: string;
-    messages: Tables['messages']['Insert'][];
-  }
-) {
-  const messagesWithpersonaId = messages.map((message) => ({
-    ...message,
-    persona_id: personaId,
-  }));
-
-  const { error } = await client.from('messages').insert(messagesWithpersonaId);
-
-  if (error) throw error;
 }
 
 type PostgrestError = {

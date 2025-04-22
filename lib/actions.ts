@@ -52,6 +52,7 @@ export async function savePersona(payload: SaveEntityPayload) {
         sender_address: payload.sender_address,
       })
       .eq('id', payload.id)
+      .eq('user_id', user.id)
       .select()
       .single();
     if (error) throw new Error(error.message);
@@ -69,4 +70,23 @@ export async function savePersona(payload: SaveEntityPayload) {
     if (error) throw new Error(error.message);
     return data;
   }
+}
+
+//
+// Delete a Persona: deletes based on id and user_id.
+//
+export async function deletePersona(id: string) {
+  'use server';
+  const supabase = await createClient();
+  const { data: { user }, error: authErr } = await supabase.auth.getUser();
+  if (authErr) throw new Error(authErr.message);
+  if (!user) throw new Error('User not found');
+
+  const { error } = await supabase
+    .from('personas')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id);
+  if (error) throw new Error(error.message);
+  return { success: true };
 }
