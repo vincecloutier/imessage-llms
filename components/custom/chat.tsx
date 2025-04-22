@@ -1,212 +1,103 @@
 'use client';
 
-import { Attachment, Message } from 'ai';
-import { useChat } from '@ai-sdk/react';
-import { useState, useRef, DragEvent } from 'react';
-import { AnimatePresence, motion } from "framer-motion";
-import { toast } from "sonner";
-
+import { useState, useRef, useEffect, FormEvent, KeyboardEvent } from 'react';
 import { InputMessage, PreviewMessage, ThinkingMessage } from '@/components/custom/message';
-import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
 import { SidebarTrigger } from '../ui/sidebar';
-import { Separator } from '../ui/separator';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import AuthButton from './logout-button';
-// Helper function to convert File to Attachment with data URL
-const fileToAttachment = async (file: File): Promise<Attachment> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      resolve({
-        name: file.name,
-        contentType: file.type,
-        url: event.target?.result as string, // Use data URL for preview
+import { BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage, Breadcrumb, } from '../ui/breadcrumb';
+import { Separator } from '../ui/separator';
+
+export function Chat({ user_id, id, initialMessages }: { user_id: string | null; id: string | null; initialMessages: any[] }) {
+  const [messages, setMessages] = useState(initialMessages || []);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages]);
+
+  const sendMessage = async (message: string) => {
+    if (!id || !message.trim()) return;
+
+    const userMessage = {role: 'user', content: message };
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('https://april-python.vercel.app/api/frontend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          user_id: user_id,
+          persona_id: id,
+          message: message,
+          attachment: null,
+        }),
       });
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
 
-export function Chat({ id, initialMessages }: { id: string | null; initialMessages: Array<Message> }) {
-  const { messages, handleSubmit, input, setInput, status } = useChat({body: { id }, initialMessages});
-  const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
-  const [files, setFiles] = useState<FileList | null>(null);
-  const [previewAttachments, setPreviewAttachments] = useState<Array<Attachment>>([]); // New state for previews
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Function to update both files and previewAttachments state
-  const updateFilesAndPreviews = async (newFiles: FileList | null) => {
-    setFiles(newFiles);
-    if (newFiles && newFiles.length > 0) {
-      const attachmentPromises = Array.from(newFiles).map(fileToAttachment);
-      const resolvedAttachments = await Promise.all(attachmentPromises);
-      setPreviewAttachments(resolvedAttachments);
-    } else {
-      setPreviewAttachments([]); // Clear previews if files are cleared
+      const result = await response.json();
+      const aiMessage = {
+        role: 'assistant',
+        content: result.message?.content || 'Error: No response',
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (err) {
+      setMessages((prev) => [...prev, { id: 'error', role: 'assistant', content: 'Something went wrong: ' + err }]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // New helper function to process files
-  const processFiles = (filesArray: File[]): boolean => {
-    if (filesArray.length === 0) {
-        updateFilesAndPreviews(null);
-        return true; // No files to process is not an error state
+  const handleSubmit = (e?: FormEvent<HTMLFormElement> | KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e && 'preventDefault' in e) {
+      e.preventDefault();
     }
-    const validFiles = filesArray.filter((file) => file.type.startsWith("image/"));
-    if (validFiles.length === filesArray.length) {
-      const dataTransfer = new DataTransfer();
-      validFiles.forEach((file) => dataTransfer.items.add(file));
-      updateFilesAndPreviews(dataTransfer.files);
-      return true;
-    } else {
-      toast.error("Only image files are allowed!");
-      updateFilesAndPreviews(null);
-      return false;
-    }
-  };
-
-  // File handling functions
-  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(false);
-    processFiles(Array.from(event.dataTransfer.files));
-  };
-
-  const handlePaste = (event: React.ClipboardEvent) => {
-    const items = event.clipboardData?.items;
-    if (items) {
-      const filesFromPaste = Array.from(items)
-        .map((item) => item.getAsFile())
-        .filter((file): file is File => file !== null);
-      processFiles(filesFromPaste);
-    }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files;
-    if (selectedFiles) {
-      const success = processFiles(Array.from(selectedFiles));
-      if (!success && fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    } else {
-      updateFilesAndPreviews(null); // Clear if selection is cancelled
-    }
+    sendMessage(input);
+    setInput('');
   };
 
   return (
-    <>
-      <div className="relative h-dvh" ref={containerRef} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onPaste={handlePaste}>
-        <AnimatePresence>
-          {isDragging && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none dark:bg-zinc-900/90 z-10 flex flex-col gap-1 justify-center items-center bg-zinc-100/90 rounded-md"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <div>Drag and drop files here</div>
-              <div className="text-sm dark:text-zinc-400 text-zinc-500">
-                {"(images only)"}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <header className="flex justify-between h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                    Persona
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>April</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-          <div className="flex items-center gap-2 px-4">
-            <AuthButton />
-          </div>
-        </header>
-
-          <div
-            ref={messagesContainerRef}
-            className="flex flex-1 flex-col min-w-0 h-[calc(100%-4rem)] gap-6 pt-4 overflow-y-scroll scrollbar-hide"
-          >
-            {messages.map((message, index) => (
-              <PreviewMessage
-                key={message.id}
-                message={message}
-                isLoading={status === 'submitted' && messages.length - 1 === index}
-              />
-            ))}
-
-            {status === 'submitted' &&
-              messages.length > 0 &&
-              messages[messages.length - 1].role === 'user' && (
-                <ThinkingMessage />
-              )}
-
-            <form
-              className="w-full mx-auto px-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (files && files.length > 0) {
-                  const options = { experimental_attachments: files };
-                  handleSubmit(e, options);
-                  updateFilesAndPreviews(null); // Clear files and previews on submit
-                } else {
-                  handleSubmit(e);
-                }
-              }}
-            >
-              <InputMessage
-                personaId={id}
-                input={input}
-                setInput={setInput}
-                handleSubmit={(e) => {
-                  const options = files ? { experimental_attachments: files } : {};
-                  handleSubmit(e, options);
-                  updateFilesAndPreviews(null); // Clear files and previews on submit via Enter key
-                }}
-                isLoading={status === 'submitted'}
-                attachments={previewAttachments}
-              />
-            </form>
-
-            <div
-              ref={messagesEndRef}
-              className="shrink-0 min-w-[24px] min-h-[24px]"
-            />
-          </div>
-
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={handleFileChange}
-          />
+    <div className="relative h-dvh">
+      <header className="flex justify-between h-16 shrink-0 items-center gap-2 px-4">
+        <div className="flex items-center gap-2">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">Persona</BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>April</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
-    </>
+        <AuthButton />
+      </header>
+
+      <div className="flex flex-1 flex-col min-w-0 h-[calc(100%-4rem)] gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4">
+        {messages.map((message, index) => (
+          <PreviewMessage
+            key={index}
+            message={message}
+            isLoading={false}
+          />
+        ))}
+        {isLoading && <ThinkingMessage />}
+        <form className="w-full mx-auto" onSubmit={handleSubmit}>
+          <InputMessage
+            personaId={id}
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleSubmit}
+            isLoading={isLoading}
+            attachments={[]}
+          />
+        </form>
+        <div ref={messagesEndRef} className="shrink-0 min-w-[24px] min-h-[24px]" />
+      </div>
+    </div>
   );
 }

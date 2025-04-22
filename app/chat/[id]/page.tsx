@@ -33,6 +33,7 @@ export default async function Page(props: { params: Promise<any> }) {
   
   return (
       <Chat
+      user_id={user.id}
       id={persona.id}
       initialMessages={convertToUIMessages(messagesFromDb)}
     />
