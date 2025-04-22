@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { Chat } from '@/components/custom/chat';
+import { Chat } from '@/components/custom/chat-main';
 import {
   getPersonaById,
   getMessagesByPersonaId,

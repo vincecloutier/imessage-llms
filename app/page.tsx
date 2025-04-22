@@ -1,4 +1,4 @@
-import { Chat as PreviewChat } from '@/components/custom/chat';
+import { Chat as PreviewChat } from '@/components/custom/chat-main';
 
 export default async function Home() {  
   return (

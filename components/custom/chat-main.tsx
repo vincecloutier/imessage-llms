@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent, KeyboardEvent } from 'react';
-import { InputMessage, PreviewMessage, ThinkingMessage } from '@/components/custom/message';
+import { InputMessage, PreviewMessage, ThinkingMessage } from '@/components/custom/chat-message';
 import { SidebarTrigger } from '../ui/sidebar';
 import AuthButton from './logout-button';
 import { BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage, Breadcrumb, } from '../ui/breadcrumb';
@@ -23,7 +23,7 @@ export function Chat({ user_id, id, initialMessages }: { user_id: string | null;
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://april-python.vercel.app/api/frontend', {
+      const response = await fetch('http://localhost:3001/api/frontend', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
