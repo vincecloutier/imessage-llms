@@ -1,116 +1,149 @@
-import { Attachment } from 'ai';
-import { Loader, X, Eye } from 'lucide-react';
-import { useState } from 'react';
+"use client"
 
-export const PreviewAttachment = ({
-  attachment,
-  onRemove,
-  isUploading = false,
-}: {
-  attachment: Attachment;
-  onRemove: (attachment: Attachment) => void;
-  isUploading?: boolean;
-}) => {
-  const { name, url, contentType } = attachment;
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+import { useState, useEffect } from "react"
+import { X, Image as ImageIcon, AlertTriangle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog"
+import Image from "next/image"
+import { createSignedAttachmentUrl } from "@/lib/supabase/actions" // Updated import path
+import { Skeleton } from "@/components/ui/skeleton"
 
-  const handleRemove = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onRemove(attachment);
-  };
+interface ImagePreviewProps {
+  source: string | null | undefined // Can be blob URL, https URL, or file_path
+  onDelete?: () => void
+  alt?: string
+}
 
-  const handlePreviewOpen = () => {
-    if (contentType?.startsWith('image')) {
-      setIsPreviewOpen(true);
+export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImagePreviewProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [resolvedUrl, setResolvedUrl] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!source) {
+      setResolvedUrl(null)
+      setIsLoading(false)
+      setError(null)
+      return
     }
-  };
 
-  const handlePreviewClose = () => {
-    setIsPreviewOpen(false);
-  };
+    if (source.startsWith('blob:') || source.startsWith('http')) {
+      console.log('ImagePreview: Using direct URL:', source)
+      setResolvedUrl(source)
+      setIsLoading(false)
+      setError(null)
+    } else {
+      console.log('ImagePreview: Received potential file path, attempting fetch:', source)
+      let isMounted = true
+      const fetchUrl = async () => {
+        setIsLoading(true)
+        setError(null)
+        try {
+          console.log('ImagePreview: Calling createSignedAttachmentUrl with path:', source)
+          const result = await createSignedAttachmentUrl(source)
+          console.log('ImagePreview: Result from createSignedAttachmentUrl:', result)
+
+          if (!isMounted) return
+
+          if (result.error) {
+            console.error("ImagePreview: Failed to get signed URL:", result.error)
+            setError(result.error)
+            setResolvedUrl(null)
+          } else {
+            setResolvedUrl(result.signedUrl)
+          }
+        } catch (err: any) {
+          if (!isMounted) return
+          console.error("ImagePreview: Error calling createSignedAttachmentUrl action:", err)
+          setError(err.message || "Failed to load image.")
+          setResolvedUrl(null)
+        } finally {
+          if (isMounted) {
+            setIsLoading(false)
+          }
+        }
+      }
+      fetchUrl()
+
+      return () => { isMounted = false }
+    }
+  }, [source])
+
+  const renderPreviewContent = () => {
+    if (isLoading) {
+      return <Skeleton className="w-32 h-32" />
+    }
+    if (error) {
+      return (
+        <div className="w-32 h-32 flex flex-col items-center justify-center text-destructive bg-destructive/10 border border-destructive/50 rounded-md p-2 text-center">
+          <AlertTriangle className="w-6 h-6 mb-1" />
+          <span className="text-xs">Load failed</span>
+        </div>
+      )
+    }
+    if (resolvedUrl) {
+      return (
+        <Image
+          src={resolvedUrl}
+          alt={alt}
+          width={128}
+          height={128}
+          className="w-full h-full object-cover"
+          onClick={() => setIsOpen(true)} // Open dialog only if image loaded
+        />
+      )
+    }
+    // Fallback if source is null/undefined or resolvedUrl is null without error/loading
+    return (
+        <div className="w-32 h-32 flex items-center justify-center bg-muted rounded-md">
+            <ImageIcon className="w-8 h-8 text-muted-foreground" />
+        </div>
+    );
+  }
 
   return (
     <>
-      <div className="flex flex-col gap-1 group relative">
-        <button
-          type="button"
-          onClick={handlePreviewOpen}
-          className="w-20 aspect-video bg-muted rounded-md relative flex flex-col items-center justify-center overflow-hidden focus:outline-none"
-          aria-label={`Preview ${name ?? 'attachment'}`}
-          disabled={isUploading}
-        >
-          {contentType ? (
-            contentType.startsWith('image') ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={url}
-                src={url}
-                alt={name ?? 'An image attachment'}
-                className="rounded-md size-full object-cover"
-              />
-            ) : (
-              <div className="text-xs p-1 text-center text-muted-foreground">
-                {name ?? 'File'}
-              </div>
-            )
-          ) : (
-            <div className="text-xs p-1 text-center text-muted-foreground">
-              Invalid Type
-            </div>
-          )}
+      <div className="relative inline-block group">
+        <div className="border rounded-md overflow-hidden relative w-32 h-32">
+          {/* Preview thumbnail */} 
+          <div className="w-full h-full cursor-pointer">
+             {renderPreviewContent()}
+          </div>
 
-          {contentType?.startsWith('image') && !isUploading && (
-             <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Eye className="text-white h-6 w-6" />
-             </div>
+          {/* Delete button - Render only if onDelete is provided */} 
+          {onDelete && (
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute top-1 right-1 w-6 h-6 rounded-full opacity-80 hover:opacity-100 disabled:opacity-50"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (onDelete) onDelete()
+              }}
+              disabled={isLoading} // Disable delete while loading new source
+            >
+              <X className="h-3 w-3" />
+            </Button>
           )}
-
-          {isUploading && (
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-              <div className="animate-spin text-white">
-                <Loader />
-              </div>
-            </div>
-          )}
-        </button>
-        {!isUploading && (
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="absolute top-0 right-0 -mt-1 -mr-1 bg-background border border-destructive text-destructive rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:bg-destructive hover:text-destructive-foreground"
-            aria-label={`Remove ${name ?? 'attachment'}`}
-          >
-            <X className="h-3 w-3" />
-          </button>
-        )}
+        </div>
       </div>
 
-      {isPreviewOpen && contentType?.startsWith('image') && (
-        <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-          onClick={handlePreviewClose}
-        >
-          <div
-            className="relative max-w-4xl max-h-[80vh] bg-background p-2 rounded-lg shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-             <button
-               type="button"
-               onClick={handlePreviewClose}
-               className="absolute top-2 right-2 bg-background text-muted-foreground rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-ring hover:bg-muted"
-               aria-label="Close preview"
-             >
-               <X className="h-5 w-5" />
-             </button>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={url}
-              alt={name ?? 'Image preview'}
-              className="block max-w-full max-h-[calc(80vh-2rem)]"
-            />
-          </div>
-        </div>
-      )}
+      {/* Image preview dialog - Only allow opening if URL resolved successfully */} 
+      <Dialog open={isOpen && !!resolvedUrl && !error} onOpenChange={setIsOpen}>
+        <DialogOverlay className="bg-black/50" />
+        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-transparent border-0 shadow-none">
+          {resolvedUrl && (
+             <Image
+               src={resolvedUrl} // Use resolvedUrl here too
+               alt={alt}
+               width={1024}
+               height={768}
+               className="w-full h-auto max-h-[80vh] object-contain"
+             />
+          )}
+        </DialogContent>
+      </Dialog>
     </>
-  );
-};
+  )
+}

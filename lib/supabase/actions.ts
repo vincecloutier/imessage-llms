@@ -1,43 +1,7 @@
+'use server';
 
 import { cache } from 'react';
-
 import { createClient } from '@/lib/supabase/server';
-
-export const getUser = async () => {
-  const supabase = await createClient();
-  const {data: { user }, error} = await supabase.auth.getUser();
-  if (!user) return null;
-  if (error) {console.error(error); return null;}
-  return user;
-};
-
-export const getProfile = async (email: string) => {
-  const supabase = await createClient();
-  const { data: users, error } = await supabase.from('profiles').select().eq('email', email).single();
-  if (error) throw error;
-  return users;
-};
-
-export const getPersonaById = async (personaId: string) => {
-  const supabase = await createClient();
-  const { data: persona, error } = await supabase.from('personas').select().eq('id', personaId).single();
-  if (error) throw error;
-  return persona;
-};
-
-export const getPersonasByUserId = async (userId: string) => {
-  const supabase = await createClient();
-  const { data: personas, error } = await supabase.from('personas').select().eq('user_id', userId);
-  if (error) throw error;
-  return personas;
-};
-
-export const getMessagesByPersonaId = async (personaId: string) => {
-  const supabase = await createClient();
-  const { data: messages, error } = await supabase.from('messages').select().eq('persona_id', personaId).order('created_at', { ascending: true });
-  if (error) throw error;
-  return messages;
-};
 
 const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour - adjust as needed
 
@@ -48,27 +12,34 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
 
   const supabase = await createClient();
 
+  // Add RLS requirement: Get current user ID
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+      return { error: 'Authentication required.', signedUrl: null };
+  }
+
+  if (!filePath.startsWith(`${user.id}/`)) { return { error: 'Unauthorized' }; }
+
   try {
-    // 1. Check cache first
+    // 1. Check cache first (RLS will automatically filter by user_id)
     const { data: cachedData, error: cacheError } = await supabase
       .from('cached_signed_urls')
       .select('signed_url, expires_at')
       .eq('file_path', filePath)
+      .eq('user_id', user.id) 
       .single();
 
     if (cacheError && cacheError.code !== 'PGRST116') { // Ignore 'PGRST116' (Row not found)
       console.error('Error checking cache:', cacheError);
-      // Decide if you want to proceed without cache or return error
-      // Proceeding for now, but logging the error
     }
 
     if (cachedData?.signed_url && new Date(cachedData.expires_at) > new Date()) {
-      console.log(`Using cached signed URL for path: [${filePath}]`);
+      console.log(`Using cached signed URL for path: [${filePath}] for user [${user.id}]`);
       return { error: null, signedUrl: cachedData.signed_url };
     }
 
     // 2. If not in cache or expired, generate new URL
-    console.log(`Generating new signed URL for path: [${filePath}]`);
+    console.log(`Generating new signed URL for path: [${filePath}] for user [${user.id}]`);
     const { data: storageData, error: storageError } = await supabase.storage
       .from('attachments')
       .createSignedUrl(filePath, SIGNED_URL_EXPIRY_SECONDS);
@@ -82,7 +53,7 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
       return { error: 'Failed to generate signed URL.', signedUrl: null };
     }
 
-    // 3. Store the new URL in the cache
+    // 3. Store the new URL in the cache (RLS requires user_id)
     const expiresAt = new Date();
     expiresAt.setSeconds(expiresAt.getSeconds() + SIGNED_URL_EXPIRY_SECONDS);
 
@@ -92,17 +63,19 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
         file_path: filePath,
         signed_url: storageData.signedUrl,
         expires_at: expiresAt.toISOString(),
+        user_id: user.id // Add user_id for RLS
       });
 
     if (upsertError) {
       console.error('Error saving signed URL to cache:', upsertError);
-      // Return the generated URL anyway, even if caching failed
+    } else {
+        console.log(`Cached new signed URL for path: [${filePath}] for user [${user.id}]`);
     }
 
     return { error: null, signedUrl: storageData.signedUrl };
 
   } catch (e: any) {
-    console.error('Unexpected error generating signed URL:', e);
+    console.error(`Unexpected error generating signed URL for user [${user.id}]:`, e);
     return { error: e.message || 'An unexpected error occurred.', signedUrl: null };
   }
-});
+}); 

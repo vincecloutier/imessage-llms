@@ -6,37 +6,83 @@ import { SidebarTrigger } from '../ui/sidebar';
 import AuthButton from './logout-button';
 import { BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage, Breadcrumb, } from '../ui/breadcrumb';
 import { Separator } from '../ui/separator';
+import { toast } from 'sonner';
 
-export function Chat({ user_id, id, initialMessages }: { user_id: string | null; id: string | null; initialMessages: any[] }) {
-  const [messages, setMessages] = useState(initialMessages || []);
+type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+  attachment?: string | null;
+};
+
+export function Chat({ user_id, id, initialMessages }: { user_id: string | null; id: string | null; initialMessages: Message[] }) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages || []);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages]);
 
-  const sendMessage = async (message: string) => {
-    if (!id || !message.trim()) return;
-    setMessages((prev) => [...prev, {role: 'user', content: message }]);
+  const sendMessage = async (message: string, file: File | null) => {
+    if (!id || (!message.trim() && !file)) {
+      toast.error('Please enter a message or add an attachment.');
+      return;
+    }
     setIsLoading(true);
+
+    const userMessage: Message = { role: 'user', content: message };
+    if (file) {
+      userMessage.attachment = URL.createObjectURL(file);
+    }
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setAttachmentFile(null);
+
+    const formData = new FormData();
+    formData.append('user_id', user_id || '');
+    formData.append('persona_id', id);
+    formData.append('message', message);
+    if (file) {
+      formData.append('attachment', file);
+    }
+
     try {
+      if (userMessage.attachment && userMessage.attachment.startsWith('blob:')) {
+        URL.revokeObjectURL(userMessage.attachment);
+      }
+
       const response = await fetch('http://localhost:3001/api/frontend', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         credentials: 'include',
-        body: JSON.stringify({
-          user_id: user_id,
-          persona_id: id,
-          message: message,
-          attachment: null,
-        })
+        body: formData,
       });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Server error: ${response.status} ${errorData}`);
+      }
+
       const result = await response.json();
-      setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content}]);
-    } catch (err) {
-      setMessages((prev) => [...prev, {role: 'assistant', content: err}]);
+      const assistantMessage: Message = { role: 'assistant', content: result.message.content };
+      if (result.message.attachment) {
+        assistantMessage.attachment = result.message.attachment;
+      }
+       setMessages((prev) => {
+         const updatedMessages = prev.map(msg => 
+             msg === userMessage && msg.attachment?.startsWith('blob:') 
+             ? { ...msg, attachment: result.user_message_attachment_url || null }
+             : msg
+         );
+         return [...updatedMessages, assistantMessage];
+       });
+       
+    } catch (err: any) {
+       if (userMessage.attachment && userMessage.attachment.startsWith('blob:')) {
+        URL.revokeObjectURL(userMessage.attachment);
+       }
+       console.error("Send message error:", err);
+       toast.error(`Failed to send message: ${err.message}`);
+       setMessages((prev) => [...prev.filter(msg => msg !== userMessage), {role: 'assistant', content: `Error: ${err.message || 'Could not send message'}`}]);
     } finally {
       setIsLoading(false);
     }
@@ -46,8 +92,11 @@ export function Chat({ user_id, id, initialMessages }: { user_id: string | null;
     if (e && 'preventDefault' in e) {
       e.preventDefault();
     }
-    sendMessage(input);
-    setInput('');
+    if (isLoading) {
+        toast.error('Please wait for the previous response to complete.');
+        return;
+    }
+    sendMessage(input, attachmentFile);
   };
 
   return (
@@ -74,20 +123,18 @@ export function Chat({ user_id, id, initialMessages }: { user_id: string | null;
           <PreviewMessage
             key={index}
             message={message}
-            isLoading={false}
           />
         ))}
         {isLoading && <ThinkingMessage />}
-        <form className="w-full mx-auto" onSubmit={handleSubmit}>
-          <InputMessage
-            personaId={id}
-            input={input}
-            setInput={setInput}
-            handleSubmit={handleSubmit}
-            isLoading={isLoading}
-            attachments={[]}
-          />
-        </form>
+        <InputMessage
+          personaId={id}
+          input={input}
+          setInput={setInput}
+          handleSubmit={() => handleSubmit()}
+          isLoading={isLoading}
+          attachmentFile={attachmentFile}
+          setAttachmentFile={setAttachmentFile}
+        />
         <div ref={messagesEndRef} className="shrink-0 min-w-[24px] min-h-[24px]" />
       </div>
     </div>

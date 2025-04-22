@@ -1,57 +1,51 @@
 'use client';
 
-import { Message } from 'ai';
 import cx from 'classnames';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 
-import { PreviewAttachment } from './preview-attachment';
+import { ImagePreview } from './preview-attachment';
 
-import { Attachment, ChatRequestOptions } from 'ai';
 import React, {
   useRef,
   useEffect,
   useCallback,
+  useState,
 } from 'react';
 import { toast } from 'sonner';
-import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useLocalStorage } from 'usehooks-ts';
+import { Button } from '@/components/ui/button';
+import { Paperclip } from 'lucide-react';
 
-export const PreviewMessage = ({message, isLoading}: {message: Message, isLoading: boolean}) => {
+type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+  file_path?: string | null;
+}
+
+export const PreviewMessage = ({message}: {message: Message}) => {
+  console.log('PreviewMessage rendering. Message:', message);
+  console.log('PreviewMessage - Attachment value:', message.file_path);
+
   return (
-    <motion.div
-      className="w-full mx-auto max-w-3xl px-4 group/message"
-      initial={{ y: 5, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      data-role={message.role}
-    >
-      <div
-        className={cx(
-          'flex gap-4 px-3 py-2 w-fit max-w-[85%]',
-          message.role === 'user'
-            ? 'mr-auto'
-            : 'ml-auto'
-        )}
-      >
-
+    <div className="w-full mx-auto max-w-3xl px-4 group/message" data-role={message.role}>
+      <div className={cx('flex gap-4 px-3 py-2 w-fit max-w-[85%]', message.role === 'user' ? 'mr-auto' : 'ml-auto bg-muted/50 rounded-xl')}>
         <div className="flex flex-col gap-2 w-full">
-          <div className="prose dark:prose-invert">
-          {/* TODO: modify this so we split newlines */}
-          {message.content}
-          </div>
-
-          {message.experimental_attachments && (
-            <div className="flex flex-row gap-2">
-              {message.experimental_attachments.map((attachment) => (
-                <PreviewAttachment
-                  key={attachment.url}
-                  attachment={attachment}
-                  onRemove={() => {}}
-                />
-              ))}
+          {message.content && (
+             <div className="prose dark:prose-invert max-w-none"> 
+               {message.content}
+             </div>
+          )}
+          {message.file_path && (
+            <div className="mt-2">
+              <ImagePreview
+                source={message.file_path}
+                alt={message.content || "Attachment"}
+              />
             </div>
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -61,35 +55,47 @@ export function InputMessage({
   setInput,
   isLoading,
   handleSubmit,
-  className,
-  attachments,
+  attachmentFile,
+  setAttachmentFile,
 }: {
   personaId: string | null;
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;
-  attachments: Array<Attachment>;
-  handleSubmit: (
-    event?: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLTextAreaElement>,
-    chatRequestOptions?: ChatRequestOptions
-  ) => void;
-  className?: string;
+  handleSubmit: () => void;
+  attachmentFile: File | null;
+  setAttachmentFile: (file: File | null) => void;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!attachmentFile) {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(attachmentFile);
+    setPreviewUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [attachmentFile]);
 
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      const newHeight = textareaRef.current.scrollHeight;
-      textareaRef.current.style.height = `${newHeight}px`;
-      textareaRef.current.style.overflowY = textareaRef.current.scrollHeight > textareaRef.current.clientHeight ? 'auto' : 'hidden';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const maxHeight = 200;
+      textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
+      textareaRef.current.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden';
     }
   };
 
-  const [localStorageInput, setLocalStorageInput] = useLocalStorage(
-    `input-${personaId || 'null'}`,
-    ''
-  );
+  const [localStorageInput, setLocalStorageInput] = useLocalStorage(`input-${personaId || 'null'}`, '');
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -97,11 +103,10 @@ export function InputMessage({
       const finalValue = domValue || localStorageInput || '';
       if (input !== finalValue) {
           setInput(finalValue);
-      } else {
-          adjustHeight();
       }
+      requestAnimationFrame(adjustHeight);
     }
-  }, [localStorageInput, setInput]);
+  }, [localStorageInput]);
 
   useEffect(() => {
     setLocalStorageInput(input);
@@ -112,10 +117,30 @@ export function InputMessage({
     setInput(event.target.value);
   };
 
-  const submit = useCallback((event?: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event) event.preventDefault();
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error("File size exceeds 5MB limit.");
+          return;
+        }
+        if (!file.type.startsWith('image/')) {
+           toast.error("Please select an image file.");
+           return;
+        }
+        setAttachmentFile(file);
+    }
+    if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+  };
 
-    if (input.trim().length === 0 && attachments.length === 0) {
+  const handleDeleteAttachment = useCallback(() => {
+    setAttachmentFile(null);
+  }, [setAttachmentFile]);
+
+  const submit = useCallback(() => {
+    if (input.trim().length === 0 && !attachmentFile) {
         toast.error('Please enter a message or add an attachment.');
         return;
     }
@@ -123,85 +148,86 @@ export function InputMessage({
         toast.error('Please wait for the previous response to complete.');
         return;
     }
-
-    handleSubmit(event);
+    handleSubmit();
 
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current?.focus();
     }
 
-  }, [input, attachments, isLoading, handleSubmit]);
+  }, [input, attachmentFile, isLoading, handleSubmit]);
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
-    <motion.div
-      className="w-full mx-auto max-w-3xl px-4 group/message"
-      initial={{ y: 5, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      data-role="user"
-    >
-      <div
-        className={cx(
-          'flex gap-4 px-3 py-2 rounded-xl max-w-[85%]',
-          'mr-auto'
-        )}
-      >
-        <div className="flex flex-col gap-2 w-full">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={handleInput}
-            maxLength={500}
-            className={cx(
-              'prose dark:prose-invert min-h-[1em] resize-none scrollbar-hide',
-              'border-none focus:ring-0 focus:outline-none p-0',
-              className
-            )}
-            rows={1}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                submit(event);
-              }
-            }}
-          />
-          {attachments && attachments.length > 0 && (
-            <div className="flex flex-row gap-2">
-              {attachments.map((attachment) => (
-                <PreviewAttachment
-                  key={attachment.url || attachment.name}
-                  attachment={attachment}
-                  onRemove={() => {}}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </motion.div>
+     <div className="w-full mx-auto max-w-3xl px-4 pb-4 sticky bottom-0 bg-background">
+       <div className="flex items-end gap-2 border rounded-xl p-2">
+         <input
+           type="file"
+           ref={fileInputRef}
+           onChange={handleFileChange}
+           className="hidden"
+           accept="image/*"
+         />
+
+         <Button
+           variant="ghost"
+           size="icon"
+           onClick={triggerFileInput}
+           disabled={isLoading || !!attachmentFile}
+           aria-label="Attach image"
+         >
+           <Paperclip className="h-5 w-5" />
+         </Button>
+
+         <div className="flex flex-col gap-2 w-full">
+           {previewUrl && (
+             <div className="ml-1 mb-1">
+               <ImagePreview
+                 source={previewUrl}
+                 onDelete={handleDeleteAttachment}
+                 alt={attachmentFile?.name || "Selected image"}
+               />
+             </div>
+           )}
+           <textarea
+             ref={textareaRef}
+             value={input}
+             onChange={handleInput}
+             maxLength={500}
+             className={cx(
+               'prose dark:prose-invert',
+               'w-full resize-none scrollbar-hide border-none focus:ring-0 focus:outline-none p-0 bg-transparent',
+               'leading-tight'
+             )}
+             placeholder="Type your message..."
+             rows={1}
+             onKeyDown={(event) => {
+               if (event.key === 'Enter' && !event.shiftKey) {
+                 event.preventDefault();
+                 submit();
+               }
+             }}
+             disabled={isLoading}
+           />
+         </div>
+       </div>
+     </div>
   );
 }
 
-
 export const ThinkingMessage = () => {  
   return (
-    <motion.div
-      className="w-full mx-auto max-w-3xl px-4 group/message"
-      initial={{ y: 5, opacity: 0 }}
-      animate={{ y: 0, opacity: 1}}
-      data-role="assistant"
-    >
-      <div
-        className={cx(
-          'flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%]',
-          'ml-auto'
-        )}
-      >
+    <div className="w-full mx-auto max-w-3xl px-4 group/message" data-role="assistant">
+      <div className={cx('flex gap-4 px-3 py-2 rounded-xl w-fit max-w-[85%] ml-auto')}>
         <div className="flex flex-col gap-2 w-full">
           <div className="flex flex-col gap-4 text-muted-foreground">
             Typing...
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
