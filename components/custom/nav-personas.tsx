@@ -2,7 +2,7 @@
 
 import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -10,37 +10,41 @@ import {
   UserRound,
   MoreHorizontal,
   Plus,
-  LucideIcon,
-  ChevronRight,
 } from 'lucide-react';
 
 import {
-  SidebarGroup,
+SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarMenuSub,
   useSidebar,
 } from '@/components/ui/sidebar';
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/lib/supabase/types';
-import PersonaForm from './persona-form';
+import GenericForm, { GenericFormProps } from './generic-form';
+import { savePersona } from '@/lib/actions';
 
 // Type for a persona record from Supabase
 // Adjust properties as needed; here we assume a persona has at least an id and a title
 
 type persona = Database['public']['Tables']['personas']['Row'];
+
+const attributesSchema: GenericFormProps['attributesSchema'] = [
+  { name: 'name', label: 'Name', type: 'text', required: true },
+  { name: 'dob', label: 'Date of Birth', type: 'dob', required: true },
+  { name: 'occupation', label: 'Occupation', type: 'text', required: true },
+  { name: 'relationship', label: 'Relationship', type: 'enum', required: true, options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
+  { name: 'ethnicity', label: 'Ethnicity', type: 'enum', required: true, options: ['White', 'Black', 'Asian', 'Hispanic', 'Indian', 'Middle Eastern', 'Other'] },
+  { name: 'location', label: 'Location', type: 'text', required: true },
+  { name: 'hair_length', label: 'Hair Length', type: 'enum', required: true, options: ['Bald', 'Short', 'Medium', 'Long'] },
+  { name: 'hair_color', label: 'Hair Color', type: 'enum', required: true, options: ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White'] },
+  { name: 'eye_color', label: 'Eye Color', type: 'enum', required: true, options: ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Violet', 'Other'] },
+  { name: 'gender', label: 'Gender', type: 'enum', required: true, options: ['Male', 'Female', 'Other'] },
+];
 
 const fetcher = async (): Promise<persona[]> => {
   try {
@@ -59,7 +63,6 @@ const fetcher = async (): Promise<persona[]> => {
       .from('personas')
       .select('*')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: true });
 
     if (personasError) {
       console.error('Personas fetch error:', personasError);
@@ -74,10 +77,8 @@ const fetcher = async (): Promise<persona[]> => {
 };
 
 export function SidebarHistory({ user }: { user: User | null }) {
-  const { setOpenMobile, isMobile } = useSidebar();
-  const { id } = useParams();
+  const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
-  const router = useRouter();
   const { data: history, isLoading, mutate } = useSWR<persona[]>(
     user ? ['personas', user.id] : null,
     fetcher,
@@ -112,7 +113,7 @@ export function SidebarHistory({ user }: { user: User | null }) {
     );
   }
 
-  return (
+  return (  
     <>
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
     <SidebarGroupLabel>Personas</SidebarGroupLabel>
@@ -120,85 +121,47 @@ export function SidebarHistory({ user }: { user: User | null }) {
           {history?.map((persona) => (
             <SidebarMenuItem key={persona.id}>
               <SidebarMenuButton asChild>
-                <Link href={`/?id=${persona.id}`} onClick={() => setOpenMobile(false)}>
+                <Link href={`/chat/${persona.id}`} onClick={() => setOpenMobile(false)}>
                   <UserRound />
-                  <span>{persona.name || 'New persona'}</span>
+                  <span>{(() => {
+                    const nameValue = persona.attributes && typeof persona.attributes === 'object' && (persona.attributes as Record<string, unknown>).name;
+                    return (typeof nameValue === 'string' && nameValue) || 'New Persona';
+                  })()}</span>
                 </Link>
               </SidebarMenuButton>
-              <PersonaForm persona={persona} trigger={<SidebarMenuAction showOnHover>
-                <MoreHorizontal />
-                <span className="sr-only">More</span>
-              </SidebarMenuAction>} />
+              <GenericForm
+                startingValues={{
+                  id: persona.id,
+                  attributes: (persona.attributes ?? {}) as Record<string, any>,
+                  sender_address: persona.sender_address,
+                }}
+                trigger={
+                  <SidebarMenuAction showOnHover>
+                    <MoreHorizontal />
+                    <span className="sr-only">More</span>
+                  </SidebarMenuAction>
+                }
+                attributesSchema={attributesSchema}
+                entityLabel="Persona"
+                saveAction={savePersona}
+              />
             </SidebarMenuItem>
           ))}
           <SidebarMenuItem>
-            <PersonaForm trigger={<SidebarMenuButton>
-              <Plus/>
-              <span>Create New Persona</span>
-            </SidebarMenuButton>} />
+            <GenericForm
+              trigger={
+                <SidebarMenuButton>
+                  <Plus />
+                  <span>Create New Persona</span>
+                </SidebarMenuButton>
+              }
+              attributesSchema={attributesSchema}
+              entityLabel="Persona"
+              saveAction={savePersona}
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
     </>
   );
-}
-
-
-// TODO: if you ever want to add memories and assets to be editable, use this as a starting point
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string
-    url: string
-    icon: LucideIcon
-    isActive?: boolean
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
-}) {
-  return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-              {item.items?.length ? (
-                <>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuAction className="data-[state=open]:rotate-90">
-                      <ChevronRight />
-                      <span className="sr-only">Toggle</span>
-                    </SidebarMenuAction>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </>
-              ) : null}
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
-  )
 }
