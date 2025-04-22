@@ -6,7 +6,7 @@ import {
   getPersonaById,
   getMessagesByPersonaId,
   getUser,
-} from '@/db/cached-queries';
+} from '@/lib/supabase/cached-queries';
 import { convertToUIMessages } from '@/lib/utils';
 
 export default async function Page(props: { params: Promise<any> }) {

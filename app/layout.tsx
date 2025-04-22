@@ -3,7 +3,7 @@ import { Toaster } from 'sonner';
 
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/custom/app-sidebar';
-import { getUser } from '@/db/cached-queries';
+import { getUser } from '@/lib/supabase/cached-queries';
 
 import './globals.css';
 

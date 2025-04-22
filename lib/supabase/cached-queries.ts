@@ -4,7 +4,7 @@ import { cache } from 'react';
 import { unstable_cache } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
-import type { Client } from '../lib/supabase/types';
+import type { Client } from './types';
 
 const getSupabase = cache(() => createClient());
 

@@ -46,7 +46,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { toast } from "sonner"
-import { signIn } from "@/db/auth"
+import { signIn } from "@/lib/supabase/auth"
 import { useRouter } from "next/navigation"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -58,7 +58,7 @@ const data = {
     { name: "Home", icon: Home },
     { name: "Appearance", icon: Paintbrush },
     { name: "Messages & media", icon: MessageCircle },
-    { name: "Language & region", icon: Globe },
+    { name: "Language & Region", icon: Globe },
     { name: "Accessibility", icon: Keyboard },
     { name: "Mark as read", icon: Check },
     { name: "Audio & video", icon: Video },
