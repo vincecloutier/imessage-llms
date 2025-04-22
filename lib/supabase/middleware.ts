@@ -38,6 +38,11 @@ export const updateSession = async (request: NextRequest) => {
     // if (request.nextUrl.pathname !== '/' && user.error) {
     //   return NextResponse.redirect(new URL('/', request.url));
     // }
+
+    // // TODO: direct to default persona
+    // if (request.nextUrl.pathname === '/' && !user.error) {
+    //   return NextResponse.redirect(new URL(`/chat/${user.data.user?.id}`, request.url));
+    // }
     
     return response;
   } catch (e) {
