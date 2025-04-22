@@ -16,7 +16,10 @@ const getSupabase = cache(() => createClient());
 export const getUser = async () => {
   const supabase = await getSupabase();
   const {data: { user }, error} = await supabase.auth.getUser();
-  if (error || !user) {
+  if (!user) {
+    return null;
+  }
+  if (error) {
     console.error(error);
     return null;
   }
