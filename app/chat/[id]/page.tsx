@@ -34,6 +34,7 @@ export default async function Page(props: { params: Promise<any> }) {
       user_id={user.id}
       id={persona.id}
       initialMessages={messagesFromDb}
+      persona_name={persona.attributes.name}
     />
   );
 }

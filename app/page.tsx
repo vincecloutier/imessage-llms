@@ -6,6 +6,7 @@ export default async function Home() {
       user_id={null}
       id={null}
       initialMessages={[]}
+      persona_name={"April Smith"}
     />
   );
 }

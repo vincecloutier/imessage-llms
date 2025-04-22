@@ -15,7 +15,7 @@ type Message = {
   file_path?: string | null;
 };
 
-export function Chat({ user_id, id, initialMessages }: { user_id: string | null; id: string | null; initialMessages: Message[] }) {
+export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: string | null; id: string | null; initialMessages: Message[]; persona_name: string | null}) {
   const [messages, setMessages] = useState<Message[]>(
       initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []
   );
@@ -245,19 +245,19 @@ export function Chat({ user_id, id, initialMessages }: { user_id: string | null;
     >
       <header className="flex justify-between h-16 shrink-0 items-center gap-2 px-4">
         <div className="flex items-center gap-2">
-          <SidebarTrigger className="-ml-1" />
+          <SidebarTrigger/>
           <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">Persona</BreadcrumbItem>
+              <BreadcrumbItem className="hidden md:block">Chat</BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>April</BreadcrumbPage>
+                <BreadcrumbPage>{persona_name}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <AuthButton />
+          <AuthButton />
       </header>
 
       <div className="flex-1 flex flex-col min-w-0 gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
