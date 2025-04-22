@@ -74,10 +74,6 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
     let responseReceived = false;
 
     try {
-      if (tempAttachmentUrl) {
-        URL.revokeObjectURL(tempAttachmentUrl);
-      }
-
       const response = await fetch('http://localhost:3001/api/frontend', {
         method: 'POST',
         credentials: 'include',
@@ -92,25 +88,28 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
 
       const result = await response.json();
       const assistantMessage: Message = { role: 'assistant', content: result.message.content };
-      if (result.message.attachment) {
-        assistantMessage.file_path = result.message.attachment;
-      }
-       setMessages((prev) => {
+      
+      setMessages((prev) => {
          const updatedMessages = prev.map(msg =>
            msg === userMessage
-             ? { ...msg, file_path: msg.file_path || null }
+             ? { ...msg, file_path: msg.file_path  }
              : msg
          );
          return [...updatedMessages, assistantMessage];
        });
        
-    } catch (err: any) {
-       if (tempAttachmentUrl && !responseReceived) {
-           URL.revokeObjectURL(tempAttachmentUrl);
+       if (tempAttachmentUrl) {
+         URL.revokeObjectURL(tempAttachmentUrl);
        }
+       
+    } catch (err: any) {
+       if (tempAttachmentUrl && !responseReceived) {URL.revokeObjectURL(tempAttachmentUrl);}
        console.error("Send message error:", err);
        toast.error(`Failed to send message: ${err.message}`);
-       setMessages((prev) => [...prev.filter(msg => msg !== userMessage), {role: 'assistant', content: `Error: ${err.message || 'Could not send message'}`}]);
+       setMessages((prev) => [
+         ...prev.filter(msg => msg !== userMessage),
+         { role: 'assistant', content: `Error: ${err.message || 'Could not send message'}` }
+       ]);
     } finally {
       setIsLoading(false);
     }
