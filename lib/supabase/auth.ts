@@ -9,10 +9,7 @@ export async function signIn(email: string) {
     }
   })
   if (error) {
-    throw {
-      message: error.message,
-      status: error.status || 500,
-    };
+    throw new Error(error.message);
   }
   return data;
 }
