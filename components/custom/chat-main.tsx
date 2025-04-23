@@ -2,12 +2,9 @@
 
 import { useState, useRef, useEffect, FormEvent, KeyboardEvent, DragEvent, ClipboardEvent, useCallback } from 'react';
 import { InputMessage, PreviewMessage, ThinkingMessage } from '@/components/custom/chat-message';
-import { SidebarTrigger } from '../ui/sidebar';
-import AuthButton from './logout-button';
-import { BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator, BreadcrumbPage, Breadcrumb, } from '../ui/breadcrumb';
-import { Separator } from '../ui/separator';
 import { toast } from 'sonner';
 import cx from 'classnames';
+import { AppHeader } from '@/components/custom/app-header';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -242,23 +239,7 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
       onDrop={handleDrop}
       onPaste={handlePaste}
     >
-      <header className="flex justify-between h-16 shrink-0 items-center gap-2 px-4">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger/>
-          <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">Chat</BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{persona_name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-          <AuthButton />
-      </header>
-
+      <AppHeader title="Chat" subtitle={persona_name || ''} />
       <div className="flex-1 flex flex-col min-w-0 gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
           {isDraggingOver && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm pointer-events-none z-10 rounded-md m-2 border border-dashed border-blue-400">
