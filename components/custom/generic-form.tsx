@@ -34,6 +34,13 @@ export interface FieldSchema {
   type: "text" | "number" | "email" | "tel" | "date" | "calendar" | "enum";
   required: boolean;
   options?: string[];
+  rowId?: string; // Fields with the same rowId will be rendered in the same row
+  columnSpan?: number; // How many columns this field should span (default: 1)
+}
+
+export interface RowLayout {
+  id: string;
+  columns: number; // Number of equal columns in this row
 }
 
 export interface PageSchema {
@@ -41,6 +48,7 @@ export interface PageSchema {
   label: string;
   description?: string;
   fields: FieldSchema[];
+  rowLayouts?: RowLayout[]; // Define rows and their column counts
 }
 
 export interface GenericFormProps {
@@ -80,10 +88,13 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
 
   const onSubmit = async (data: Record<string, any>) => {
     try {
+      // Extract sender_address if it exists
+      const { sender_address, ...attributes } = data;
+      
       await saveAction({
         id: startingValues?.id,
-        attributes: data,
-        sender_address: data.sender_address ?? null,
+        attributes, // All form data goes here except sender_address
+        sender_address: sender_address ?? null,
       });
     } catch (error) {
       console.error(`Error submitting form:`, error);
@@ -91,6 +102,24 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
   };
 
   const defaultTab = pages[0]?.key;
+
+  // Group fields by rowId for each page
+  const getFieldGroups = (fields: FieldSchema[], rowLayouts?: RowLayout[]) => {
+    // Fields without rowId will go in their own individual rows
+    const defaultFields = fields.filter(f => !f.rowId);
+    
+    // Group fields that share rowIds
+    const rowGroups = fields
+      .filter(f => f.rowId)
+      .reduce((groups, field) => {
+        if (!field.rowId) return groups;
+        if (!groups[field.rowId]) groups[field.rowId] = [];
+        groups[field.rowId].push(field);
+        return groups;
+      }, {} as Record<string, FieldSchema[]>);
+    
+    return { defaultFields, rowGroups, rowLayouts };
+  };
 
   return (
     <Form {...form}>
@@ -103,83 +132,165 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
               </TabsTrigger>
             ))}
           </TabsList>
-          {pages.map((page) => (
-            <TabsContent key={page.key} value={page.key}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>{page.label}</CardTitle>
-                  {page.description && (
-                    <CardDescription>{page.description}</CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {page.fields.map((field) => (
-                    <FormField
-                      key={field.name}
-                      control={form.control}
-                      name={field.name}
-                      rules={{ required: field.required }}
-                      render={({ field: ctrl }) => (
-                        <FormItem>
-                          <FormLabel>{field.label}</FormLabel>
-                          <FormControl>
-                            {(() => {
-                              switch (field.type) {
-                                case "text": return <Input {...ctrl} />;
-                                case "number": return <Input type="number" {...ctrl} />;
-                                case "email": return <Input type="email" {...ctrl} />;
-                                case "tel": return <Input type="tel" {...ctrl} />;
-                                case "date": return (
-                                  <Input
-                                    type="date"
-                                    value={
-                                      ctrl.value instanceof Date
-                                        ? ctrl.value.toISOString().split("T")[0]
-                                        : ""
-                                    }
-                                    onChange={(e) =>
-                                      ctrl.onChange(new Date(e.target.value))
-                                    }
-                                  />
-                                );
-                                case "enum": return (
-                                  <Select
-                                    value={ctrl.value}
-                                    onValueChange={ctrl.onChange}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue
-                                        placeholder={`Select ${field.label}`}
-                                      />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {field.options?.map((opt) => (
-                                        <SelectItem key={opt} value={opt}>
-                                          {opt}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                );
-                                default: return <Input {...ctrl} />;
-                              }
-                            })()}
-                          </FormControl>
-                          {field.description && (
-                            <FormDescription>{field.description}</FormDescription>
-                          )}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </CardContent>
-                <CardFooter>
-                  <Button type="submit">Save Changes</Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-          ))}
+          {pages.map((page) => {
+            const { defaultFields, rowGroups, rowLayouts } = getFieldGroups(page.fields, page.rowLayouts);
+            
+            return (
+              <TabsContent key={page.key} value={page.key}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{page.label}</CardTitle>
+                    {page.description && (
+                      <CardDescription>{page.description}</CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Render fields in rows */}
+                    {Object.entries(rowGroups).map(([rowId, fields]) => {
+                      const rowLayout = rowLayouts?.find(r => r.id === rowId);
+                      const columns = rowLayout?.columns || fields.length;
+                      
+                      return (
+                        <div key={rowId} className={`grid grid-cols-${columns} gap-4`} style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                          gap: '1rem'
+                        }}>
+                          {fields.map((field) => (
+                            <FormField
+                              key={field.name}
+                              control={form.control}
+                              name={field.name}
+                              rules={{ required: field.required }}
+                              render={({ field: ctrl }) => (
+                                <FormItem style={{ 
+                                  gridColumn: field.columnSpan ? `span ${field.columnSpan}` : 'span 1'
+                                }}>
+                                  <FormLabel>{field.label}</FormLabel>
+                                  <FormControl>
+                                    {(() => {
+                                      switch (field.type) {
+                                        case "text": return <Input {...ctrl} />;
+                                        case "number": return <Input type="number" {...ctrl} />;
+                                        case "email": return <Input type="email" {...ctrl} />;
+                                        case "tel": return <Input type="tel" {...ctrl} />;
+                                        case "date": return (
+                                          <Input
+                                            type="date"
+                                            value={
+                                              ctrl.value instanceof Date
+                                                ? ctrl.value.toISOString().split("T")[0]
+                                                : ""
+                                            }
+                                            onChange={(e) =>
+                                              ctrl.onChange(new Date(e.target.value))
+                                            }
+                                          />
+                                        );
+                                        case "enum": return (
+                                          <Select
+                                            value={ctrl.value}
+                                            onValueChange={ctrl.onChange}
+                                          >
+                                            <SelectTrigger>
+                                              <SelectValue
+                                                placeholder={`Select ${field.label}`}
+                                              />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {field.options?.map((opt) => (
+                                                <SelectItem key={opt} value={opt}>
+                                                  {opt}
+                                                </SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                        );
+                                        default: return <Input {...ctrl} />;
+                                      }
+                                    })()}
+                                  </FormControl>
+                                  {field.description && (
+                                    <FormDescription>{field.description}</FormDescription>
+                                  )}
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          ))}
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Render default fields (one per row) */}
+                    {defaultFields.map((field) => (
+                      <FormField
+                        key={field.name}
+                        control={form.control}
+                        name={field.name}
+                        rules={{ required: field.required }}
+                        render={({ field: ctrl }) => (
+                          <FormItem>
+                            <FormLabel>{field.label}</FormLabel>
+                            <FormControl>
+                              {(() => {
+                                switch (field.type) {
+                                  case "text": return <Input {...ctrl} />;
+                                  case "number": return <Input type="number" {...ctrl} />;
+                                  case "email": return <Input type="email" {...ctrl} />;
+                                  case "tel": return <Input type="tel" {...ctrl} />;
+                                  case "date": return (
+                                    <Input
+                                      type="date"
+                                      value={
+                                        ctrl.value instanceof Date
+                                          ? ctrl.value.toISOString().split("T")[0]
+                                          : ""
+                                      }
+                                      onChange={(e) =>
+                                        ctrl.onChange(new Date(e.target.value))
+                                      }
+                                    />
+                                  );
+                                  case "enum": return (
+                                    <Select
+                                      value={ctrl.value}
+                                      onValueChange={ctrl.onChange}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue
+                                          placeholder={`Select ${field.label}`}
+                                        />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {field.options?.map((opt) => (
+                                          <SelectItem key={opt} value={opt}>
+                                            {opt}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  );
+                                  default: return <Input {...ctrl} />;
+                                }
+                              })()}
+                            </FormControl>
+                            {field.description && (
+                              <FormDescription>{field.description}</FormDescription>
+                            )}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </CardContent>
+                  <CardFooter>
+                    <Button type="submit">Save Changes</Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+            );
+          })}
         </Tabs>
       </form>
     </Form>

@@ -9,7 +9,8 @@ import useSWR from 'swr';
 import {
   UserRound,
   MoreHorizontal,
-  Plus,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 
 import {
@@ -34,11 +35,11 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 import { createClient } from '@/lib/supabase/client';
-import GenericForm, { GenericFormProps } from './generic-form';
-import { savePersona, deletePersona } from '@/lib/actions';
-
+import { useRouter } from 'next/navigation';
+import { deletePersona } from '@/lib/actions';
 // Type for a persona record from Supabase
 // Adjust properties as needed; here we assume a persona has at least an id and a title
 
@@ -47,19 +48,6 @@ type persona = {
   attributes: Record<string, unknown>;
   sender_address: string;
 }
-
-const attributesSchema: GenericFormProps['attributesSchema'] = [
-  { name: 'name', label: 'Name', type: 'text', required: true },
-  { name: 'dob', label: 'Date of Birth', type: 'dob', required: true },
-  { name: 'occupation', label: 'Occupation', type: 'text', required: true },
-  { name: 'relationship', label: 'Relationship', type: 'enum', required: true, options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
-  { name: 'ethnicity', label: 'Ethnicity', type: 'enum', required: true, options: ['White', 'Black', 'Asian', 'Hispanic', 'Indian', 'Middle Eastern', 'Other'] },
-  { name: 'location', label: 'Location', type: 'text', required: true },
-  { name: 'hair_length', label: 'Hair Length', type: 'enum', required: true, options: ['Bald', 'Short', 'Medium', 'Long'] },
-  { name: 'hair_color', label: 'Hair Color', type: 'enum', required: true, options: ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White'] },
-  { name: 'eye_color', label: 'Eye Color', type: 'enum', required: true, options: ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Violet', 'Other'] },
-  { name: 'gender', label: 'Gender', type: 'enum', required: true, options: ['Male', 'Female', 'Other'] },
-];
 
 const fetcher = async (): Promise<persona[]> => {
   try {
@@ -94,6 +82,7 @@ const fetcher = async (): Promise<persona[]> => {
 export function SidebarHistory({ user }: { user: User | null }) {
   const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
+  const router = useRouter();
   const { data: history, isLoading, mutate } = useSWR<persona[]>(
     user ? ['personas', user.id] : null,
     fetcher,
@@ -142,62 +131,45 @@ export function SidebarHistory({ user }: { user: User | null }) {
                   })()}</span>
                 </Link>
               </SidebarMenuButton>
-              <GenericForm
-                startingValues={{
-                  id: persona.id,
-                  attributes: (persona.attributes ?? {}) as Record<string, any>,
-                  sender_address: persona.sender_address,
-                }}
-                trigger={
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                }
-                attributesSchema={attributesSchema}
-                entityLabel="Persona"
-                saveAction={savePersona}
-              />
+              <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuAction showOnHover>
+                  <MoreHorizontal />
+                  <span className="sr-only">More</span>
+                </SidebarMenuAction>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 rounded-lg" side="right" align="center">
+                <DropdownMenuItem onClick={() => {router.push(`/persona/${persona.id}`); setOpenMobile(false);}}>
+                  <Pencil className="text-muted-foreground" />
+                  <span>Edit Persona</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                      <Trash2 className="text-muted-foreground" />
+                      <span>Delete Persona</span>
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete this persona from our servers.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={async () => {await deletePersona(persona.id);}}> Continue </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </DropdownMenuContent>
+            </DropdownMenu>
             </SidebarMenuItem>
           ))}
-          <SidebarMenuItem>
-            <GenericForm
-              trigger={
-                <SidebarMenuButton>
-                  <Plus />
-                  <span>Create New Persona</span>
-                </SidebarMenuButton>
-              }
-              attributesSchema={attributesSchema}
-              entityLabel="Persona"
-              saveAction={savePersona}
-            />
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
     </>
   );
 }
-
-
-{/* <AlertDialog>
-<AlertDialogTrigger asChild>
-  <Button variant="destructive">Delete</Button>
-</AlertDialogTrigger>
-<AlertDialogContent>
-  <AlertDialogHeader>
-    <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-  </AlertDialogHeader>
-  <AlertDialogDescription>
-    Are you sure you want to delete this {entityLabel}?
-  </AlertDialogDescription>
-  <AlertDialogFooter>
-    <AlertDialogCancel>Cancel</AlertDialogCancel>
-    <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={async () => {
-      await deletePersona(id);
-      setOpen(false);}}>
-      Confirm
-    </AlertDialogAction>
-  </AlertDialogFooter>
-</AlertDialogContent>
-</AlertDialog> */}
