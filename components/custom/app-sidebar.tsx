@@ -36,20 +36,20 @@ const data = {
 
 export function AppSidebar({ user, ...props }: { user: User | null } & React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="floating" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <div>
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">April Intelligence</span>
-                  <span className="truncate text-xs">AI-powered research</span>
-                </div>
-              </div>
+              <a href="/">
+                    <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                      <Command className="size-4" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span className="font-semibold">April Intelligence</span>
+                    <span className="">v1.0.0</span>
+                  </div>
+              </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
