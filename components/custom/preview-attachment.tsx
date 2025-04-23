@@ -3,20 +3,18 @@
 import { useState, useEffect } from "react"
 import { X, Image as ImageIcon, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "@/components/ui/dialog"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import Image from "next/image"
-import { createSignedAttachmentUrl } from "@/lib/actions" // Updated import path
+import { createSignedAttachmentUrl } from "@/lib/actions"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface ImagePreviewProps {
-  source: string | null | undefined // Can be blob URL, https URL, or file_path
+  source: string | null | undefined
   onDelete?: () => void
   alt?: string
 }
 
 export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImagePreviewProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false) // Restore isOpen state
   const [resolvedUrl, setResolvedUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,25 +28,18 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
     }
 
     if (source.startsWith('blob:') || source.startsWith('http')) {
-      console.log('ImagePreview: Using direct URL:', source)
       setResolvedUrl(source)
       setIsLoading(false)
       setError(null)
     } else {
-      console.log('ImagePreview: Received potential file path, attempting fetch:', source)
       let isMounted = true
       const fetchUrl = async () => {
         setIsLoading(true)
         setError(null)
         try {
-          console.log('ImagePreview: Calling createSignedAttachmentUrl with path:', source)
           const result = await createSignedAttachmentUrl(source)
-          console.log('ImagePreview: Result from createSignedAttachmentUrl:', result)
-
           if (!isMounted) return
-
           if (result.error) {
-            console.error("ImagePreview: Failed to get signed URL:", result.error)
             setError(result.error)
             setResolvedUrl(null)
           } else {
@@ -56,17 +47,13 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
           }
         } catch (err: any) {
           if (!isMounted) return
-          console.error("ImagePreview: Error calling createSignedAttachmentUrl action:", err)
           setError(err.message || "Failed to load image.")
           setResolvedUrl(null)
         } finally {
-          if (isMounted) {
-            setIsLoading(false)
-          }
+          if (isMounted) setIsLoading(false)
         }
       }
       fetchUrl()
-
       return () => { isMounted = false }
     }
   }, [source])
@@ -91,11 +78,10 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
           width={128}
           height={128}
           className="w-full h-full object-cover"
-          onClick={() => setIsOpen(true)} // Open dialog only if image loaded
+          onClick={() => setIsOpen(true)} // Re-add onClick to open modal
         />
       )
     }
-    // Fallback if source is null/undefined or resolvedUrl is null without error/loading
     return (
         <div className="w-32 h-32 flex items-center justify-center bg-muted rounded-md">
             <ImageIcon className="w-8 h-8 text-muted-foreground" />
@@ -107,12 +93,9 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
     <>
       <div className="relative inline-block group">
         <div className="border rounded-md overflow-hidden relative w-32 h-32">
-          {/* Preview thumbnail */} 
           <div className="w-full h-full cursor-pointer">
              {renderPreviewContent()}
           </div>
-
-          {/* Delete button - Render only if onDelete is provided */} 
           {onDelete && (
             <Button
               variant="destructive"
@@ -122,7 +105,7 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
                 e.stopPropagation()
                 if (onDelete) onDelete()
               }}
-              disabled={isLoading} // Disable delete while loading new source
+              disabled={isLoading}
             >
               <X className="h-3 w-3" />
             </Button>
@@ -130,24 +113,26 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
         </div>
       </div>
 
-      {/* Image preview dialog - Only allow opening if URL resolved successfully */}
-      <Dialog open={isOpen && !!resolvedUrl && !error} onOpenChange={setIsOpen}>
-        <DialogOverlay className="bg-black/50" />
-        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-transparent border-0 shadow-none">
-          {resolvedUrl && (
-             <Image
-               src={resolvedUrl} // Use resolvedUrl here too
-               alt={alt}
-               width={1024}
-               height={768}
-               sizes="100vw"
-               priority
-               className="w-full h-auto max-h-[80vh] object-contain"
-             />
-          )}
-        <VisuallyHidden><DialogTitle>{alt}</DialogTitle></VisuallyHidden>
-        </DialogContent>
-      </Dialog>
+      {/* Custom Fullscreen Preview Modal */}
+      {isOpen && resolvedUrl && !error && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setIsOpen(false)} // Close on overlay click
+        >
+          {/* Image container: stop propagation so clicking image doesn't close */}
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={resolvedUrl}
+              alt={alt}
+              width={1024} // Example large dimensions
+              height={768}
+              sizes="100vw" // Let browser choose based on viewport
+              priority // Load large image faster when opened
+              className="block max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-md min-w-[500px] min-h-[500px]" // Ensure image fits screen
+            />
+          </div>
+        </div>
+      )}
     </>
   )
 }
