@@ -31,7 +31,7 @@ export default function UserProfilePage() {
         {
           name: "birth_date",
           label: "Date of Birth",
-          type: "date",
+          type: "calendar",
           required: false,
         }
       ]

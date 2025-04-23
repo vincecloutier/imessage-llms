@@ -12,7 +12,7 @@ const pages: PageSchema[] = [
       description: "The attributes of this persona.",
       fields: [
         { name: 'name', label: 'Name', description: 'The name of the persona', rowId: 'a1', type: 'text', required: true },
-        { name: 'birthday', label: 'Birthday', description: 'The birthday of the persona', rowId: 'a1', type: 'date', required: true },
+        { name: 'birthday', label: 'Birthday', description: 'The birthday of the persona', rowId: 'a1', type: 'calendar', required: true },
         { name: 'occupation', label: 'Occupation', description: 'What does the persona do for a living?', rowId: 'a2', type: 'text', required: true },
         { name: 'relationship', label: 'Relationship', description: 'Who are they to you?', rowId: 'a2', type: 'enum', required: true, options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
         { name: 'location', label: 'Location', description: 'Where do they live?', rowId: 'a2', type: 'text', required: true },

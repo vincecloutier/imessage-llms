@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -25,13 +25,15 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { AppHeader } from "./app-header";
+import { format, isAfter, subYears } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface FieldSchema {
   name: string;
   label: string;
   description?: string;
-  type: "text" | "number" | "email" | "tel" | "date" | "calendar" | "enum";
+  type: "text" | "number" | "email" | "tel" | "calendar" | "enum";
   required: boolean;
   options?: string[];
   rowId?: string; // Fields with the same rowId will be rendered in the same row
@@ -65,7 +67,7 @@ export interface GenericFormProps {
   }) => Promise<any>;
 }
 
-export default function GenericForm({startingValues, pages, saveAction}: GenericFormProps) {
+export default function GenericForm({startingValues, pages, saveAction}: GenericFormProps) {  
   // Build initial form values across all pages
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
@@ -73,7 +75,10 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
     return allFields.reduce((acc, field) => {
       let value = attrs[field.name] ?? "";
       if (field.type === "number") value = Number(value) || 0;
-      if ((field.type === "date" || field.type === "calendar") && typeof value === "string") {
+      if ((field.type === "calendar") && typeof value === "string") {
+        value = new Date(value);
+      }
+      if (field.type === "calendar") {
         value = new Date(value);
       }
       acc[field.name] = value;
@@ -93,7 +98,7 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
       
       await saveAction({
         id: startingValues?.id,
-        attributes, // All form data goes here except sender_address
+        attributes,
         sender_address: sender_address ?? null,
       });
     } catch (error) {
@@ -121,6 +126,72 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
     return { defaultFields, rowGroups, rowLayouts };
   };
 
+  // Validation helper functions
+  const isOver18 = (date: Date) => {
+    const eighteenYearsAgo = subYears(new Date(), 18);
+    return isAfter(eighteenYearsAgo, date);
+  };
+
+  const noWhitespaceOnly = (value: string) => {
+    if (typeof value !== 'string') return true;
+    return value.trim() !== '' || 'Input cannot be whitespace only';
+  };
+
+  // The field renderer with location support
+  const renderFormField = (field: FieldSchema, ctrl: any) => {
+    switch (field.type) {
+      case "text": 
+      case "email": 
+      case "tel": 
+        return <Input {...ctrl} type={field.type} maxLength={50} />;
+      case "number": 
+        return <Input type="number" {...ctrl} />;
+      case "calendar": 
+        return (
+          <Input type="date" {...ctrl}  />
+        );
+      case "enum": 
+        return (
+          <Select
+            value={ctrl.value}
+            onValueChange={ctrl.onChange}
+          >
+            <SelectTrigger>
+              <SelectValue
+                placeholder={`Select ${field.label}`}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {field.options?.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      default: return <Input {...ctrl} />;
+    }
+  };
+
+  // Get validation rules based on field type
+  const getValidationRules = (field: FieldSchema) => {
+    const rules: any = { required: field.required ? 'This field is required' : false };
+    
+    if (field.type === 'text' || field.type === 'email' || field.type === 'tel') {
+      rules.maxLength = { value: 50, message: 'Maximum 50 characters allowed' };
+      rules.validate = { noWhitespaceOnly };
+    }
+    
+    if (field.type === 'calendar') {
+      rules.validate = { 
+        over18: (value: Date) => isOver18(value) || 'Must be at least 18 years old' 
+      };
+    }
+    
+    return rules;
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -145,7 +216,6 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
                     )}
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* Render fields in rows */}
                     {Object.entries(rowGroups).map(([rowId, fields]) => {
                       const rowLayout = rowLayouts?.find(r => r.id === rowId);
                       const columns = rowLayout?.columns || fields.length;
@@ -161,54 +231,14 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
                               key={field.name}
                               control={form.control}
                               name={field.name}
-                              rules={{ required: field.required }}
+                              rules={getValidationRules(field)}
                               render={({ field: ctrl }) => (
                                 <FormItem style={{ 
                                   gridColumn: field.columnSpan ? `span ${field.columnSpan}` : 'span 1'
                                 }}>
                                   <FormLabel>{field.label}</FormLabel>
                                   <FormControl>
-                                    {(() => {
-                                      switch (field.type) {
-                                        case "text": return <Input {...ctrl} />;
-                                        case "number": return <Input type="number" {...ctrl} />;
-                                        case "email": return <Input type="email" {...ctrl} />;
-                                        case "tel": return <Input type="tel" {...ctrl} />;
-                                        case "date": return (
-                                          <Input
-                                            type="date"
-                                            value={
-                                              ctrl.value instanceof Date
-                                                ? ctrl.value.toISOString().split("T")[0]
-                                                : ""
-                                            }
-                                            onChange={(e) =>
-                                              ctrl.onChange(new Date(e.target.value))
-                                            }
-                                          />
-                                        );
-                                        case "enum": return (
-                                          <Select
-                                            value={ctrl.value}
-                                            onValueChange={ctrl.onChange}
-                                          >
-                                            <SelectTrigger>
-                                              <SelectValue
-                                                placeholder={`Select ${field.label}`}
-                                              />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              {field.options?.map((opt) => (
-                                                <SelectItem key={opt} value={opt}>
-                                                  {opt}
-                                                </SelectItem>
-                                              ))}
-                                            </SelectContent>
-                                          </Select>
-                                        );
-                                        default: return <Input {...ctrl} />;
-                                      }
-                                    })()}
+                                    {renderFormField(field, ctrl)}
                                   </FormControl>
                                   {field.description && (
                                     <FormDescription>{field.description}</FormDescription>
@@ -222,58 +252,17 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
                       );
                     })}
                     
-                    {/* Render default fields (one per row) */}
                     {defaultFields.map((field) => (
                       <FormField
                         key={field.name}
                         control={form.control}
                         name={field.name}
-                        rules={{ required: field.required }}
+                        rules={getValidationRules(field)}
                         render={({ field: ctrl }) => (
                           <FormItem>
                             <FormLabel>{field.label}</FormLabel>
                             <FormControl>
-                              {(() => {
-                                switch (field.type) {
-                                  case "text": return <Input {...ctrl} />;
-                                  case "number": return <Input type="number" {...ctrl} />;
-                                  case "email": return <Input type="email" {...ctrl} />;
-                                  case "tel": return <Input type="tel" {...ctrl} />;
-                                  case "date": return (
-                                    <Input
-                                      type="date"
-                                      value={
-                                        ctrl.value instanceof Date
-                                          ? ctrl.value.toISOString().split("T")[0]
-                                          : ""
-                                      }
-                                      onChange={(e) =>
-                                        ctrl.onChange(new Date(e.target.value))
-                                      }
-                                    />
-                                  );
-                                  case "enum": return (
-                                    <Select
-                                      value={ctrl.value}
-                                      onValueChange={ctrl.onChange}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue
-                                          placeholder={`Select ${field.label}`}
-                                        />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {field.options?.map((opt) => (
-                                          <SelectItem key={opt} value={opt}>
-                                            {opt}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  );
-                                  default: return <Input {...ctrl} />;
-                                }
-                              })()}
+                              {renderFormField(field, ctrl)}
                             </FormControl>
                             {field.description && (
                               <FormDescription>{field.description}</FormDescription>
