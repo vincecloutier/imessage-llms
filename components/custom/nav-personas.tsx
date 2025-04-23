@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 import {
-SidebarGroup,
+  SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
@@ -21,6 +21,18 @@ SidebarGroup,
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 
 import { createClient } from '@/lib/supabase/client';
@@ -145,13 +157,6 @@ export function SidebarHistory({ user }: { user: User | null }) {
                 attributesSchema={attributesSchema}
                 entityLabel="Persona"
                 saveAction={savePersona}
-                destructiveAction={async (id?: string) => {
-                  if (!id) {
-                    console.error("Delete action called without an ID.");
-                    return { success: false }; // Indicate failure
-                  }
-                  return deletePersona(id);
-                }}
               />
             </SidebarMenuItem>
           ))}
@@ -173,3 +178,26 @@ export function SidebarHistory({ user }: { user: User | null }) {
     </>
   );
 }
+
+
+{/* <AlertDialog>
+<AlertDialogTrigger asChild>
+  <Button variant="destructive">Delete</Button>
+</AlertDialogTrigger>
+<AlertDialogContent>
+  <AlertDialogHeader>
+    <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+  </AlertDialogHeader>
+  <AlertDialogDescription>
+    Are you sure you want to delete this {entityLabel}?
+  </AlertDialogDescription>
+  <AlertDialogFooter>
+    <AlertDialogCancel>Cancel</AlertDialogCancel>
+    <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={async () => {
+      await deletePersona(id);
+      setOpen(false);}}>
+      Confirm
+    </AlertDialogAction>
+  </AlertDialogFooter>
+</AlertDialogContent>
+</AlertDialog> */}

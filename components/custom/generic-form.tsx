@@ -14,17 +14,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
-import {
   Select,
   SelectTrigger,
   SelectValue,
@@ -56,11 +45,9 @@ export interface GenericFormProps {
     attributes: Record<string, any>;
     sender_address?: string | null;
   }) => Promise<any>;
-  /** Optional destructive action, e.g. deletePersona */
-  destructiveAction?: (id?: string) => Promise<any>;
 }
 
-export default function GenericForm({ startingValues, trigger, attributesSchema, entityLabel, saveAction, destructiveAction }: GenericFormProps) {
+export default function GenericForm({ startingValues, trigger, attributesSchema, entityLabel, saveAction }: GenericFormProps) {
   // Build initial form values based on schema and existing attributes
   const initialValues = useMemo(() => {
     const attrs = (startingValues?.attributes ?? {}) as Record<string, any>;
@@ -141,31 +128,8 @@ export default function GenericForm({ startingValues, trigger, attributesSchema,
               </div>
             ))}
           </div>
-          <DialogFooter className="w-full flex items-center justify-between">
-            {isEditing && destructiveAction && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Delete</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                  </AlertDialogHeader>
-                  <AlertDialogDescription>
-                    Are you sure you want to delete this {entityLabel}?
-                  </AlertDialogDescription>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction className="bg-red-500 hover:bg-red-600" onClick={async () => {
-                      await destructiveAction(startingValues?.id);
-                      setOpen(false);}}>
-                      Confirm
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-            <Button type="submit" className="ml-auto">Save Changes</Button>
+          <DialogFooter>
+            <Button type="submit" >Save Changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>
