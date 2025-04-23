@@ -11,10 +11,12 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Plus,
 } from 'lucide-react';
 
 import {
   SidebarGroup,
+  SidebarGroupAction,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
@@ -119,6 +121,9 @@ export function SidebarHistory({ user }: { user: User | null }) {
     <>
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
     <SidebarGroupLabel>Personas</SidebarGroupLabel>
+    <SidebarGroupAction onClick={() => {router.push('/persona/new'); setOpenMobile(false);}}>
+        <Plus /> <span className="sr-only">Add Persona</span>
+    </SidebarGroupAction>
         <SidebarMenu>
           {history?.map((persona) => (
             <SidebarMenuItem key={persona.id}>
