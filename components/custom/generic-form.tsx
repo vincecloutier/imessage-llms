@@ -61,7 +61,7 @@ export interface GenericFormProps {
 }
 
 export default function GenericForm({ startingValues, trigger, attributesSchema, entityLabel, saveAction, destructiveAction }: GenericFormProps) {
-  // Build initial form values based on schema and existing persona attributes
+  // Build initial form values based on schema and existing attributes
   const initialValues = useMemo(() => {
     const attrs = (startingValues?.attributes ?? {}) as Record<string, any>;
     return attributesSchema.reduce((acc, field) => {
