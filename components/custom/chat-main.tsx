@@ -5,6 +5,7 @@ import { InputMessage, PreviewMessage, ThinkingMessage } from '@/components/cust
 import { toast } from 'sonner';
 import cx from 'classnames';
 import { AppHeader } from '@/components/custom/app-header';
+import { AnimatePresence, motion } from 'framer-motion';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -229,23 +230,16 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
   }, [handleKeyDown]);
 
   return (
-    <div
-      className={cx(
-          "relative h-dvh transition-colors duration-200 ease-in-out flex flex-col",
-          { 'bg-blue-100 dark:bg-blue-900/30': isDraggingOver }
-      )}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      onPaste={handlePaste}
-    >
+    <div className={cx("relative h-dvh transition-colors duration-200 ease-in-out flex flex-col")} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onPaste={handlePaste}>
       <AppHeader title="Chat" subtitle={persona_name || ''} />
+      <AnimatePresence>
+        {isDraggingOver && (
+          <motion.div  className="absolute top-16 inset-4 pointer-events-none z-10 flex flex-col items-center justify-center gap-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-900/90" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="text-sm dark:text-zinc-400 text-zinc-500"> {"Images Only"}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="flex-1 flex flex-col min-w-0 gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
-          {isDraggingOver && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm pointer-events-none z-10 rounded-md m-2 border border-dashed border-blue-400">
-                  <p className="text-white text-2xl font-semibold">Drop image to attach</p>
-              </div>
-           )}
         {messages.map((message, index) => (<PreviewMessage key={index} message={message}/>))}
         {isLoading && <ThinkingMessage />}
         <div ref={messagesEndRef}/>
