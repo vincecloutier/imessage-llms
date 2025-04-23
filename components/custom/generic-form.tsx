@@ -23,11 +23,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format, isAfter, subYears } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export interface FieldSchema {
   name: string;
@@ -75,11 +70,10 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
     return allFields.reduce((acc, field) => {
       let value = attrs[field.name] ?? "";
       if (field.type === "number") value = Number(value) || 0;
-      if ((field.type === "calendar") && typeof value === "string") {
-        value = new Date(value);
-      }
       if (field.type === "calendar") {
-        value = new Date(value);
+        const today = new Date();
+        const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        value = attrs[field.name] ? new Date(attrs[field.name]) : eighteenYearsAgo;
       }
       acc[field.name] = value;
       return acc;
@@ -126,12 +120,6 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
     return { defaultFields, rowGroups, rowLayouts };
   };
 
-  // Validation helper functions
-  const isOver18 = (date: Date) => {
-    const eighteenYearsAgo = subYears(new Date(), 18);
-    return isAfter(eighteenYearsAgo, date);
-  };
-
   const noWhitespaceOnly = (value: string) => {
     if (typeof value !== 'string') return true;
     return value.trim() !== '' || 'Input cannot be whitespace only';
@@ -146,9 +134,14 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
         return <Input {...ctrl} type={field.type} maxLength={50} />;
       case "number": 
         return <Input type="number" {...ctrl} />;
-      case "calendar": 
+      case "calendar":
         return (
-          <Input type="date" {...ctrl}  />
+          <Input
+            type="date"
+            {...ctrl}
+            value={ctrl.value instanceof Date ? ctrl.value.toISOString().slice(0, 10) : ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => ctrl.onChange(new Date(e.target.value))}
+          />
         );
       case "enum": 
         return (
@@ -182,13 +175,24 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
       rules.maxLength = { value: 50, message: 'Maximum 50 characters allowed' };
       rules.validate = { noWhitespaceOnly };
     }
-    
     if (field.type === 'calendar') {
-      rules.validate = { 
-        over18: (value: Date) => isOver18(value) || 'Must be at least 18 years old' 
+      rules.validate = {
+        ...(rules.validate || {}),
+        over18: (value: Date) => {
+          const today = new Date();
+          const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+          return value <= eighteenYearsAgo || 'You must be at least 18 years old';
+        }
       };
     }
     
+    if (field.type === 'enum') {
+      rules.validate = {
+        ...(rules.validate || {}),
+        enum: (value: string) => field.options?.includes(value) || `Invalid option: ${value}`
+      };
+    }
+
     return rules;
   };
 
