@@ -50,7 +50,6 @@ export interface GenericFormProps {
     sender_address?: string | null;
   };
   pages: PageSchema[];
-  entityLabel: string;
   saveAction: (payload: {
     id?: string;
     attributes: Record<string, any>;
@@ -58,7 +57,7 @@ export interface GenericFormProps {
   }) => Promise<any>;
 }
 
-export default function GenericForm({startingValues, pages, entityLabel, saveAction}: GenericFormProps) {
+export default function GenericForm({startingValues, pages, saveAction}: GenericFormProps) {
   // Build initial form values across all pages
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
@@ -87,15 +86,13 @@ export default function GenericForm({startingValues, pages, entityLabel, saveAct
         sender_address: data.sender_address ?? null,
       });
     } catch (error) {
-      console.error(`Error saving ${entityLabel}:`, error);
+      console.error(`Error submitting form:`, error);
     }
   };
 
   const defaultTab = pages[0]?.key;
 
   return (
-    <>
-    <AppHeader title={"Configure"} subtitle={entityLabel} />
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <Tabs defaultValue={defaultTab} className="w-full">
@@ -186,6 +183,5 @@ export default function GenericForm({startingValues, pages, entityLabel, saveAct
         </Tabs>
       </form>
     </Form>
-    </>
   );
 }
