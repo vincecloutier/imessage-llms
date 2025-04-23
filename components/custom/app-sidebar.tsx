@@ -10,28 +10,24 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import { BookOpen, Command, LifeBuoy, Send } from 'lucide-react';
-import { NavSecondary } from '@/components/custom/nav-footer';
+import { NavUser } from '@/components/custom/nav-user';
+import { NavSecondary } from '@/components/custom/nav-secondary';
 
 const data = {
     navSecondary: [
-      {
-        title: "Support",
-        url: "mailto:support@aprilintelligence.com",
-        icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "mailto:info@aprilintelligence.com",
-      icon: Send,
-    },
-    {
-      title: "Privacy Policy",  
-      url: "/privacy",
-      icon: BookOpen,
-    }
+    { title: "Support", url: "mailto:support@aprilintelligence.com", icon: LifeBuoy },
+    { title: "Feedback", url: "mailto:info@aprilintelligence.com", icon: Send },
+    { title: "Privacy Policy", url: "/privacy", icon: BookOpen },
   ]
+}
+
+const user_preview = {
+  name: "April Smith",
+  email: "april@aprilintelligence.com",
+  avatar: "https://github.com/shadcn.png",
 }
 
 export function AppSidebar({ user, ...props }: { user: User | null } & React.ComponentProps<typeof Sidebar>) {
@@ -58,6 +54,9 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
        <SidebarHistory user={user} />
        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
+      <SidebarFooter>
+        {user && <NavUser user={user_preview}/>}
+      </SidebarFooter>
     </Sidebar>
   );
 }
