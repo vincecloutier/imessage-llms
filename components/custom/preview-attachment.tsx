@@ -128,7 +128,11 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
               height={768}
               sizes="100vw" // Let browser choose based on viewport
               priority // Load large image faster when opened
-              className="block max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-md min-w-[500px] min-h-[500px]" // Ensure image fits screen
+              className="block max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-md min-h-[500px]" // Ensure image fits screen
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsOpen(false)
+              }}
             />
           </div>
         </div>
