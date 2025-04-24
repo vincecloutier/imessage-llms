@@ -243,7 +243,8 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
         {messages.map((message, index) => (<PreviewMessage key={index} message={message}/>))}
         {isLoading && <ThinkingMessage />}
         <div ref={messagesEndRef}/>
-        <div className="pb-4">
+      </div>
+      <div className="pb-4">
           <InputMessage
             textareaRef={textareaRef}
             input={input}
@@ -254,7 +255,7 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
             setAttachmentFile={setAttachmentFile}
           />
        </div>
-      </div>
+
     </div>
   );
 }

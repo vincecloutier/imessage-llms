@@ -21,11 +21,11 @@ type Message = {
 export const PreviewMessage = ({message}: {message: Message}) => {
   return (
     <div className="w-full mx-auto max-w-3xl px-4 group/message" data-role={message.role}>
-      <div className={cx('flex flex-col gap-2 px-3 py-2 w-fit max-w-[85%]', message.role === 'user' ? 'mr-auto' : 'ml-auto' )}>
+      <div className={cx('flex flex-col gap-2 px-3 py-2 w-fit max-w-[85%]', message.role === 'user' ? 'ml-auto bg-blue-500 text-white rounded-lg' : 'mr-auto' )}>
+        {message.file_path && (<ImagePreview source={message.file_path} alt={message.content || "Attachment"} />)}
           <div className="prose dark:prose-invert max-w-none"> 
             {message.content}
           </div>
-        {message.file_path && (<ImagePreview source={message.file_path} alt={message.content || "Attachment"} />)}
       </div>
     </div>
   );
@@ -144,7 +144,7 @@ export function InputMessage({
         className="hidden"
         accept="image/*"
       />
-      <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-col gap-2 w-full rounded-lg bg-blue-500 text-white">
         <textarea
           ref={textareaRef}
           value={input}
