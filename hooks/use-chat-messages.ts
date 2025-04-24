@@ -10,10 +10,10 @@ type Message = {
 type ChatMessagesProps = {
   initialMessages: Message[];
   user_id: string | null;
-  id: string | null;
+  persona_id: string | null;
 };
 
-export function useChatMessages({ initialMessages, user_id, id }: ChatMessagesProps) {
+export function useChatMessages({ initialMessages, user_id, persona_id }: ChatMessagesProps) {
   const [messages, setMessages] = useState<Message[]>(
     initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []
   );
@@ -27,7 +27,7 @@ export function useChatMessages({ initialMessages, user_id, id }: ChatMessagesPr
   ) => {
     const trimmedContent = messageContent.trim();
     
-    if (!id || (!trimmedContent && !attachmentFile)) {
+    if (!persona_id || (!trimmedContent && !attachmentFile)) {
       toast.error('Please enter a message or add an attachment.');
       return;
     }
@@ -48,7 +48,7 @@ export function useChatMessages({ initialMessages, user_id, id }: ChatMessagesPr
 
     const formData = new FormData();
     formData.append('user_id', user_id || '');
-    formData.append('persona_id', id);
+    formData.append('persona_id', persona_id);
     formData.append('message', trimmedContent);
     
     if (attachmentFile) {
