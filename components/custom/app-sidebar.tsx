@@ -15,7 +15,7 @@ import {
 import { BookOpen, Command, LifeBuoy, Send } from 'lucide-react';
 import { NavSignIn, NavUser } from '@/components/custom/nav-user';
 import { NavSecondary } from '@/components/custom/nav-secondary';
-import { useRouter } from 'next/navigation';
+
 const data = {
     navSecondary: [
     { title: "Support", url: "mailto:support@aprilintelligence.com", icon: LifeBuoy },
@@ -38,8 +38,8 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/">
-                    <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                      <Command className="size-4" />
+                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                    <Command className="size-4" />
                   </div>
                   <div className="flex flex-col gap-0.5 leading-none">
                     <span className="font-semibold">April Intelligence</span>
@@ -56,7 +56,7 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
       </SidebarContent>
       <SidebarFooter>
          {user && <NavUser user={user_preview}/>}
-         {!user && <NavSignIn />}
+         {!user && <NavSignIn/>}
       </SidebarFooter>
     </Sidebar>
   );
