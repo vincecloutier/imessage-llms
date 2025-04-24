@@ -29,10 +29,7 @@ export const PreviewMessage = ({message}: {message: Message}) => {
 export const ThinkingMessage = () => {
   return (
     <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2 mb-4" data-role="assistant">
-      <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center">
-        <span className="text-sm font-semibold">AI</span>
-      </div>
-      <div className="px-4 py-3 rounded-2xl rounded-tl-none bg-gray-100 dark:bg-gray-800">
+      <div className="px-4 py-3 rounded-2xl bg-gray-100 dark:bg-gray-800">
         <div className="flex gap-1">
           <span className="animate-bounce">●</span>
           <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>●</span>
@@ -136,7 +133,7 @@ export function InputMessage({
   }, [input, attachmentFile, isLoading, handleSubmit, textareaRef]);
 
   return (
-    <div className="w-full mx-auto max-w-3xl px-4 mt-4">
+    <div className="w-full mx-auto max-w-3xl px-4">
               {previewUrl && attachmentFile && (
           <div className="px-4 pb-3">
             <ImagePreview
@@ -146,7 +143,6 @@ export function InputMessage({
             />
           </div>
         )}
-
       <div className="border rounded-full shadow-sm bg-white dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <div className="flex items-center w-full px-4 py-2">
           <button 
