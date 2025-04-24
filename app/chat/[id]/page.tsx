@@ -32,9 +32,8 @@ export default async function Page(props: { params: Promise<any> }) {
   return (
       <Chat
       user_id={user.id}
-      id={persona.id}
+      persona_id={persona.id}
       initialMessages={messagesFromDb}
-      persona_name={persona.attributes.name}
     />
   );
 }

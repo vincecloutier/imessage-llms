@@ -4,9 +4,8 @@ export default async function Home() {
   return (
       <PreviewChat
       user_id={null}
-      id={null}
+      persona_id={null}
       initialMessages={[]}
-      persona_name={"April Smith"}
     />
   );
 }
