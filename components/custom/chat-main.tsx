@@ -143,7 +143,6 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
         {isLoading && <ThinkingMessage />}
         <div ref={messagesEndRef}/>
       </div>
-      <div className="pb-4">
           <InputMessage
             textareaRef={textareaRef}
             input={input}
@@ -153,8 +152,6 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
             attachmentFile={attachmentFile}
             setAttachmentFile={setAttachmentFile}
           />
-       </div>
-
     </div>
   );
 }

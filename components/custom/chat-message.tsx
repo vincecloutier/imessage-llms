@@ -132,9 +132,9 @@ export function InputMessage({
 
   }, [input, attachmentFile, isLoading, handleSubmit, textareaRef]);
 
-  return (
-    <div className="w-full mx-auto max-w-3xl px-4">
-              {previewUrl && attachmentFile && (
+  return ( 
+    <div className="w-full mx-auto max-w-3xl px-4 pb-8">
+          {previewUrl && attachmentFile && (
           <div className="px-4 pb-3">
             <ImagePreview
               source={previewUrl}
