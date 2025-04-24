@@ -138,7 +138,7 @@ export function SidebarHistory({ user }: { user: User | null }) {
               </SidebarMenuButton>
               <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
+                <SidebarMenuAction>
                   <MoreHorizontal />
                   <span className="sr-only">More</span>
                 </SidebarMenuAction>
