@@ -1,17 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect, FormEvent, KeyboardEvent, useCallback } from 'react';
+import {useRef, useEffect, FormEvent, KeyboardEvent } from 'react';
 import { PreviewMessage, ThinkingMessage } from '@/components/custom/chat-message';
 import { toast } from 'sonner';
 import cx from 'classnames';
 import { AppHeader } from '@/components/custom/app-header';
 import { AnimatePresence, motion } from 'framer-motion';
 import { InputMessage } from '@/components/custom/chat-message';
-import { useDragAndDrop } from '@/hooks/use-chat-drag-and-drop';
-import { usePaste } from '@/hooks/use-chat-paste';
 import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 import { useChatMessages } from '@/hooks/use-chat-messages';
-import { useFileHandler } from '@/hooks/use-file-handler';
+import { useFileInput } from '@/hooks/use-chat-file-input';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -19,18 +17,17 @@ type Message = {
   file_path?: string | null;
 };
 
-export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: string | null; id: string | null; initialMessages: Message[]; persona_name: string | null }) {
+export function Chat({ user_id, persona_id, initialMessages }: { user_id: string | null; persona_id: string | null; initialMessages: Message[];}) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
+
   // Custom hooks for handling messages, file attachments and API calls
-  const { messages,isLoading, input, setInput, sendMessage } = useChatMessages({ initialMessages, user_id, id });
-  const {attachmentFile, setAttachmentFile, handleFileAdded} = useFileHandler(textareaRef);
+  const { messages,isLoading, input, setInput, sendMessage } = useChatMessages({ initialMessages, user_id, persona_id });
+  const { isDraggingOver, handlers, attachmentFile, setAttachmentFile } = useFileInput(textareaRef, setInput);  
+  useKeyboardFocus(textareaRef);
 
   // Auto-scroll to bottom when messages change
-  useEffect(() => { 
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
-  }, [messages]);
+  useEffect(() => {messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages]);
 
   // Handle form submission
   const handleSubmit = (e?: FormEvent<HTMLFormElement> | KeyboardEvent<HTMLTextAreaElement>) => {
@@ -44,13 +41,9 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
     sendMessage(input, attachmentFile, setAttachmentFile);
   };
 
-  useKeyboardFocus(textareaRef);
-  const handlePaste = usePaste(textareaRef, setInput, handleFileAdded);
-  const { isDraggingOver, handlers } = useDragAndDrop(handleFileAdded);
-  
   return (
-    <div className={cx("relative h-dvh transition-colors duration-200 ease-in-out flex flex-col")} onPaste={handlePaste} {...handlers}>
-      <AppHeader title="Chat" subtitle={persona_name || ''} />
+    <div className={cx("relative h-dvh transition-colors duration-200 ease-in-out flex flex-col")} {...handlers}>
+      <AppHeader title="Chat" subtitle={'Temp Persona'} />
       
       <AnimatePresence>
       {isDraggingOver && (
