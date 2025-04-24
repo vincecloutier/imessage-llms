@@ -168,7 +168,7 @@ export function InputMessage({
             ref={textareaRef}
             value={input}
             onChange={handleInput}
-            maxLength={500}
+            maxLength={300}
             className={cx(
               'flex-grow resize-none scrollbar-hide border-none focus:ring-0 focus:outline-none py-1 bg-transparent',
               'leading-tight text-sm md:text-base',

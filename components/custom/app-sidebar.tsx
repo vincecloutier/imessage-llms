@@ -56,7 +56,7 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
       </SidebarContent>
       <SidebarFooter>
          {user && <NavUser user={user_preview}/>}
-        {!user && <NavSignIn />}
+         {!user && <NavSignIn />}
       </SidebarFooter>
     </Sidebar>
   );
