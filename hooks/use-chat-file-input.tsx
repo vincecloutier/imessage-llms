@@ -1,4 +1,4 @@
-import { useCallback, useState, RefObject, ClipboardEvent, DragEvent } from 'react';
+import { useCallback, useState, RefObject, ClipboardEvent, DragEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 
 export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInput: (value: ((prev: string) => string) | string) => void) {  
@@ -18,14 +18,11 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
     textareaRef.current?.focus();
   }, [textareaRef]);
   
-  const onPaste = useCallback((event: ClipboardEvent<HTMLDivElement>) => {
+  const handlePaste = useCallback((event: ClipboardEvent<HTMLDivElement> | ClipboardEvent) => {
     const items = event.clipboardData?.items;
     if (!items) return;
     
-    const imageItem = Array.from(items).find(
-      item => item.kind === 'file' && item.type.startsWith('image/')
-    );
-    
+    const imageItem = Array.from(items).find(item => item.kind === 'file' && item.type.startsWith('image/'));
     if (imageItem) {
       const file = imageItem.getAsFile();
       if (file) {
@@ -35,25 +32,28 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
       }
     }
     
-    if (event.target !== textareaRef.current) {
-      const textItem = Array.from(items).find(
-        item => item.kind === 'string' && item.type === 'text/plain'
-      );
-      
-      if (textItem) {
-        textItem.getAsString((text) => {
-          setInput(prev => prev + text);
-          textareaRef.current?.focus();
-          requestAnimationFrame(() => {
-            if (textareaRef.current) {
-              textareaRef.current.selectionStart = textareaRef.current.selectionEnd = textareaRef.current.value.length;
-            }
-          });
+    const textItem = Array.from(items).find(item => item.kind === 'string' && item.type === 'text/plain');
+    if (textItem) {
+      event.preventDefault();
+      textItem.getAsString((text) => {
+        setInput(prev => prev + text);
+        textareaRef.current?.focus();
+        requestAnimationFrame(() => {
+          if (textareaRef.current) {
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = textareaRef.current.value.length;
+          }
         });
-      }
+      });
     }
   }, [handleFileAdded, setInput, textareaRef]);
 
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste as unknown as EventListener);
+    return () => {
+      document.removeEventListener('paste', handlePaste as unknown as EventListener);
+    };
+  }, [handlePaste]);
+  
   const onDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -87,6 +87,6 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
     isDraggingOver,
     attachmentFile,
     setAttachmentFile,
-    handlers: {onPaste, onDragOver, onDragLeave, onDrop}
+    handlers: {onPaste: handlePaste, onDragOver, onDragLeave, onDrop}
   };
 }
