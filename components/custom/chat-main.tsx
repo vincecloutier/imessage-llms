@@ -59,9 +59,7 @@ export function Chat({ user_id, persona_id, initialMessages }: { user_id: string
       </AnimatePresence>
       
       <div className="flex-1 flex flex-col min-w-0 gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
-        {messages.map((message, index) => (
-          <PreviewMessage key={index} message={message}/>
-        ))}
+        {messages.map((message, index) => (<PreviewMessage key={index} message={message}/>))}
         {isLoading && <ThinkingMessage />}
         <div ref={messagesEndRef}/>
       </div>
