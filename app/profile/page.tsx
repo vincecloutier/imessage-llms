@@ -1,63 +1,62 @@
+import { AppHeader } from "@/components/custom/app-header";
 import GenericForm, { PageSchema, FieldSchema } from "@/components/custom/generic-form";
+import { saveProfile } from "@/lib/actions";
 
-
-export default function UserProfilePage() {
-  // Define form pages with fields
-  const pages: PageSchema[] = [
+const pages: PageSchema[] = [
     {
       key: "personal",
       label: "Personal Information",
       description: "Your basic contact details",
       fields: [
+        { name: "name", label: "Name", type: "text", description: "Your name will be used to identify you in the app.", required: true, rowId: "personal" },
+        { name: "birthday", label: "Birthday", description: "Your date of birth will be used to calculate your age.", type: "calendar", required: false, rowId: "personal" },
+        { name: "phone", label: "Phone Number", type: "tel", required: false, rowId: "personal" },
+      ]
+    },
+    {
+      key: "location",
+      label: "Location",
+      description: "Your location will only be used to provide context to the personas. If you don't want to share your location, you can leave this blank, but you will lose weather and time zone context so your personas may text you outside of the app.",
+      fields: [
         {
-          name: "full_name",
-          label: "Full Name",
+          name: "location",
+          label: "Location",
           type: "text",
           required: true,
         },
         {
-          name: "email",
-          label: "Email Address",
-          description: "We'll never share your email with anyone",
-          type: "email",
+          name: "timezone",
+          label: "Timezone",
+          type: "enum",
           required: true,
-        },
-        {
-          name: "phone",
-          label: "Phone Number",
-          type: "tel",
-          required: false,
-        },
-        {
-          name: "birth_date",
-          label: "Date of Birth",
-          type: "calendar",
-          required: false,
         }
       ]
     },
     {
-      key: "preferences",
-      label: "Preferences",
-      description: "Customize your experience",
+      key: "Contact Information",
+      label: "Contact Information",
+      description: "Your contact information will be used to send you notifications and updates.",
       fields: [
         {
-          name: "theme",
-          label: "Theme",
-          type: "enum",
-          required: true,
-          options: ["Light", "Dark", "System"]
-        },
-        {
-          name: "notifications",
-          label: "Notification Preference",
-          type: "enum",
-          required: true,
-          options: ["Email", "SMS", "Both", "None"]
+          name: "email",
+          label: "Email",
+          type: "email",
+          required: false,
         }
       ]
     }
   ];
+
+export const timezoneOptions = [
+  { label: "America/New_York", value: "America/New_York" },
+  { label: "America/Chicago", value: "America/Chicago" },
+  { label: "America/Los_Angeles", value: "America/Los_Angeles" },
+  { label: "America/Denver", value: "America/Denver" },
+  
+];
+
+export default function UserProfilePage() {
+  // Define form pages with fields
 
   // Example initial values
   const initialValues = {
@@ -69,25 +68,20 @@ export default function UserProfilePage() {
       notifications: "Email"
     }
   };
-
-  // Save handler function
-  const handleSave = async (payload: any) => {
-    console.log("Saving user profile:", payload);
-    // In a real app, you would call an API here
-    return await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-  };
-
   return (
-    <div className="container mx-auto py-8">
+    <>
+      <AppHeader
+        title={"Profile"}
+        subtitle={"Personal Information"}
+    />
+    <div className="mx-16 ">
       <GenericForm
         startingValues={initialValues}
         pages={pages}
-        saveAction={handleSave}
-      />
-    </div>
+        saveAction={saveProfile}
+        useTabs={false}
+        />
+      </div>
+    </>
   );
 }

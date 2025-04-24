@@ -46,6 +46,7 @@ export interface PageSchema {
   description?: string;
   fields: FieldSchema[];
   rowLayouts?: RowLayout[]; // Define rows and their column counts
+  tabKey?: string; // Optional tab this page belongs to
 }
 
 export interface GenericFormProps {
@@ -60,9 +61,10 @@ export interface GenericFormProps {
     attributes: Record<string, any>;
     sender_address?: string | null;
   }) => Promise<any>;
+  useTabs?: boolean; // Whether to use tabs or not
 }
 
-export default function GenericForm({startingValues, pages, saveAction}: GenericFormProps) {  
+export default function GenericForm({startingValues, pages, saveAction, useTabs = true}: GenericFormProps) {  
   // Build initial form values across all pages
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
@@ -100,7 +102,23 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
     }
   };
 
-  const defaultTab = pages[0]?.key;
+  // Group pages by tab for optional tab rendering
+  const pagesByTab = useMemo(() => {
+    if (!useTabs) {
+      return { noTab: pages };
+    }
+    
+    return pages.reduce((acc, page) => {
+      const tabKey = page.tabKey || page.key;
+      if (!acc[tabKey]) acc[tabKey] = [];
+      acc[tabKey].push(page);
+      return acc;
+    }, {} as Record<string, PageSchema[]>);
+  }, [pages, useTabs]);
+
+  // Get tabs from the grouped pages
+  const tabs = useMemo(() => Object.keys(pagesByTab), [pagesByTab]);
+  const defaultTab = tabs[0] || 'noTab';
 
   // Group fields by rowId for each page
   const getFieldGroups = (fields: FieldSchema[], rowLayouts?: RowLayout[]) => {
@@ -196,95 +214,112 @@ export default function GenericForm({startingValues, pages, saveAction}: Generic
     return rules;
   };
 
+  const renderPageContent = (page: PageSchema) => {
+    const { defaultFields, rowGroups, rowLayouts } = getFieldGroups(page.fields, page.rowLayouts);
+    
+    return (
+      <Card key={page.key} className="mb-4">
+        <CardHeader>
+          <CardTitle>{page.label}</CardTitle>
+          {page.description && (
+            <CardDescription>{page.description}</CardDescription>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {Object.entries(rowGroups).map(([rowId, fields]) => {
+            const rowLayout = rowLayouts?.find(r => r.id === rowId);
+            const columns = rowLayout?.columns || fields.length;
+            
+            return (
+              <div key={rowId} className={`grid gap-4`} style={{ 
+                display: 'grid', 
+                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                gap: '1rem'
+              }}>
+                {fields.map((field) => (
+                  <FormField
+                    key={field.name}
+                    control={form.control}
+                    name={field.name}
+                    rules={getValidationRules(field)}
+                    render={({ field: ctrl }) => (
+                      <FormItem style={{ 
+                        gridColumn: field.columnSpan ? `span ${field.columnSpan}` : 'span 1'
+                      }}>
+                        <FormLabel>{field.label}</FormLabel>
+                        <FormControl>
+                          {renderFormField(field, ctrl)}
+                        </FormControl>
+                        {field.description && (
+                          <FormDescription>{field.description}</FormDescription>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+            );
+          })}
+          
+          {defaultFields.map((field) => (
+            <FormField
+              key={field.name}
+              control={form.control}
+              name={field.name}
+              rules={getValidationRules(field)}
+              render={({ field: ctrl }) => (
+                <FormItem>
+                  <FormLabel>{field.label}</FormLabel>
+                  <FormControl>
+                    {renderFormField(field, ctrl)}
+                  </FormControl>
+                  {field.description && (
+                    <FormDescription>{field.description}</FormDescription>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Tabs defaultValue={defaultTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            {pages.map((page) => (
-              <TabsTrigger key={page.key} value={page.key}>
-                {page.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {pages.map((page) => {
-            const { defaultFields, rowGroups, rowLayouts } = getFieldGroups(page.fields, page.rowLayouts);
+        {useTabs && tabs.length > 1 ? (
+          <Tabs defaultValue={defaultTab} className="w-full">
+            <TabsList className={`grid w-full grid-cols-${Math.min(tabs.length, 4)}`}>
+              {tabs.map((tabKey) => {
+                const firstPage = pagesByTab[tabKey][0];
+                return (
+                  <TabsTrigger key={tabKey} value={tabKey}>
+                    {firstPage.tabKey ? tabKey : firstPage.label}
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
             
-            return (
-              <TabsContent key={page.key} value={page.key}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{page.label}</CardTitle>
-                    {page.description && (
-                      <CardDescription>{page.description}</CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {Object.entries(rowGroups).map(([rowId, fields]) => {
-                      const rowLayout = rowLayouts?.find(r => r.id === rowId);
-                      const columns = rowLayout?.columns || fields.length;
-                      
-                      return (
-                        <div key={rowId} className={`grid grid-cols-${columns} gap-4`} style={{ 
-                          display: 'grid', 
-                          gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                          gap: '1rem'
-                        }}>
-                          {fields.map((field) => (
-                            <FormField
-                              key={field.name}
-                              control={form.control}
-                              name={field.name}
-                              rules={getValidationRules(field)}
-                              render={({ field: ctrl }) => (
-                                <FormItem style={{ 
-                                  gridColumn: field.columnSpan ? `span ${field.columnSpan}` : 'span 1'
-                                }}>
-                                  <FormLabel>{field.label}</FormLabel>
-                                  <FormControl>
-                                    {renderFormField(field, ctrl)}
-                                  </FormControl>
-                                  {field.description && (
-                                    <FormDescription>{field.description}</FormDescription>
-                                  )}
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          ))}
-                        </div>
-                      );
-                    })}
-                    
-                    {defaultFields.map((field) => (
-                      <FormField
-                        key={field.name}
-                        control={form.control}
-                        name={field.name}
-                        rules={getValidationRules(field)}
-                        render={({ field: ctrl }) => (
-                          <FormItem>
-                            <FormLabel>{field.label}</FormLabel>
-                            <FormControl>
-                              {renderFormField(field, ctrl)}
-                            </FormControl>
-                            {field.description && (
-                              <FormDescription>{field.description}</FormDescription>
-                            )}
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </CardContent>
-                  <CardFooter>
-                    <Button type="submit">Save Changes</Button>
-                  </CardFooter>
-                </Card>
+            {tabs.map((tabKey) => (
+              <TabsContent key={tabKey} value={tabKey}>
+                {pagesByTab[tabKey].map(renderPageContent)}
+                <div className="mt-4 flex justify-end">
+                  <Button type="submit">Save Changes</Button>
+                </div>
               </TabsContent>
-            );
-          })}
-        </Tabs>
+            ))}
+          </Tabs>
+        ) : (
+          <>
+            {pages.map(renderPageContent)}
+            <div className="mt-4 flex justify-end">
+              <Button type="submit">Save Changes</Button>
+            </div>
+          </>
+        )}
       </form>
     </Form>
   );

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { getPersonaById, getUser } from '@/lib/supabase/cached-queries';
 import { AppHeader } from '@/components/custom/app-header';
-import GenericForm, { GenericFormProps, PageSchema } from '@/components/custom/generic-form';
+import GenericForm, {PageSchema } from '@/components/custom/generic-form';
 import { savePersona } from '@/lib/actions';
 
 const pages: PageSchema[] = [
@@ -34,14 +34,7 @@ const pages: PageSchema[] = [
   
   
 export default async function Page(props: { params: Promise<any> }) {
-  const params = await props.params;
-  const { id } = params;
-
-  const persona = await getPersonaById(id);
-
-  if (!persona) {
-    notFound();
-  }
+  const { id } = await props.params;
 
   const user = await getUser();
 
@@ -49,7 +42,14 @@ export default async function Page(props: { params: Promise<any> }) {
     return notFound();
   }
 
-  if (user.id !== persona.user_id) {
+  const persona = id == 'new' ? {
+    id: null,
+    attributes: {name: 'New Persona'},
+    sender_address: null,
+    user_id: user.id,
+  } : await getPersonaById(id);
+
+  if (!persona || user.id !== persona.user_id) {
     return notFound();
   }
 
@@ -68,6 +68,7 @@ export default async function Page(props: { params: Promise<any> }) {
         }}
         pages={pages}
         saveAction={savePersona}
+        useTabs={false}
       />
       </div>
     </>
