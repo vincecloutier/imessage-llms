@@ -1,11 +1,15 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent, KeyboardEvent, DragEvent, ClipboardEvent, useCallback } from 'react';
-import { InputMessage, PreviewMessage, ThinkingMessage } from '@/components/custom/chat-message';
+import { PreviewMessage, ThinkingMessage } from '@/components/custom/chat-message';
 import { toast } from 'sonner';
 import cx from 'classnames';
 import { AppHeader } from '@/components/custom/app-header';
 import { AnimatePresence, motion } from 'framer-motion';
+import { InputMessage } from '@/components/custom/chat-message';
+import { useDragAndDrop } from '@/hooks/use-chat-drag-and-drop';
+import { usePaste } from '@/hooks/use-chat-paste';
+import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -14,13 +18,10 @@ type Message = {
 };
 
 export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: string | null; id: string | null; initialMessages: Message[]; persona_name: string | null}) {
-  const [messages, setMessages] = useState<Message[]>(
-      initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []
-  );
+  const [messages, setMessages] = useState<Message[]>(initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -118,119 +119,17 @@ export function Chat({ user_id, id, initialMessages, persona_name }: { user_id: 
       e.preventDefault();
     }
     if (isLoading) {
-        toast.error('Please wait for the previous response to complete.');
-        return;
+      toast.error('Please wait for the previous response to complete.');
+      return;
     }
     sendMessage();
   };
 
-  const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDraggingOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-        setIsDraggingOver(false);
-    }
-  }, []);
-
-  const handleDrop = useCallback((event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsDraggingOver(false);
-
-    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-      const imageFile = Array.from(event.dataTransfer.files).find(file => file.type.startsWith('image/'));
-      const fileToUse = imageFile || event.dataTransfer.files[0];
-
-      if(fileToUse.type.startsWith('image/')) {
-         handleFileAdded(fileToUse);
-      } else {
-          toast.info("Only image files can be dropped as attachments.");
-      }
-      event.dataTransfer.clearData();
-    }
-  }, [handleFileAdded]);
-
-  const handlePaste = useCallback((event: ClipboardEvent<HTMLDivElement>) => {
-    const items = event.clipboardData?.items;
-    if (!items) return;
-
-    const isPastingInTextarea = event.target === textareaRef.current;
-
-    let imageHandled = false;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.kind === 'file' && item.type.startsWith('image/')) {
-        const file = item.getAsFile();
-        if (file) {
-          event.preventDefault();
-          handleFileAdded(file);
-          imageHandled = true;
-          break;
-        }
-      }
-    }
-
-    if (imageHandled) return;
-
-    if (!isPastingInTextarea) {
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-             if (item.kind === 'string' && item.type === 'text/plain') {
-                item.getAsString((text) => {
-                    setInput((prev) => prev + text);
-                    textareaRef.current?.focus();
-                    requestAnimationFrame(() => {
-                        if (textareaRef.current) {
-                            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = textareaRef.current.value.length;
-                        }
-                    });
-                });
-                 break;
-            }
-        }
-    }
-
-  }, [handleFileAdded, setInput]);
-
-  const handleKeyDown = useCallback((event: globalThis.KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-
-      const target = event.target as HTMLElement;
-      const isInputFocused = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-
-      if (event.key === 'Escape' && attachmentFile) {
-         if (!isInputFocused) {
-             event.preventDefault();
-             setAttachmentFile(null);
-             toast.info("Attachment removed.");
-         }
-         else if (target === textareaRef.current) {
-              setAttachmentFile(null);
-              toast.info("Attachment removed.");
-         }
-      }
-
-      if (!isInputFocused && target.tagName !== 'BUTTON' && event.key.length === 1 && !event.isComposing) {
-           textareaRef.current?.focus();
-      }
-
-  }, [attachmentFile, setAttachmentFile]);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleKeyDown]);
-
+  useKeyboardFocus(textareaRef);
+  const handlePaste = usePaste(textareaRef, setInput, handleFileAdded);
+  const { isDraggingOver, handlers } = useDragAndDrop(handleFileAdded);
   return (
-    <div className={cx("relative h-dvh transition-colors duration-200 ease-in-out flex flex-col")} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onPaste={handlePaste}>
+    <div className={cx("relative h-dvh transition-colors duration-200 ease-in-out flex flex-col")} onPaste={handlePaste} {...handlers}>
       <AppHeader title="Chat" subtitle={persona_name || ''} />
       <AnimatePresence>
         {isDraggingOver && (
