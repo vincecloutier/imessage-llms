@@ -8,7 +8,7 @@ export function usePaste(
 ) {
   return useCallback((event: ClipboardEvent<HTMLDivElement>) => {
     const items = event.clipboardData?.items;
-    if (!items || event.target === textareaRef.current) return;
+    if (!items) return;
     
     const imageItem = Array.from(items).find(
       item => item.kind === 'file' && item.type.startsWith('image/')
@@ -23,20 +23,22 @@ export function usePaste(
       }
     }
     
-    const textItem = Array.from(items).find(
-      item => item.kind === 'string' && item.type === 'text/plain'
-    );
-    
-    if (textItem) {
-      textItem.getAsString((text) => {
-        setInput(prev => prev + text);
-        textareaRef.current?.focus();
-        requestAnimationFrame(() => {
-          if (textareaRef.current) {
-            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = textareaRef.current.value.length;
-          }
+    if (event.target !== textareaRef.current) {
+      const textItem = Array.from(items).find(
+        item => item.kind === 'string' && item.type === 'text/plain'
+      );
+      
+      if (textItem) {
+        textItem.getAsString((text) => {
+          setInput(prev => prev + text);
+          textareaRef.current?.focus();
+          requestAnimationFrame(() => {
+            if (textareaRef.current) {
+              textareaRef.current.selectionStart = textareaRef.current.selectionEnd = textareaRef.current.value.length;
+            }
+          });
         });
-      });
+      }
     }
   }, [handleFileAdded, setInput, textareaRef]);
 }
