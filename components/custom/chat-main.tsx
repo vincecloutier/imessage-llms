@@ -17,13 +17,13 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // First get the file handler which manages the core file state
-  const { attachmentFile, setAttachmentFile, previewUrl, handleFileAdded, handleFileRemoved } = useFileHandler(textareaRef);
+  const { attachmentFile, setAttachmentFile, handleFileAdded, handleFileRemoved } = useFileHandler(textareaRef);
   
   // Custom hooks for handling messages and API calls
   const { messages, isResponding, input, setInput, sendMessage } = useChatMessages({ initialMessages, user_id, persona_id });
   
   // Now use the file input hook with the handlers from useFileHandler
-  const { isDraggingOver, handlers } = useFileInput(textareaRef, setInput,  handleFileAdded, attachmentFile, previewUrl);
+  const { isDraggingOver, handlers } = useFileInput(textareaRef, setInput, handleFileAdded, attachmentFile);
   
   useKeyboardFocus(textareaRef);
 
@@ -56,9 +56,8 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
         input={input}
         setInput={setInput}
         isResponding={isResponding}
-        handleSubmit={() => sendMessage(input, attachmentFile, previewUrl, setAttachmentFile)}
+        handleSubmit={() => sendMessage(input, attachmentFile, setAttachmentFile)}
         attachmentFile={attachmentFile}
-        previewUrl={previewUrl}
         handleFileAdded={handleFileAdded}
         handleFileRemoved={handleFileRemoved}
         textareaRef={textareaRef}

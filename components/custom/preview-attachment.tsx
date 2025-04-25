@@ -8,13 +8,13 @@ import { createSignedAttachmentUrl } from "@/lib/actions"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface ImagePreviewProps {
-  source: string | null | undefined
+  source: string | null | undefined | File
   onDelete?: () => void
   alt?: string
 }
 
 export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImagePreviewProps) {
-  const [isOpen, setIsOpen] = useState(false) // Restore isOpen state
+  const [isOpen, setIsOpen] = useState(false)
   const [resolvedUrl, setResolvedUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,34 +27,50 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
       return
     }
 
-    if (source.startsWith('blob:') || source.startsWith('http')) {
-      setResolvedUrl(source)
+    // Handle File object directly
+    if (source instanceof File) {
+      const objectUrl = URL.createObjectURL(source)
+      setResolvedUrl(objectUrl)
       setIsLoading(false)
       setError(null)
-    } else {
-      let isMounted = true
-      const fetchUrl = async () => {
-        setIsLoading(true)
-        setError(null)
-        try {
-          const result = await createSignedAttachmentUrl(source)
-          if (!isMounted) return
-          if (result.error) {
-            setError(result.error)
-            setResolvedUrl(null)
-          } else {
-            setResolvedUrl(result.signedUrl)
-          }
-        } catch (err: any) {
-          if (!isMounted) return
-          setError(err.message || "Failed to load image.")
-          setResolvedUrl(null)
-        } finally {
-          if (isMounted) setIsLoading(false)
-        }
+      
+      // Clean up function
+      return () => {
+        URL.revokeObjectURL(objectUrl)
       }
-      fetchUrl()
-      return () => { isMounted = false }
+    }
+
+    // Handle string URLs (blob or http)
+    if (typeof source === 'string') {
+      if (source.startsWith('blob:') || source.startsWith('http')) {
+        setResolvedUrl(source)
+        setIsLoading(false)
+        setError(null)
+      } else {
+        let isMounted = true
+        const fetchUrl = async () => {
+          setIsLoading(true)
+          setError(null)
+          try {
+            const result = await createSignedAttachmentUrl(source)
+            if (!isMounted) return
+            if (result.error) {
+              setError(result.error)
+              setResolvedUrl(null)
+            } else {
+              setResolvedUrl(result.signedUrl)
+            }
+          } catch (err: any) {
+            if (!isMounted) return
+            setError(err.message || "Failed to load image.")
+            setResolvedUrl(null)
+          } finally {
+            if (isMounted) setIsLoading(false)
+          }
+        }
+        fetchUrl()
+        return () => { isMounted = false }
+      }
     }
   }, [source])
 
@@ -78,7 +94,7 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
           width={128}
           height={128}
           className="w-full h-full object-cover"
-          onClick={() => setIsOpen(true)} // Re-add onClick to open modal
+          onClick={() => setIsOpen(true)}
         />
       )
     }

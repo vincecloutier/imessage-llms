@@ -1,7 +1,7 @@
 import { useCallback, useState, RefObject, ClipboardEvent, DragEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 
-export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInput: (value: ((prev: string) => string) | string) => void, handleFileAdded: (file: File) => boolean, attachmentFile: File | null, previewUrl: string | null) {  
+export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInput: (value: ((prev: string) => string) | string) => void, handleFileAdded: (file: File) => boolean, attachmentFile: File | null) {  
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   
   const handlePaste = useCallback((event: ClipboardEvent<HTMLDivElement> | ClipboardEvent) => {
@@ -72,7 +72,6 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
   return { 
     isDraggingOver,
     attachmentFile,
-    previewUrl,
     handlers: {onPaste: handlePaste, onDragOver, onDragLeave, onDrop}
   };
 }

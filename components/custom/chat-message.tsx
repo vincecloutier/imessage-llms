@@ -7,13 +7,27 @@ import { Paperclip, ArrowUp } from 'lucide-react';
 import { Message } from '@/lib/types';
 
 export const PreviewMessage = ({message}: {message: Message}) => {
+  // Clean up blob URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      if (message.file_path && message.file_path.startsWith('blob:')) {
+        URL.revokeObjectURL(message.file_path);
+      }
+    };
+  }, [message.file_path]);
+
   return (
     <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2 mb-4" data-role={message.role}>
       <div className={cx(
         'flex flex-col gap-2 px-4 py-3 rounded-2xl max-w-[75%]',
         message.role === 'user' ? 'ml-auto bg-blue-500 text-white' : 'mr-auto bg-gray-100 dark:bg-gray-800'
       )}>
-        {message.file_path && (<ImagePreview source={message.file_path} alt={message.content || "Attachment"} />)}
+        {(message.file_path || message.attachmentFile) && (
+          <ImagePreview 
+            source={message.attachmentFile || message.file_path} 
+            alt={message.content || "Attachment"} 
+          />
+        )}
         <div className="prose dark:prose-invert max-w-none"> {message.content} </div>
       </div>
     </div>
@@ -40,7 +54,6 @@ export function InputMessage({
   isResponding,
   handleSubmit,
   attachmentFile,
-  previewUrl,
   handleFileAdded,
   handleFileRemoved,
   textareaRef
@@ -50,7 +63,6 @@ export function InputMessage({
   isResponding: boolean;
   handleSubmit: () => void;
   attachmentFile: File | null;
-  previewUrl: string | null;
   handleFileAdded: (file: File) => boolean;
   handleFileRemoved: () => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
@@ -80,10 +92,10 @@ export function InputMessage({
 
   return (
     <div className="w-full mx-auto max-w-3xl px-4 pb-8">
-          {previewUrl && attachmentFile && (
+          {attachmentFile && (
           <div className="px-4 pb-3">
             <ImagePreview
-              source={previewUrl}
+              source={attachmentFile}
               onDelete={handleFileRemoved}
               alt={attachmentFile.name || "Selected image"}
             />

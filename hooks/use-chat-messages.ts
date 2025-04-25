@@ -7,7 +7,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
   const [input, setInput] = useState('');
   const [isResponding, setIsResponding] = useState(false);
 
-  const sendMessage = async (content: string, attachmentFile: File | null, previewUrl: string | null, setAttachmentFile: (file: File | null) => void) => {
+  const sendMessage = async (content: string, attachmentFile: File | null, setAttachmentFile: (file: File | null) => void) => {
     const trimmed = content.trim();
     
     if (!trimmed && !attachmentFile) {
@@ -23,8 +23,8 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
 
     const userMessage: Message = {role: 'user', content: trimmed};
 
-    if (attachmentFile && previewUrl) {
-      userMessage.file_path = previewUrl;
+    if (attachmentFile) {
+      userMessage.attachmentFile = attachmentFile;
     }
 
     setMessages((prev) => [...prev, userMessage]);
