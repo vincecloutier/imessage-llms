@@ -1,19 +1,8 @@
+import { Message } from '@/lib/types';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-type Message = {
-  role: 'user' | 'assistant';
-  content: string;
-  file_path?: string | null;
-};
-
-type ChatMessagesProps = {
-  user_id: string | null;
-  persona_id: string | null;
-  initialMessages: Message[];
-};
-
-export function useChatMessages({user_id, persona_id, initialMessages}: ChatMessagesProps) {
+export function useChatMessages({user_id, persona_id, initialMessages}: { user_id: string | null;  persona_id: string | null; initialMessages: Message[];}) {
   const [messages, setMessages] = useState<Message[]>(
     initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []
   );

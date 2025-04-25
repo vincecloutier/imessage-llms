@@ -5,12 +5,7 @@ import { ImagePreview } from './preview-attachment';
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { Paperclip, ArrowUp } from 'lucide-react';
-
-type Message = {
-  role: 'user' | 'assistant';
-  content: string;
-  file_path?: string | null;
-}
+import { Message } from '@/lib/types';
 
 export const PreviewMessage = ({message}: {message: Message}) => {
   return (

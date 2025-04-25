@@ -1,5 +1,5 @@
 'use client';
-
+import { Persona } from '@/lib/types';
 import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -42,16 +42,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { deletePersona } from '@/lib/actions';
-// Type for a persona record from Supabase
-// Adjust properties as needed; here we assume a persona has at least an id and a title
 
-type persona = {
-  id: string;
-  attributes: Record<string, unknown>;
-  sender_address: string;
-}
-
-const fetcher = async (): Promise<persona[]> => {
+const fetcher = async (): Promise<Persona[]> => {
   try {
     const supabase = createClient();
     const {
@@ -85,19 +77,9 @@ export function SidebarHistory({ user }: { user: User | null }) {
   const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
-  const { data: history, isLoading, mutate } = useSWR<persona[]>(
-    user ? ['personas', user.id] : null,
-    fetcher,
-    {
-      fallbackData: [],
-      refreshInterval: 5000,
-      revalidateOnFocus: true,
-    }
-  );
+  const { data: history, isLoading, mutate } = useSWR<Persona[]>(user ? ['personas', user.id] : null, fetcher);
 
-  useEffect(() => {
-    mutate();
-  }, [pathname, mutate]);
+  useEffect(() => {mutate();}, [pathname, mutate]); 
 
   if (!user) {
     return (
