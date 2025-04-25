@@ -7,7 +7,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: { user_i
     initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []
   );
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isResponding, setIsResponding] = useState(false);
 
   const sendMessage = async (
     messageContent: string, 
@@ -21,7 +21,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: { user_i
       return;
     }
     
-    setIsLoading(true);
+    setIsResponding(true);
 
     const userMessage: Message = { role: 'user', content: trimmedContent };
     let tempAttachmentUrl: string | null = null;
@@ -92,13 +92,13 @@ export function useChatMessages({user_id, persona_id, initialMessages}: { user_i
         }
       ]);
     } finally {
-      setIsLoading(false);
+      setIsResponding(false);
     }
   };
 
   return {
     messages,
-    isLoading,
+    isResponding,
     input,
     setInput,
     sendMessage

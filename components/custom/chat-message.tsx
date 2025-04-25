@@ -38,7 +38,7 @@ export const ThinkingMessage = () => {
 export function InputMessage({
   input,
   setInput,
-  isLoading,
+  isResponding,
   handleSubmit,
   attachmentFile,
   setAttachmentFile,
@@ -46,7 +46,7 @@ export function InputMessage({
 }:{
   input: string;
   setInput: (value: string) => void;
-  isLoading: boolean;
+  isResponding: boolean;
   handleSubmit: () => void;
   attachmentFile: File | null;
   setAttachmentFile: (file: File | null) => void;
@@ -114,7 +114,7 @@ export function InputMessage({
         toast.error('Please enter a message or add an attachment.');
         return;
     }
-    if (isLoading) {
+    if (isResponding) {
         toast.error('Please wait for the previous response to complete.');
         return;
     }
@@ -125,7 +125,7 @@ export function InputMessage({
       textareaRef.current.focus();
     }
 
-  }, [input, attachmentFile, isLoading, handleSubmit, textareaRef]);
+  }, [input, attachmentFile, isResponding, handleSubmit, textareaRef]);
 
   return ( 
     <div className="w-full mx-auto max-w-3xl px-4 pb-8">
@@ -172,15 +172,15 @@ export function InputMessage({
                 submit();
               }
             }}
-            disabled={isLoading}
+            disabled={isResponding}
           />
           
           <button 
             onClick={submit}
-            disabled={isLoading || (input.trim().length === 0 && !attachmentFile)}
+            disabled={isResponding || (input.trim().length === 0 && !attachmentFile)}
             className={cx(
               "flex-shrink-0 rounded-full p-2 ml-2", 
-              (isLoading || (input.trim().length === 0 && !attachmentFile)) 
+              (isResponding || (input.trim().length === 0 && !attachmentFile)) 
                 ? "text-gray-400 bg-gray-100 dark:bg-gray-800" 
                 : "text-white bg-blue-500 hover:bg-blue-600"
             )}

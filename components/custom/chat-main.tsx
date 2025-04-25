@@ -21,7 +21,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Custom hooks for handling messages, file attachments and API calls
-  const { messages,isLoading, input, setInput, sendMessage } = useChatMessages({ initialMessages, user_id, persona_id });
+  const { messages, isResponding, input, setInput, sendMessage } = useChatMessages({ initialMessages, user_id, persona_id });
   const { isDraggingOver, handlers, attachmentFile, setAttachmentFile } = useFileInput(textareaRef, setInput);  
   useKeyboardFocus(textareaRef);
 
@@ -33,7 +33,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
     if (e && 'preventDefault' in e) {
       e.preventDefault();
     }
-    if (isLoading) {
+    if (isResponding) {
       toast.error('Please wait for the previous response to complete.');
       return;
     }
@@ -58,7 +58,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
       
       <div className="flex-1 flex flex-col min-w-0 gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
         {messages.map((message, index) => (<PreviewMessage key={index} message={message}/>))}
-        {isLoading && <ThinkingMessage />}
+        {isResponding && <ThinkingMessage />}
         <div ref={messagesEndRef}/>
       </div>
       
@@ -67,7 +67,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
         input={input}
         setInput={setInput}
         handleSubmit={handleSubmit}
-        isLoading={isLoading}
+        isResponding={isResponding}
         attachmentFile={attachmentFile}
         setAttachmentFile={setAttachmentFile}
       />
