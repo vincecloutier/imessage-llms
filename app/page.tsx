@@ -5,6 +5,7 @@ export default async function Home() {
       <PreviewChat
       user_id={null}
       persona_id={null}
+      persona_name={null}
       initialMessages={[]}
     />
   );
