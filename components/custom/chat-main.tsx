@@ -9,12 +9,7 @@ import { InputMessage } from '@/components/custom/chat-message';
 import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 import { useChatMessages } from '@/hooks/use-chat-messages';
 import { useFileInput } from '@/hooks/use-chat-file-input';
-
-type Message = {
-  role: 'user' | 'assistant';
-  content: string;
-  file_path?: string | null;
-};
+import { Message } from '@/lib/types';
 
 export function Chat({ user_id, persona_id, persona_name, initialMessages }: { user_id: string | null; persona_id: string | null; persona_name: string | null; initialMessages: Message[];}) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
