@@ -3,7 +3,6 @@
 import {useRef, useEffect, FormEvent, KeyboardEvent } from 'react';
 import { PreviewMessage, ThinkingMessage } from '@/components/custom/chat-message';
 import { toast } from 'sonner';
-import cx from 'classnames';
 import { AppHeader } from '@/components/custom/app-header';
 import { AnimatePresence, motion } from 'framer-motion';
 import { InputMessage } from '@/components/custom/chat-message';
@@ -17,7 +16,7 @@ type Message = {
   file_path?: string | null;
 };
 
-export function Chat({ user_id, persona_id, initialMessages }: { user_id: string | null; persona_id: string | null; initialMessages: Message[];}) {
+export function Chat({ user_id, persona_id, persona_name, initialMessages }: { user_id: string | null; persona_id: string | null; persona_name: string | null; initialMessages: Message[];}) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -42,9 +41,8 @@ export function Chat({ user_id, persona_id, initialMessages }: { user_id: string
   };
 
   return (
-    <div className={cx("relative h-dvh transition-colors duration-200 ease-in-out flex flex-col")} {...handlers}>
-      <AppHeader title="Chat" subtitle={'Temp Persona'} />
-      
+    <div className="relative h-dvh transition-colors duration-200 ease-in-out flex flex-col" {...handlers}>      
+      <AppHeader title="Chat" subtitle={persona_name || 'New Persona'}/>
       <AnimatePresence>
       {isDraggingOver && (
         <motion.div 

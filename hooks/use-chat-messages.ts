@@ -8,12 +8,12 @@ type Message = {
 };
 
 type ChatMessagesProps = {
-  initialMessages: Message[];
   user_id: string | null;
   persona_id: string | null;
+  initialMessages: Message[];
 };
 
-export function useChatMessages({ initialMessages, user_id, persona_id }: ChatMessagesProps) {
+export function useChatMessages({user_id, persona_id, initialMessages}: ChatMessagesProps) {
   const [messages, setMessages] = useState<Message[]>(
     initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []
   );
