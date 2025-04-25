@@ -54,7 +54,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
     } finally {
       setIsResponding(false);
     }
-
   };
+  
   return {messages, isResponding, input, setInput, sendMessage};
 } 
