@@ -32,7 +32,7 @@ export const getPersonasByUserId = async (userId: string) => {
 
 export const getMessagesByPersonaId = async (personaId: string) => {
   const supabase = await createClient();
-  const { data: messages, error } = await supabase.from('messages').select().eq('persona_id', personaId).order('created_at', { ascending: true });
+  const { data: messages, error } = await supabase.from('messages').select().eq('persona_id', personaId).order('created_at', { ascending: true }).limit(20);
   if (error) throw error;
   return messages;
 };
