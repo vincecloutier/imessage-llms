@@ -33,10 +33,6 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
     if (e && 'preventDefault' in e) {
       e.preventDefault();
     }
-    if (isResponding) {
-      toast.error('Please wait for the previous response to complete.');
-      return;
-    }
     sendMessage(input, attachmentFile, setAttachmentFile);
   };
 

@@ -2,28 +2,26 @@ import { Message } from '@/lib/types';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export function useChatMessages({user_id, persona_id, initialMessages}: { user_id: string | null;  persona_id: string | null; initialMessages: Message[];}) {
-  const [messages, setMessages] = useState<Message[]>(
-    initialMessages?.map(msg => ({ ...msg, file_path: msg.file_path })) || []
-  );
+export function useChatMessages({user_id, persona_id, initialMessages}: {user_id: string | null;  persona_id: string | null; initialMessages: Message[];}) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages || []);
   const [input, setInput] = useState('');
   const [isResponding, setIsResponding] = useState(false);
 
-  const sendMessage = async (
-    messageContent: string, 
-    attachmentFile: File | null,
-    setAttachmentFile: (file: File | null) => void
-  ) => {
-    const trimmedContent = messageContent.trim();
+  const sendMessage = async (content: string, attachmentFile: File | null, setAttachmentFile: (file: File | null) => void) => {
+    const trimmed = content.trim();
     
-    if (!persona_id || (!trimmedContent && !attachmentFile)) {
+    if (!trimmed && !attachmentFile) {
       toast.error('Please enter a message or add an attachment.');
+      return;
+    }
+    if (isResponding) {
+      toast.error('Please wait for the previous response to complete.');
       return;
     }
     
     setIsResponding(true);
 
-    const userMessage: Message = { role: 'user', content: trimmedContent };
+    const userMessage: Message = {role: 'user', content: trimmed};
     let tempAttachmentUrl: string | null = null;
 
     if (attachmentFile) {
@@ -37,14 +35,12 @@ export function useChatMessages({user_id, persona_id, initialMessages}: { user_i
 
     const formData = new FormData();
     formData.append('user_id', user_id || '');
-    formData.append('persona_id', persona_id);
-    formData.append('message', trimmedContent);
+    formData.append('persona_id', persona_id || '');
+    formData.append('message', trimmed);
     
     if (attachmentFile) {
       formData.append('attachment', attachmentFile);
     }
-
-    let responseReceived = false;
 
     try {
       const response = await fetch('http://localhost:3001/api/frontend', {
@@ -52,55 +48,18 @@ export function useChatMessages({user_id, persona_id, initialMessages}: { user_i
         credentials: 'include',
         body: formData,
       });
-      responseReceived = true;
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Server error: ${response.status} ${errorData}`);
-      }
-
       const result = await response.json();
-      const assistantMessage: Message = { 
-        role: 'assistant', 
-        content: result.message.content 
-      };
-      
-      setMessages((prev) => {
-        const updatedMessages = prev.map(msg =>
-          msg === userMessage
-            ? { ...msg, file_path: msg.file_path }
-            : msg
-        );
-        return [...updatedMessages, assistantMessage];
-      });
-      
+      setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content}]);
+    } catch (err: any) {
+      console.error("Send message error:", err);
+      toast.error(`Failed to send message. Please report this issue by emailing support@aprilintelligence.com`);
+    } finally {
+      setIsResponding(false);
       if (tempAttachmentUrl) {
         URL.revokeObjectURL(tempAttachmentUrl);
       }
-      
-    } catch (err: any) {
-      if (tempAttachmentUrl && !responseReceived) {
-        URL.revokeObjectURL(tempAttachmentUrl);
-      }
-      console.error("Send message error:", err);
-      toast.error(`Failed to send message: ${err.message}`);
-      setMessages((prev) => [
-        ...prev.filter(msg => msg !== userMessage),
-        { 
-          role: 'assistant', 
-          content: `Error: ${err.message || 'Could not send message'}` 
-        }
-      ]);
-    } finally {
-      setIsResponding(false);
     }
-  };
 
-  return {
-    messages,
-    isResponding,
-    input,
-    setInput,
-    sendMessage
   };
+  return {messages, isResponding, input, setInput, sendMessage};
 } 

@@ -110,14 +110,6 @@ export function InputMessage({
   }, [setAttachmentFile, textareaRef]);
 
   const submit = useCallback(() => {
-    if (input.trim().length === 0 && !attachmentFile) {
-        toast.error('Please enter a message or add an attachment.');
-        return;
-    }
-    if (isResponding) {
-        toast.error('Please wait for the previous response to complete.');
-        return;
-    }
     handleSubmit();
 
     if (textareaRef.current) {
@@ -172,7 +164,6 @@ export function InputMessage({
                 submit();
               }
             }}
-            disabled={isResponding}
           />
           
           <button 
@@ -181,8 +172,8 @@ export function InputMessage({
             className={cx(
               "flex-shrink-0 rounded-full p-2 ml-2", 
               (isResponding || (input.trim().length === 0 && !attachmentFile)) 
-                ? "text-gray-400 bg-gray-100 dark:bg-gray-800" 
-                : "text-white bg-blue-500 hover:bg-blue-600"
+              ? "text-gray-400 bg-gray-100 dark:bg-gray-800" 
+              : "text-white bg-blue-500 hover:bg-blue-600"
             )}
           >
             <ArrowUp size={18} />
