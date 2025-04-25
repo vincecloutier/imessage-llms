@@ -1,22 +1,8 @@
 import { useCallback, useState, RefObject, ClipboardEvent, DragEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 
-export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInput: (value: ((prev: string) => string) | string) => void) {  
+export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInput: (value: ((prev: string) => string) | string) => void, handleFileAdded: (file: File) => boolean, attachmentFile: File | null, previewUrl: string | null) {  
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
-
-  const handleFileAdded = useCallback((file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size exceeds 5MB limit.");
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      toast.error("Please select an image file.");
-      return;
-    }
-    setAttachmentFile(file);
-    textareaRef.current?.focus();
-  }, [textareaRef]);
   
   const handlePaste = useCallback((event: ClipboardEvent<HTMLDivElement> | ClipboardEvent) => {
     const items = event.clipboardData?.items;
@@ -86,7 +72,7 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
   return { 
     isDraggingOver,
     attachmentFile,
-    setAttachmentFile,
+    previewUrl,
     handlers: {onPaste: handlePaste, onDragOver, onDragLeave, onDrop}
   };
 }

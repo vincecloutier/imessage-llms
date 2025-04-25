@@ -1,5 +1,5 @@
 import { Message } from '@/lib/types';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { toast } from 'sonner';
 
 export function useChatMessages({user_id, persona_id, initialMessages}: {user_id: string | null;  persona_id: string | null; initialMessages: Message[];}) {
@@ -7,7 +7,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
   const [input, setInput] = useState('');
   const [isResponding, setIsResponding] = useState(false);
 
-  const sendMessage = async (content: string, attachmentFile: File | null, setAttachmentFile: (file: File | null) => void) => {
+  const sendMessage = async (content: string, attachmentFile: File | null, previewUrl: string | null, setAttachmentFile: (file: File | null) => void) => {
     const trimmed = content.trim();
     
     if (!trimmed && !attachmentFile) {
@@ -22,11 +22,9 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
     setIsResponding(true);
 
     const userMessage: Message = {role: 'user', content: trimmed};
-    let tempAttachmentUrl: string | null = null;
 
-    if (attachmentFile) {
-      tempAttachmentUrl = URL.createObjectURL(attachmentFile);
-      userMessage.file_path = tempAttachmentUrl;
+    if (attachmentFile && previewUrl) {
+      userMessage.file_path = previewUrl;
     }
 
     setMessages((prev) => [...prev, userMessage]);
@@ -55,9 +53,6 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
       toast.error(`Failed to send message. Please report this issue by emailing support@aprilintelligence.com`);
     } finally {
       setIsResponding(false);
-      if (tempAttachmentUrl) {
-        URL.revokeObjectURL(tempAttachmentUrl);
-      }
     }
 
   };

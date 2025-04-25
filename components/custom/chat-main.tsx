@@ -10,26 +10,25 @@ import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 import { useChatMessages } from '@/hooks/use-chat-messages';
 import { useFileInput } from '@/hooks/use-chat-file-input';
 import { Message } from '@/lib/types';
+import { useFileHandler } from '@/hooks/use-file-handler';
 
 export function Chat({ user_id, persona_id, persona_name, initialMessages }: { user_id: string | null; persona_id: string | null; persona_name: string | null; initialMessages: Message[];}) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Custom hooks for handling messages, file attachments and API calls
+  // First get the file handler which manages the core file state
+  const { attachmentFile, setAttachmentFile, previewUrl, handleFileAdded, handleFileRemoved } = useFileHandler(textareaRef);
+  
+  // Custom hooks for handling messages and API calls
   const { messages, isResponding, input, setInput, sendMessage } = useChatMessages({ initialMessages, user_id, persona_id });
-  const { isDraggingOver, handlers, attachmentFile, setAttachmentFile } = useFileInput(textareaRef, setInput);  
+  
+  // Now use the file input hook with the handlers from useFileHandler
+  const { isDraggingOver, handlers } = useFileInput(textareaRef, setInput,  handleFileAdded, attachmentFile, previewUrl);
+  
   useKeyboardFocus(textareaRef);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages]);
-
-  // Handle form submission
-  const handleSubmit = (e?: FormEvent<HTMLFormElement> | KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e && 'preventDefault' in e) {
-      e.preventDefault();
-    }
-    sendMessage(input, attachmentFile, setAttachmentFile);
-  };
 
   return (
     <div className="relative h-dvh transition-colors duration-200 ease-in-out flex flex-col" {...handlers}>      
@@ -54,13 +53,15 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
       </div>
       
       <InputMessage
-        textareaRef={textareaRef}
         input={input}
         setInput={setInput}
-        handleSubmit={handleSubmit}
         isResponding={isResponding}
+        handleSubmit={() => sendMessage(input, attachmentFile, previewUrl, setAttachmentFile)}
         attachmentFile={attachmentFile}
-        setAttachmentFile={setAttachmentFile}
+        previewUrl={previewUrl}
+        handleFileAdded={handleFileAdded}
+        handleFileRemoved={handleFileRemoved}
+        textareaRef={textareaRef}
       />
     </div>
   );
