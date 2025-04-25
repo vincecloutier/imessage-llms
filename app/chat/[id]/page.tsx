@@ -1,20 +1,15 @@
 import { notFound } from 'next/navigation';
 
 import { Chat } from '@/components/custom/chat-main';
-import {
-  getPersonaById,
-  getMessagesByPersonaId,
-  getUser,
-} from '@/lib/supabase/cached-queries';
+import { getPersonaById, getMessagesByPersonaId, getUser } from '@/lib/supabase/cached-queries';
 
 export default async function Page(props: { params: Promise<any> }) {
-  const params = await props.params;
-  const { id } = params;
+  const { id } = await props.params;
 
   const persona = await getPersonaById(id);
 
   if (!persona) {
-    notFound();
+    return notFound();
   }
 
   const user = await getUser();
