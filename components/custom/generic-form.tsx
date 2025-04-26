@@ -199,7 +199,7 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         over18: (value: Date) => {
           const today = new Date();
           const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-          return value <= eighteenYearsAgo || 'You must be at least 18 years old';
+          return value <= eighteenYearsAgo || 'Must be at least 18 years old';
         }
       };
     }
