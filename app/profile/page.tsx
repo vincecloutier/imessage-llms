@@ -10,39 +10,16 @@ const pages: PageSchema[] = [
       fields: [
         { name: "name", label: "Name", type: "text", description: "Your name will be used to identify you in the app.", required: true, rowId: "personal" },
         { name: "birthday", label: "Birthday", description: "Your date of birth will be used to calculate your age.", type: "calendar", required: false, rowId: "personal" },
-        { name: "phone", label: "Phone Number", type: "tel", required: false, rowId: "personal" },
+        { name: "sender_address", label: "Phone Number", description: "The phone number that will be used to communicate with your personas.", type: "tel", required: false, rowId: "personal" }
       ]
     },
     {
       key: "location",
       label: "Location",
-      description: "Your location will only be used to provide context to the personas. If you don't want to share your location, you can leave this blank, but you will lose weather and time zone context so your personas may text you outside of the app.",
+      description: "Your location will only be used to provide context to the personas. If you don't want to share your location, please select another city.",
       fields: [
-        {
-          name: "location",
-          label: "Location",
-          type: "text",
-          required: true,
-        },
-        {
-          name: "timezone",
-          label: "Timezone",
-          type: "enum",
-          required: true,
-        }
-      ]
-    },
-    {
-      key: "Contact Information",
-      label: "Contact Information",
-      description: "Your contact information will be used to send you notifications and updates.",
-      fields: [
-        {
-          name: "email",
-          label: "Email",
-          type: "email",
-          required: false,
-        }
+        {name: "location", label: "Location", type: "text", required: true, rowId: "location"},
+        {name: "timezone", label: "Timezone", type: "enum", required: true, rowId: "timezone"}
       ]
     }
   ];
