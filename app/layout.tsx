@@ -6,6 +6,7 @@ import { AppSidebar } from '@/components/custom/app-sidebar';
 import { getUser } from '@/lib/supabase/cached-queries';
 
 import './globals.css';
+import { ThemeProvider } from '@/components/custom/theme-provider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
@@ -22,12 +23,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head/>
       <body className="antialiased">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
           <Toaster position="top-center" />
           <SidebarProvider>
             <AppSidebar user={user} />
             <SidebarInset>{children}</SidebarInset>
           </SidebarProvider>
+          </ThemeProvider>
       </body>
     </html>
   );
