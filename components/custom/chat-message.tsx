@@ -17,17 +17,19 @@ export const PreviewMessage = ({message}: {message: Message}) => {
   }, [message.file_path]);
 
   return (
-    <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2 mb-4" data-role={message.role}>
-      <div className={cx(
-        'flex flex-col gap-2 px-4 py-3 rounded-2xl max-w-[75%]',
-        message.role === 'user' ? 'ml-auto bg-blue-500 text-white' : 'mr-auto bg-gray-100 dark:bg-gray-800'
-      )}>
-        {(message.file_path || message.attachmentFile) && (
+    <div className="w-full mx-auto max-w-3xl px-4 flex flex-col mb-4" data-role={message.role}>
+      {(message.file_path || message.attachmentFile) && (
+        <div className="self-end">
           <ImagePreview 
             source={message.attachmentFile || message.file_path} 
             alt={message.content || "Attachment"} 
           />
-        )}
+        </div>
+      )}
+      <div className={cx(
+        'flex flex-col gap-2 px-4 py-3 rounded-2xl max-w-[75%]',
+        message.role === 'user' ? 'ml-auto bg-blue-500 text-white' : 'mr-auto bg-gray-100 dark:bg-gray-800'
+      )}>
         <div className="prose dark:prose-invert max-w-none"> {message.content} </div>
       </div>
     </div>
