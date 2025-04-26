@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { getProfile } from './cached-queries';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -33,13 +34,30 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user && 
-    request.nextUrl.pathname.startsWith('/chat') ||
+    (request.nextUrl.pathname.startsWith('/chat') ||
     request.nextUrl.pathname.startsWith('/persona') ||
-    request.nextUrl.pathname.startsWith('/profile')
+    request.nextUrl.pathname.startsWith('/profile'))
   ) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
+  }
+
+  // If user is authenticated, check if they have set up their profile
+  if (
+      user && 
+      !request.nextUrl.pathname.startsWith('/profile') && 
+      !request.nextUrl.pathname.startsWith('/auth')) {
+    
+    // fetch user profile from database
+    const profile = await getProfile(user.id);
+
+    // if profile is not complete, redirect to profile page
+    if (!profile) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/profile'
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse
