@@ -1,55 +1,46 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-export const updateSession = async (request: NextRequest) => {
-  try {
-    let response = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+export async function updateSession(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value)
-            );
-            response = NextResponse.next({
-              request,
-            });
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            );
-          },
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
         },
-      }
-    );
-
-    // const user = await supabase.auth.getUser();
-
-    // // Protected routes
-    // if (request.nextUrl.pathname !== '/' && user.error) {
-    //   return NextResponse.redirect(new URL('/', request.url));
-    // }
-
-    // // TODO: direct to default persona
-    // if (request.nextUrl.pathname === '/' && !user.error) {
-    //   return NextResponse.redirect(new URL(`/chat/${user.data.user?.id}`, request.url));
-    // }
-    
-    return response;
-  } catch (e) {
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
       },
-    });
+    }
+  )
+
+  // do not run code here (see supabase docs)
+
+  const {data: { user }} = await supabase.auth.getUser()
+
+  if (
+    !user && 
+    request.nextUrl.pathname.startsWith('/chat') ||
+    request.nextUrl.pathname.startsWith('/persona') ||
+    request.nextUrl.pathname.startsWith('/profile')
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.redirect(url)
   }
-};
+
+  return supabaseResponse
+}
