@@ -1,6 +1,8 @@
 import { AppHeader } from "@/components/custom/app-header";
 import GenericForm, { PageSchema, FieldSchema } from "@/components/custom/generic-form";
 import { saveProfile } from "@/lib/actions";
+import { getUser, getProfile } from "@/lib/supabase/cached-queries";
+import { notFound } from "next/navigation";
 
 const pages: PageSchema[] = [
     {
@@ -19,7 +21,7 @@ const pages: PageSchema[] = [
       description: "Your location will only be used to provide context to the personas. If you don't want to share your location, please select another city.",
       fields: [
         {name: "location", label: "Location", type: "text", required: true, rowId: "location"},
-        {name: "timezone", label: "Timezone", type: "enum", required: true, rowId: "timezone"}
+        // {name: "timezone", label: "Timezone", type: "enum", required: true, rowId: "timezone"}
       ]
     }
   ];
@@ -29,22 +31,31 @@ export const timezoneOptions = [
   { label: "America/Chicago", value: "America/Chicago" },
   { label: "America/Los_Angeles", value: "America/Los_Angeles" },
   { label: "America/Denver", value: "America/Denver" },
-  
 ];
+export default async function UserProfilePage() {
+  const user = await getUser();
 
-export default function UserProfilePage() {
-  // Define form pages with fields
+  if (!user) {
+    return notFound();
+  }
+  
+  let profile = await getProfile(user.id);
 
-  // Example initial values
-  const initialValues = {
-    id: "user-123",
-    attributes: {
-      full_name: "John Doe",
-      email: "john@example.com",
-      theme: "Light",
-      notifications: "Email"
-    }
-  };
+  if (!profile) {
+    profile = {
+      id: user.id,
+      attributes: {
+        name: null,
+        birthday: null,
+        location: null,
+        timezone: null,
+        latitude: null,
+        longitude: null
+      },
+      sender_address: null
+    };
+  }
+  
   return (
     <>
       <AppHeader
@@ -53,7 +64,7 @@ export default function UserProfilePage() {
     />
     <div className="mx-16 ">
       <GenericForm
-        startingValues={initialValues}
+        startingValues={profile}
         pages={pages}
         saveAction={saveProfile}
         useTabs={false}

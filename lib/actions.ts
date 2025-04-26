@@ -26,7 +26,7 @@ export async function saveProfile(payload: SaveEntityPayload) {
 
     const { data, error } = await supabase
         .from('profiles')
-        .insert({
+        .upsert({
         id: user.id,
         attributes: payload.attributes,
         sender_address: payload.sender_address ?? user.email,

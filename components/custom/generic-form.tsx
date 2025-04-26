@@ -65,11 +65,11 @@ export interface GenericFormProps {
 }
 
 export default function GenericForm({startingValues, pages, saveAction, useTabs = true}: GenericFormProps) {  
-  // Build initial form values across all pages
+  // build initial form values across all pages
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
     const allFields = pages.flatMap((p) => p.fields);
-    return allFields.reduce((acc, field) => {
+    const initialData = allFields.reduce((acc, field) => {
       let value = attrs[field.name] ?? "";
       if (field.type === "number") value = Number(value) || 0;
       if (field.type === "calendar") {
@@ -80,6 +80,11 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
       acc[field.name] = value;
       return acc;
     }, {} as Record<string, any>);
+    // add sender_address if it exists
+    if (startingValues?.sender_address !== undefined) {
+      initialData.sender_address = startingValues.sender_address;
+    }
+    return initialData;
   }, [pages, startingValues]);
 
   const form = useForm({
