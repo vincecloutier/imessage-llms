@@ -78,6 +78,15 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
         value = attrs[field.name] ? new Date(attrs[field.name]) : eighteenYearsAgo;
       }
+      if (field.type === "city") {
+        // Reconstruct city object from flattened fields
+        value = {
+          name: attrs["location"] || "",
+          lat: attrs["latitude"],
+          lon: attrs["longitude"],
+          timezone: attrs["timezone"]
+        };
+      }
       acc[field.name] = value;
       return acc;
     }, {} as Record<string, any>);
