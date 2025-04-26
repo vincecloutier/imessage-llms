@@ -94,8 +94,21 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
 
   const onSubmit = async (data: Record<string, any>) => {
     try {
+      // Convert all Date objects to YYYY-MM-DD format
+      const formattedData = {...data};
+      
+      // Find calendar fields
+      const calendarFields = pages.flatMap(p => p.fields).filter(f => f.type === "calendar").map(f => f.name);
+      
+      // Format calendar dates to YYYY-MM-DD
+      calendarFields.forEach(fieldName => {
+        if (formattedData[fieldName] instanceof Date) {
+          formattedData[fieldName] = formattedData[fieldName].toISOString().slice(0, 10);
+        }
+      });
+      
       // Extract sender_address if it exists
-      const { sender_address, ...attributes } = data;
+      const { sender_address, ...attributes } = formattedData;
       
       await saveAction({
         id: startingValues?.id,
