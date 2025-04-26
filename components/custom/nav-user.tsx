@@ -132,7 +132,7 @@ export function NavSignIn() {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Connect</DialogTitle>
-          <DialogDescription>Enter your email below to receive a sign in link</DialogDescription>
+          <DialogDescription>Enter your email below to receive a sign in link.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
@@ -146,20 +146,20 @@ export function NavSignIn() {
           />
           <DialogFooter>
             <div className="flex justify-between w-full">
-              <div className="flex items-center justify-between space-x-2">
+              <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="remember" 
-                checked={rememberEmail}
-                onCheckedChange={(checked) => setRememberEmail(checked === true)}
-            />
-            <label 
-                htmlFor="remember" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Remember Me?
-              </label>
-            </div>
-            <Button type="submit">Receive Sign In Link</Button>
+                  checked={rememberEmail}
+                  onCheckedChange={(checked) => setRememberEmail(checked === true)}
+                />
+                <label 
+                  htmlFor="remember" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Remember Me?
+                </label>
+              </div>
+              <Button type="submit">Receive Link</Button>
             </div>
           </DialogFooter>
         </form>
