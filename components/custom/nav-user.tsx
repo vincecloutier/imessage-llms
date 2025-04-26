@@ -31,7 +31,8 @@ import { toast } from "sonner"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "../ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export function NavUser({user}: {user: {name: string, email: string, avatar: string}}) {
   const { isMobile } = useSidebar()
@@ -73,12 +74,32 @@ export function NavUser({user}: {user: {name: string, email: string, avatar: str
 export function NavSignIn() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [rememberEmail, setRememberEmail] = useState(false);
+  
+  // Load remembered email on component mount
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberEmail(true);
+    }
+  }, []);
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     try {
       const formData = new FormData(event.currentTarget);
       const email = formData.get('email') as string;
+      
+      // Save email if remember is checked
+      if (rememberEmail) {
+        localStorage.setItem('rememberedEmail', email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+      
       await signIn(email);
       setOpen(false);
       toast.success('Sign in link sent to email');
@@ -88,6 +109,7 @@ export function NavSignIn() {
       toast.error(error.message);
     }
   }
+  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <SidebarMenu>
@@ -116,12 +138,29 @@ export function NavSignIn() {
           <Input
             id="email"
             name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="example@mail.com"
             required
             type="email"
           />
           <DialogFooter>
+            <div className="flex justify-between w-full">
+              <div className="flex items-center justify-between space-x-2">
+                <Checkbox 
+                  id="remember" 
+                checked={rememberEmail}
+                onCheckedChange={(checked) => setRememberEmail(checked === true)}
+            />
+            <label 
+                htmlFor="remember" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Remember Me?
+              </label>
+            </div>
             <Button type="submit">Receive Sign In Link</Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
