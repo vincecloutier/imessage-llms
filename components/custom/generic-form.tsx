@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -23,12 +23,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { searchCity } from "@/lib/actions";
 
 export interface FieldSchema {
   name: string;
   label: string;
   description?: string;
-  type: "text" | "number" | "email" | "tel" | "calendar" | "enum";
+  type: "text" | "number" | "email" | "tel" | "calendar" | "enum" | "city";
   required: boolean;
   options?: string[];
   rowId?: string; // Fields with the same rowId will be rendered in the same row
@@ -104,6 +105,19 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
       calendarFields.forEach(fieldName => {
         if (formattedData[fieldName] instanceof Date) {
           formattedData[fieldName] = formattedData[fieldName].toISOString().slice(0, 10);
+        }
+      });
+      
+      // Find and flatten all city fields
+      const cityFields = pages.flatMap(p => p.fields).filter(f => f.type === "city").map(f => f.name);
+      
+      cityFields.forEach(fieldName => {
+        const cityData = formattedData[fieldName];
+        if (cityData && typeof cityData === 'object' && cityData.name) {
+          formattedData[`latitude`] = cityData.lat;
+          formattedData[`longitude`] = cityData.lon;
+          formattedData[`timezone`] = cityData.timezone;
+          formattedData[`location`] = cityData.name;
         }
       });
       
@@ -199,6 +213,76 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
             </SelectContent>
           </Select>
         );
+      case "city":
+        // Store input text separately from the actual city value
+        const [cityInputText, setCityInputText] = useState("");
+        const [errorMessage, setErrorMessage] = useState("");
+        const [isSearching, setIsSearching] = useState(false);
+        
+        const handleCitySearch = async () => {
+          if (cityInputText.length < 3) {
+            setErrorMessage("Please enter at least 3 characters");
+            return;
+          }
+          
+          setIsSearching(true);
+          setErrorMessage("Searching...");
+          
+          try {
+            // Call the server action
+            const result = await searchCity(cityInputText);
+            
+            if (result && !result.error) {
+              ctrl.onChange(result);
+              setCityInputText(result.name || '');
+              setErrorMessage("");
+            } else {
+              setErrorMessage(result.error || "No matching location found");
+              ctrl.onChange(null);
+            }
+          } catch (error) {
+            console.error("City search error:", error);
+            setErrorMessage("Error searching for city. Please try again.");
+            ctrl.onChange(null);
+          } finally {
+            setIsSearching(false);
+          }
+        };
+        
+        // Initialize input field with existing value
+        useEffect(() => {
+          if (ctrl.value && ctrl.value.name) {
+            setCityInputText(ctrl.value.name);
+          }
+        }, []);
+        
+        return (
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                value={cityInputText}
+                onChange={(e) => setCityInputText(e.target.value)}
+                placeholder="Enter city name"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleCitySearch();
+                  }
+                }}
+              />
+              <Button 
+                type="button"
+                onClick={handleCitySearch}
+                disabled={isSearching}
+              >
+                Search
+              </Button>
+
+            </div>
+            {errorMessage && <p className="text-sm">{errorMessage}</p>}
+          </div>
+        );
       default: return <Input {...ctrl} />;
     }
   };
@@ -228,7 +312,18 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         enum: (value: string) => field.options?.includes(value) || `Invalid option: ${value}`
       };
     }
-
+    if (field.type === "city") {
+      rules.validate = {
+        ...(rules.validate || {}),
+        location: (v: any) =>
+          v &&
+          typeof v === "object" &&
+          v.name &&
+          v.lat !== undefined &&
+          v.lon !== undefined &&
+          v.timezone ? true : "Select a location",
+      };
+    }
     return rules;
   };
 

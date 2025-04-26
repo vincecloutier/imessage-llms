@@ -20,7 +20,7 @@ const pages: PageSchema[] = [
       label: "Location",
       description: "Your location will only be used to provide context to the personas. If you don't want to share your location, please select another city.",
       fields: [
-        {name: "location", label: "Location", type: "text", required: true, rowId: "location"},
+        {name: "location", label: "Location", type: "city", required: true, rowId: "location"},
         // {name: "timezone", label: "Timezone", type: "enum", required: true, rowId: "timezone"}
       ]
     }
