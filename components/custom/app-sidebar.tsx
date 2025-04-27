@@ -2,7 +2,6 @@
 
 import { User } from '@supabase/supabase-js';
 
-import { SidebarHistory } from '@/components/custom/nav-personas';
 import {
   Sidebar,
   SidebarContent,
@@ -13,8 +12,9 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { BookOpen, Command, LifeBuoy, Send } from 'lucide-react';
-import { NavSignIn, NavUser } from '@/components/custom/nav-user';
+import { NavPersonas } from '@/components/custom/nav-personas';
 import { NavSecondary } from '@/components/custom/nav-secondary';
+import { NavSignIn, NavUser } from '@/components/custom/nav-user';
 
 const data = {
     navSecondary: [
@@ -51,7 +51,7 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-       <SidebarHistory user={user} />
+       <NavPersonas/>
        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

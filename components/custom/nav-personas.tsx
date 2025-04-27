@@ -1,9 +1,8 @@
 'use client';
 import { Persona } from '@/lib/types';
-import { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import {
@@ -43,7 +42,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { deletePersona } from '@/lib/actions';
 
-const fetcher = async (): Promise<Persona[]> => {
+const fetcher = async (): Promise<{ personas: Persona[], isAuthenticated: boolean }> => {
   try {
     const supabase = createClient();
     const {
@@ -51,9 +50,9 @@ const fetcher = async (): Promise<Persona[]> => {
       error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user) {
+    if (userError || !user || user.is_anonymous) {
       console.error('Auth error:', userError);
-      return [];
+      return { personas: [], isAuthenticated: false };
     }
 
     const { data: personas, error: personasError } = await supabase
@@ -63,38 +62,41 @@ const fetcher = async (): Promise<Persona[]> => {
 
     if (personasError) {
       console.error('Personas fetch error:', personasError);
-      return [];
+      return { personas: [], isAuthenticated: true };
     }
 
-    return personas || [];
+    return { personas: personas || [], isAuthenticated: true };
   } catch (error) {
     console.error('Fetcher error:', error);
-    return [];
+    return { personas: [], isAuthenticated: false };
   }
 };
 
-export function SidebarHistory({ user }: { user: User | null }) {
+export function NavPersonas() {
   const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
-  const { data: history, isLoading, mutate } = useSWR<Persona[]>(user ? ['personas', user.id] : null, fetcher);
+  const { data, isLoading, mutate } = useSWR('personas', fetcher);
+  
+  const isAuthenticated = data?.isAuthenticated ?? false;
+  const history = data?.personas ?? [];
 
   useEffect(() => {mutate();}, [pathname, mutate]); 
-
-  if (!user) {
-    return (
-      <SidebarGroup>
-        <SidebarGroupLabel>Personas</SidebarGroupLabel>
-            <div className="px-2 py-1 text-xs text-sidebar-foreground/50">Login to save and edit your personas!</div>
-      </SidebarGroup>
-    );
-  }
 
   if (isLoading) {
     return (
       <SidebarGroup>
         <SidebarGroupLabel>Personas</SidebarGroupLabel>
         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">Loading...</div>
+      </SidebarGroup>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SidebarGroup>
+        <SidebarGroupLabel>Personas</SidebarGroupLabel>
+            <div className="px-2 py-1 text-xs text-sidebar-foreground/50">Login to save and edit your personas!</div>
       </SidebarGroup>
     );
   }
@@ -107,7 +109,7 @@ export function SidebarHistory({ user }: { user: User | null }) {
         <Plus /> <span className="sr-only">Add Persona</span>
     </SidebarGroupAction>
         <SidebarMenu>
-          {history?.map((persona) => (
+          {history.map((persona) => (
             <SidebarMenuItem key={persona.id}>
               <SidebarMenuButton asChild>
                 <Link href={`/chat/${persona.id}`} onClick={() => setOpenMobile(false)}>
