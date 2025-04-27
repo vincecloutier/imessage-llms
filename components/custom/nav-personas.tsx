@@ -50,8 +50,12 @@ const fetcher = async (): Promise<{ personas: Persona[], isAuthenticated: boolea
       error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError || !user || user.is_anonymous) {
-      console.error('Auth error:', userError);
+    if (userError || !user) {
+      console.error('Personas Navbar Authentication Error:', userError);
+      return { personas: [], isAuthenticated: false };
+    }
+
+    if (user.is_anonymous) {
       return { personas: [], isAuthenticated: false };
     }
 
@@ -61,13 +65,13 @@ const fetcher = async (): Promise<{ personas: Persona[], isAuthenticated: boolea
       .eq('user_id', user.id)
 
     if (personasError) {
-      console.error('Personas fetch error:', personasError);
+      console.error('Personas Navbar Fetch Error:', personasError);
       return { personas: [], isAuthenticated: true };
     }
 
     return { personas: personas || [], isAuthenticated: true };
   } catch (error) {
-    console.error('Fetcher error:', error);
+    console.error('Personas Navbar Fetcher Error:', error);
     return { personas: [], isAuthenticated: false };
   }
 };
