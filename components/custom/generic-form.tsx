@@ -24,6 +24,28 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { searchCity } from "@/lib/actions";
+import { toast } from "sonner";
+
+const deepEqual = (obj1: any, obj2: any): boolean => {
+  if (obj1 === obj2) return true;
+  
+  if (obj1 == null || obj2 == null || typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+    return obj1 === obj2;
+  }
+  
+  if (obj1 instanceof Date && obj2 instanceof Date) {
+    return obj1.getTime() === obj2.getTime();
+  }
+  
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  
+  if (keys1.length !== keys2.length) return false;
+  
+  return keys1.every(key => 
+    keys2.includes(key) && deepEqual(obj1[key], obj2[key])
+  );
+};
 
 export interface FieldSchema {
   name: string;
@@ -97,13 +119,46 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
     return initialData;
   }, [pages, startingValues]);
 
+  // Track the last saved values for comparison after submit
+  const [lastSavedValues, setLastSavedValues] = useState(initialValues);
+
   const form = useForm({
     defaultValues: initialValues,
     mode: "onChange",
   });
 
+  // Track if form has changes
+  const [formHasChanges, setFormHasChanges] = useState(false);
+  // Track form submission status
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveSuccessful, setSaveSuccessful] = useState(false);
+  
+  // Watch for form changes
+  const currentValues = form.watch();
+  
+  // Reset form state after successful save
+  useEffect(() => {
+    if (saveSuccessful) {
+      // Update our reference values to match the current values
+      setLastSavedValues(currentValues);
+      form.reset(currentValues);
+      setFormHasChanges(false);
+      setSaveSuccessful(false);
+    }
+  }, [saveSuccessful, currentValues, form]);
+  
+  // Detect form changes - compare with lastSavedValues instead of initialValues
+  useEffect(() => {
+    if (!isSubmitting) {
+      const isEqual = deepEqual(lastSavedValues, currentValues);
+      setFormHasChanges(!isEqual);
+    }
+  }, [currentValues, lastSavedValues, isSubmitting]);
+
   const onSubmit = async (data: Record<string, any>) => {
     try {
+      setIsSubmitting(true);
+      
       // Convert all Date objects to YYYY-MM-DD format
       const formattedData = {...data};
       
@@ -133,13 +188,31 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
       // Extract sender_address if it exists
       const { sender_address, ...attributes } = formattedData;
       
-      await saveAction({
+      const payload = {
         id: startingValues?.id,
         attributes,
         sender_address: sender_address ?? null,
-      });
+      };
+      
+      toast.promise(
+        saveAction(payload)
+          .then((result) => {
+            setSaveSuccessful(true);
+            return result;
+          })
+          .finally(() => {
+            setIsSubmitting(false);
+          }),
+        {
+          loading: 'Saving changes...',
+          success: 'Changes saved successfully',
+          error: 'Failed to save changes'
+        }
+      );
     } catch (error) {
+      setIsSubmitting(false);
       console.error(`Error submitting form:`, error);
+      toast.error("Failed to save changes");
     }
   };
 
@@ -429,7 +502,7 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
               <TabsContent key={tabKey} value={tabKey}>
                 {pagesByTab[tabKey].map(renderPageContent)}
                 <div className="mt-4 flex justify-end">
-                  <Button type="submit">Save Changes</Button>
+                  <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
                 </div>
               </TabsContent>
             ))}
@@ -438,7 +511,7 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
           <>
             {pages.map(renderPageContent)}
             <div className="mt-4 flex justify-end">
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
             </div>
           </>
         )}
