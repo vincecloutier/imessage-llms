@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getProfile } from './cached-queries';
+import { getPersonasByUserId, getProfile } from './cached-queries';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -45,12 +45,22 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // if user is authenticated force them to setup a profile
+  // if user is authenticated force them to setup a profile 
   if (user && (path.startsWith('/chat') || path.startsWith('/persona') || path === '/')){
     const profile = await getProfile(user.id)
     if (!profile) {
       const url = request.nextUrl.clone()
       url.pathname = '/profile'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // if user is authenticated force them to set up a persona 
+  if (user && (path.startsWith('/chat') || (path.startsWith('/persona') && path !== '/persona/new') || path === '/')){
+    const personas = await getPersonasByUserId(user.id)
+    if (personas.length === 0) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/persona/new'
       return NextResponse.redirect(url)
     }
   }
