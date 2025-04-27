@@ -1,7 +1,5 @@
 'use client';
 
-import { User } from '@supabase/supabase-js';
-
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +12,7 @@ import {
 import { BookOpen, Command, LifeBuoy, Send } from 'lucide-react';
 import { NavPersonas } from '@/components/custom/nav-personas';
 import { NavSecondary } from '@/components/custom/nav-secondary';
-import { NavSignIn, NavUser } from '@/components/custom/nav-user';
+import { NavUser } from '@/components/custom/nav-user';
 
 const data = {
     navSecondary: [
@@ -24,13 +22,7 @@ const data = {
   ]
 }
 
-const user_preview = {
-  name: "April Smith",
-  email: "april@aprilintelligence.com",
-  avatar: "https://github.com/shadcn.png",
-}
-
-export function AppSidebar({ user, ...props }: { user: User | null } & React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="floating" {...props}>
       <SidebarHeader>
@@ -55,8 +47,7 @@ export function AppSidebar({ user, ...props }: { user: User | null } & React.Com
        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-         {user && <NavUser user={user_preview}/>}
-         {!user && <NavSignIn/>}
+         <NavUser/>
       </SidebarFooter>
     </Sidebar>
   );
