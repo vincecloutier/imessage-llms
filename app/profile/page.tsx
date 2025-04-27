@@ -13,47 +13,16 @@ const pages: PageSchema[] = [
     label: 'Personal Information',
     description: 'Your basic contact details',
     fields: [
-      {
-        name: 'name',
-        label: 'Name',
-        type: 'text',
-        description: 'Your name will be used to identify you in the app.',
-        required: true,
-        rowId: 'personal',
-      },
-      {
-        name: 'birthday',
-        label: 'Birthday',
-        description: 'Your date of birth will be used to calculate your age.',
-        type: 'calendar',
-        required: false,
-        rowId: 'personal',
-      },
-      {
-        name: 'sender_address',
-        label: 'Phone Number',
-        description:
-          'The phone number that will be used to communicate with your personas.',
-        type: 'tel',
-        required: false,
-        rowId: 'personal',
-      },
+      {name: 'name', label: 'Name', type: 'text', description: 'Your name will be used to identify you in the app.',required: true,rowId: 'personal'},
+      {name: 'birthday',label: 'Birthday', description: 'Your date of birth will be used to calculate your age.', type: 'calendar', required: false, rowId: 'personal'},
+      {name: 'sender_address', label: 'Phone Number',  description: 'The phone number that will be used to communicate with your personas.', type: 'tel', required: false, rowId: 'personal'},
     ],
   },
   {
     key: 'location',
     label: 'Location',
-    description:
-      "Your location will only be used to provide context to the personas. If you don't want to share your location, please select another city.",
-    fields: [
-      {
-        name: 'location',
-        label: 'Location',
-        type: 'city',
-        required: true,
-        rowId: 'location',
-      },
-      // {name: "timezone", label: "Timezone", type: "enum", required: true, rowId: "timezone"}
+    description: "Your location will only be used to provide context to the personas. If you don't want to share your location, please select another city.",
+    fields: [{name: 'location', label: 'Location', type: 'city', required: true, rowId: 'location',},
     ],
   },
 ];
