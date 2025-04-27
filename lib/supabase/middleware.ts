@@ -63,6 +63,13 @@ export async function updateSession(request: NextRequest) {
       url.pathname = '/persona/new'
       return NextResponse.redirect(url)
     }
+    
+    // if user is authenticated and on root path, redirect to first persona
+    if (path === '/' && personas.length > 0) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/chat/${personas[0].id}`
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse
