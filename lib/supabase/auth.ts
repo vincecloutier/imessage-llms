@@ -2,10 +2,27 @@ import { createClient } from '@/lib/supabase/client';
 
 export async function anonymousSignIn() {
   const supabase = createClient();
+  
+  // First try to get the existing session
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  if (session) {
-    return session;
+  
+  // If session exists and is valid, return it
+  if (session && !sessionError) {
+    try {
+      // Verify the session is still valid by getting the user
+      const { data, error } = await supabase.auth.getUser();
+      if (!error && data.user) {
+        return session;
+      }
+      // If error or no user, sign out to clear the invalid session
+      await supabase.auth.signOut();
+    } catch (e) {
+      // Handle any errors by signing out
+      await supabase.auth.signOut();
+    }
   }
+  
+  // Create a new anonymous user
   const { data, error } = await supabase.auth.signInAnonymously();
   if (error) {
     throw new Error(error.message);
