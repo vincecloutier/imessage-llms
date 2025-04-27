@@ -11,8 +11,8 @@ export const getUser = cache(async () => {
 
 export const getProfile = cache(async (id: string) => {
   const supabase = await createClient();
-  const { data: users, error } = await supabase.from('profiles').select().eq('id', id).single();
-  if (error) throw error;
+  const { data: users, error } = await supabase.from('profiles').select().eq('id', id).maybeSingle();
+  if (error) {console.error(error); return null;}
   return users;
 });
 

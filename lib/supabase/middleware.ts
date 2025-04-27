@@ -31,28 +31,23 @@ export async function updateSession(request: NextRequest) {
   // do not run code here (see supabase docs)
 
   const {data: { user }} = await supabase.auth.getUser()
+  
+  // just to simplify checks below
+  const path = request.nextUrl.pathname
 
-  if (
-    !user && 
-    (request.nextUrl.pathname.startsWith('/chat') ||
-    request.nextUrl.pathname.startsWith('/persona') ||
-    request.nextUrl.pathname.startsWith('/profile'))
-  ) {
+  // notice we specify protected routes explicity since an inverse check 
+  // like !== x is too broad and prevents assets/fonts from loading
+
+  // if user is unauthenticated force to '/'
+  if (!user && (path.startsWith('/chat') || path.startsWith('/persona') || path.startsWith('/profile'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
   }
 
-  // If user is authenticated, check if they have set up their profile
-  if (
-      user && 
-      !request.nextUrl.pathname.startsWith('/profile') && 
-      !request.nextUrl.pathname.startsWith('/auth')) {
-    
-    // fetch user profile from database
-    const profile = await getProfile(user.id);
-
-    // if profile is not complete, redirect to profile page
+  // if user is authenticated force them to setup a profile
+  if (user && (path.startsWith('/chat') || path.startsWith('/persona') || path === '/')){
+    const profile = await getProfile(user.id)
     if (!profile) {
       const url = request.nextUrl.clone()
       url.pathname = '/profile'
