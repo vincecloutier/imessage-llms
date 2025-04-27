@@ -27,6 +27,7 @@ export const getPersonasByUserId = cache(async (userId: string) => {
   const supabase = await createClient();
   const { data: personas, error } = await supabase.from('personas').select().eq('user_id', userId);
   if (error) throw error;
+  console.log(personas)
   return personas;
 });
 
