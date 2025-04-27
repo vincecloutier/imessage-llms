@@ -6,19 +6,15 @@ import { getPersonaById, getMessagesByPersonaId, getUser } from '@/lib/supabase/
 export default async function Page(props: { params: Promise<any> }) {
   const { id } = await props.params;
 
-  const persona = await getPersonaById(id);
-
-  if (!persona) {
-    return notFound();
-  }
-
   const user = await getUser();
 
   if (!user) {
     return notFound();
   }
 
-  if (user.id !== persona.user_id) {
+  const persona = await getPersonaById(id);
+
+  if (!persona || user.id !== persona.user_id) {
     return notFound();
   }
 
