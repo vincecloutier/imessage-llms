@@ -19,8 +19,6 @@ export const viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const user = await getUser();
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head/>
@@ -33,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           >
           <Toaster position="top-center" />
           <SidebarProvider>
-            <AppSidebar user={user} />
+            <AppSidebar/>
             <SidebarInset>{children}</SidebarInset>
           </SidebarProvider>
           </ThemeProvider>

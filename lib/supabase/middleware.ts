@@ -31,6 +31,7 @@ export async function updateSession(request: NextRequest) {
   // do not run code here (see supabase docs)
 
   const {data: { user }} = await supabase.auth.getUser()
+  const isAnon = user?.is_anonymous ?? false
   
   // just to simplify checks below
   const path = request.nextUrl.pathname
@@ -39,14 +40,14 @@ export async function updateSession(request: NextRequest) {
   // like !== x is too broad and prevents assets/fonts from loading
 
   // if user is unauthenticated force to '/'
-  if (!user && (path.startsWith('/chat') || path.startsWith('/persona') || path.startsWith('/profile'))) {
+  if ((!user || isAnon) && (path.startsWith('/chat') || path.startsWith('/persona') || path.startsWith('/profile'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
   }
 
   // if user is authenticated force them to setup a profile 
-  if (user && (path.startsWith('/chat') || path.startsWith('/persona') || path === '/')){
+  if (user && !isAnon && (path.startsWith('/chat') || path.startsWith('/persona') || path === '/')){
     const profile = await getProfile(user.id)
     if (!profile) {
       const url = request.nextUrl.clone()
@@ -56,7 +57,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // if user is authenticated force them to set up a persona 
-  if (user && (path.startsWith('/chat') || (path.startsWith('/persona') && path !== '/persona/new') || path === '/')){
+  if (user && !isAnon && (path.startsWith('/chat') || (path.startsWith('/persona') && path !== '/persona/new') || path === '/')){
     const personas = await getPersonasByUserId(user.id)
     if (personas.length === 0) {
       const url = request.nextUrl.clone()
