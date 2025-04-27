@@ -45,14 +45,14 @@ export default async function UserProfilePage() {
     profile = {
       id: user.id,
       attributes: {
-        name: null,
-        birthday: null,
-        location: null,
-        timezone: null,
-        latitude: null,
-        longitude: null
+        name: "",
+        birthday: "",
+        location: "",
+        timezone: "",
+        latitude: "",
+        longitude: "",
       },
-      sender_address: null
+      sender_address: "",
     };
   }
   
