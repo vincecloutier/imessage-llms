@@ -2,7 +2,7 @@ import { Message } from '@/lib/types';
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
 
-export function useChatMessages({user_id, persona_id, initialMessages}: {user_id: string | null;  persona_id: string | null; initialMessages: Message[];}) {
+export function useChatMessages({user_id, persona_id, initialMessages}: {user_id: string; persona_id: string; initialMessages: Message[];}) {
   const [messages, setMessages] = useState<Message[]>(initialMessages || []);
   const [input, setInput] = useState('');
   const [isResponding, setIsResponding] = useState(false);
@@ -32,8 +32,8 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
     setAttachmentFile(null);
 
     const formData = new FormData();
-    formData.append('user_id', user_id || '');
-    formData.append('persona_id', persona_id || '');
+    formData.append('user_id', user_id);
+    formData.append('persona_id', persona_id);
     formData.append('message', trimmed);
     
     if (attachmentFile) {

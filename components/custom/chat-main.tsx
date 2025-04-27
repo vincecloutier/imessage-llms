@@ -12,7 +12,7 @@ import { useFileInput } from '@/hooks/use-chat-file-input';
 import { Message } from '@/lib/types';
 import { useFileHandler } from '@/hooks/use-file-handler';
 
-export function Chat({ user_id, persona_id, persona_name, initialMessages }: { user_id: string | null; persona_id: string | null; persona_name: string | null; initialMessages: Message[];}) {
+export function Chat({ user_id, persona_id, persona_name, initialMessages }: { user_id: string; persona_id: string; persona_name: string; initialMessages: Message[];}) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,7 +32,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
 
   return (
     <div className="relative h-dvh transition-colors duration-200 ease-in-out flex flex-col" {...handlers}>      
-      <AppHeader title="Chat" subtitle={persona_name || 'New Persona'}/>
+      <AppHeader title="Chat" subtitle={persona_name}/>
       <AnimatePresence>
       {isDraggingOver && (
         <motion.div 
