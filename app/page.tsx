@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Chat as PreviewChat } from '@/components/custom/chat-main';
 import { anonymousSignIn } from '@/lib/supabase/auth';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -31,11 +30,13 @@ export default function Home() {
 
   if (isLoading) return null;
 
+  if (!userId) return null;
+
   return (
     <PreviewChat
       user_id={userId}
-      persona_id={null}
-      persona_name={null}
+      persona_id={"new"}
+      persona_name={"New Persona"}
       initialMessages={[]}
     />
   );
