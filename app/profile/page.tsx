@@ -27,13 +27,6 @@ const pages: PageSchema[] = [
   },
 ];
 
-const timezoneOptions = [
-  { label: 'America/New_York', value: 'America/New_York' },
-  { label: 'America/Chicago', value: 'America/Chicago' },
-  { label: 'America/Los_Angeles', value: 'America/Los_Angeles' },
-  { label: 'America/Denver', value: 'America/Denver' },
-];
-
 export default async function UserProfilePage() {
   const user = await getUser();
 
