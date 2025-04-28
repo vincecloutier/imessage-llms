@@ -120,11 +120,9 @@ export function NavUser() {
     async function getUser() {
       const supabase = createClient();
       const { data, error } = await supabase.auth.getUser();
-      if (!error && data.user) {
-        setUser(data.user);
-      }
+      if (!error && data.user) setUser(data.user);
+      if (error) setUser(null);
     }
-    
     getUser();
   }, []);
 
@@ -155,7 +153,17 @@ export function NavUser() {
               <DropdownMenuItem onClick={() => router.push('/profile')}> <BadgeCheck/> Account </DropdownMenuItem>
               <DropdownMenuItem> <CreditCard/> Billing </DropdownMenuItem>
               <DropdownMenuSeparator/>
-              <DropdownMenuItem onClick={() => {signOut(); router.push('/'); router.refresh();}}> <LogOut/> Log Out </DropdownMenuItem>
+              <DropdownMenuItem onClick={async () => {
+                try {
+                  await signOut();
+                  setUser(null);
+                  router.push('/');
+                  router.refresh();
+                } catch (error) {
+                  console.error('Logout error:', error);
+                  toast.error('Failed to log out');
+                }
+              }}> <LogOut/> Log Out </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarMenuItem>
