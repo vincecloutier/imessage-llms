@@ -5,75 +5,37 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
-import {
-  UserRound,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Plus,
-} from 'lucide-react';
-
-import {
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@/components/ui/sidebar';
-
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+import { UserRound, MoreHorizontal, Pencil, Trash2, Plus } from 'lucide-react';
 
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { SidebarGroup, SidebarGroupAction, SidebarGroupLabel, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { deletePersona } from '@/lib/actions';
 
 const fetcher = async (): Promise<{ personas: Persona[], isAuthenticated: boolean }> => {
-  try {
-    const supabase = createClient();
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  const supabase = createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    if (userError || !user) {
-      console.error('Personas Navbar Authentication Error:', userError);
-      return { personas: [], isAuthenticated: false };
-    }
-
-    if (user.is_anonymous) {
-      return { personas: [], isAuthenticated: false };
-    }
-
-    const { data: personas, error: personasError } = await supabase
-      .from('personas')
-      .select('*')
-      .eq('user_id', user.id)
-
-    if (personasError) {
-      console.error('Personas Navbar Fetch Error:', personasError);
-      return { personas: [], isAuthenticated: true };
-    }
-
-    return { personas: personas || [], isAuthenticated: true };
-  } catch (error) {
-    console.error('Personas Navbar Fetcher Error:', error);
+  if (userError || !user) {
+    console.error('Personas Navbar Authentication Error:', userError);
     return { personas: [], isAuthenticated: false };
   }
+
+  if (user.is_anonymous) {
+    return { personas: [], isAuthenticated: false };
+  }
+
+  const { data: personas, error: personasError } = await supabase.from('personas').select('*').eq('user_id', user.id);
+
+  if (personasError) {
+    console.error('Personas Navbar Fetch Error:', personasError);
+    return { personas: [], isAuthenticated: true };
+  }
+
+  return { personas: personas || [], isAuthenticated: true };
 };
 
 export function NavPersonas() {
