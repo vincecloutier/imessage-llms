@@ -36,12 +36,12 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
       <AnimatePresence>
       {isDraggingOver && (
         <motion.div 
-          className="absolute top-16 inset-4 pointer-events-none z-10 flex flex-col items-center justify-center gap-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-900/90" 
+          className="absolute top-16 inset-4 pointer-events-none z-10 flex flex-col items-center justify-center gap-1 rounded-xl bg-muted/90" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
         >
-          <div className="text-sm dark:text-zinc-400 text-zinc-500">{"Images Only"}</div>
+          <div className="text-sm text-muted-foreground">{"Images Only"}</div>
         </motion.div>
       )}
       </AnimatePresence>
@@ -63,7 +63,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
         textareaRef={textareaRef}
       />
 
-      <div className="text-xs text-center pb-4 text-red-500">
+      <div className="text-xs text-center pb-4 text-destructive">
         {persona_id === "new" && (<div> This conversation will not be saved. Please connect to your account to save your conversations. </div>)}
       </div>
       
