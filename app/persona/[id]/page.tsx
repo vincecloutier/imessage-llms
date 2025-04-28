@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getPersonaById, getUser } from '@/lib/supabase/cached-queries';
+import { getPersonaById, getUser } from '@/lib/queries';
 import { AppHeader } from '@/components/custom/app-header';
 import GenericForm, {PageSchema } from '@/components/custom/generic-form';
 import { savePersona } from '@/lib/actions';

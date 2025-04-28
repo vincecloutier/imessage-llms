@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { Chat } from '@/components/custom/chat-main';
-import { getPersonaById, getMessagesByPersonaId, getUser } from '@/lib/supabase/cached-queries';
+import { getPersonaById, getMessagesByPersonaId, getUser } from '@/lib/queries';
 
 export default async function Page(props: { params: Promise<any> }) {
   const { id } = await props.params;

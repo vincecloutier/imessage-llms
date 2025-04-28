@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getPersonasByUserId, getProfile } from './cached-queries';
+import { getPersonasByUserId, getProfile } from '../queries';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({

@@ -4,7 +4,7 @@ import GenericForm, {
   FieldSchema,
 } from '@/components/custom/generic-form';
 import { saveProfile } from '@/lib/actions';
-import { getUser, getProfile } from '@/lib/supabase/cached-queries';
+import { getUser, getProfile } from '@/lib/queries';
 import { notFound } from 'next/navigation';
 
 const pages: PageSchema[] = [
