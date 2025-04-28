@@ -67,7 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </SidebarHeader>
               <SidebarContent>
                 <NavPersonas/>
-                {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+                <NavSecondary items={data.navSecondary} className="mt-auto" />
               </SidebarContent>
               <SidebarFooter>
                 <NavUser/>
