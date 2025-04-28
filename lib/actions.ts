@@ -17,15 +17,8 @@ async function getSupabaseUser() {
 export async function saveProfile(payload: SaveEntityPayload) {
     'use server';
     const { supabase, user } = await getSupabaseUser();
-    const { data, error } = await supabase
-        .from('profiles')
-        .upsert({
-        id: user.id,
-        attributes: payload.attributes,
-        sender_address: payload.sender_address ?? user.email,
-        })
-        .select()
-        .single();
+    const profile = {id: user.id, attributes: payload.attributes, sender_address: payload.sender_address ?? user.email};
+    const { data, error } = await supabase.from('profiles').upsert(profile).select().single();
     if (error) throw new Error(error.message);
     return data;
 }
@@ -33,46 +26,21 @@ export async function saveProfile(payload: SaveEntityPayload) {
 export async function savePersona(payload: SaveEntityPayload) {
   'use server';
   const { supabase, user } = await getSupabaseUser();
-  if (payload.id) {
-    const { data, error } = await supabase
-      .from('personas')
-      .update({
-        attributes: payload.attributes,
-        sender_address: payload.sender_address,
-      })
-      .eq('id', payload.id)
-      .eq('user_id', user.id)
-      .select()
-      .single();
-    if (error) throw new Error(error.message);
-    return data;
-  } else {
-    const { data, error } = await supabase
-      .from('personas')
-      .insert({
-        user_id: user.id,
-        attributes: payload.attributes,
-        sender_address: payload.sender_address,
-      })
-      .select()
-      .single();
-    if (error) throw new Error(error.message);
-    return data;
-  }
+  const query = !!payload.id
+    ? supabase.from('personas').update({ attributes: payload.attributes, sender_address: payload.sender_address }).eq('id', payload.id).eq('user_id', user.id)
+    : supabase.from('personas').insert({ user_id: user.id, attributes: payload.attributes, sender_address: payload.sender_address });
+  const { data, error } = await query.select().single();
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export async function deletePersona(id: string) {
   'use server';
   const { supabase, user } = await getSupabaseUser();
-  const { error } = await supabase
-    .from('personas')
-    .delete()
-    .eq('id', id)
-    .eq('user_id', user.id);
+  const { error } = await supabase.from('personas').delete().eq('id', id).eq('user_id', user.id);
   if (error) throw new Error(error.message);
   return { success: true };
 }
-
 
 export const createSignedAttachmentUrl = cache(async (filePath: string) => {
   if (!filePath) return { error: 'File path is required.', signedUrl: null };
@@ -82,12 +50,7 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
   if (!filePath.startsWith(`${user.id}/`)) return { error: 'Unauthorized', signedUrl: null };
 
   // first check cache
-  const { data: cachedData, error: cacheError } = await supabase
-    .from('cached_signed_urls')
-    .select('signed_url, expires_at')
-    .eq('file_path', filePath)
-    .eq('user_id', user.id)
-    .single();
+  const { data: cachedData, error: cacheError } = await supabase.from('cached_signed_urls').select('signed_url, expires_at').eq('file_path', filePath).eq('user_id', user.id).single();
 
   // ignore "row not found" error, but log others
   if (cacheError && cacheError.code !== 'PGRST116') {
@@ -100,9 +63,7 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
   }
 
   // next generate new signed url
-  const { data: storageData, error: storageError } = await supabase.storage
-    .from('attachments')
-    .createSignedUrl(filePath, SIGNED_URL_EXPIRY_SECONDS);
+  const { data: storageData, error: storageError } = await supabase.storage.from('attachments').createSignedUrl(filePath, SIGNED_URL_EXPIRY_SECONDS);
 
   // if error or no signed url, return error
   if (storageError || !storageData?.signedUrl) {
@@ -111,9 +72,7 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
 
   // cache the new url (don't fail if this errors)
   const expiresAt = new Date(Date.now() + SIGNED_URL_EXPIRY_SECONDS * 1000);
-  const { error: upsertError } = await supabase
-    .from('cached_signed_urls')
-    .upsert({
+  const { error: upsertError } = await supabase.from('cached_signed_urls').upsert({
       file_path: filePath,
       signed_url: storageData.signedUrl,
       expires_at: expiresAt.toISOString(),
