@@ -1,18 +1,7 @@
 import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { getUser } from '@/lib/queries';
-
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { BookOpen, Command, LifeBuoy, Send } from 'lucide-react';
 import { NavPersonas } from '@/components/custom/sidebar-personas';
 import { NavSecondary } from '@/components/custom/sidebar-secondary';
