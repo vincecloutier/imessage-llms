@@ -28,9 +28,9 @@ export const PreviewMessage = ({message}: {message: Message}) => {
       )}
       <div className={cx(
         'flex flex-col gap-2 px-4 py-3 rounded-2xl max-w-[75%]',
-        message.role === 'user' ? 'ml-auto bg-blue-500 text-white' : 'mr-auto bg-gray-100 dark:bg-gray-800'
+        message.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'mr-auto bg-secondary text-secondary-foreground'
       )}>
-        <div className="prose dark:prose-invert max-w-none"> {message.content} </div>
+        {message.content}
       </div>
     </div>
   );
@@ -39,7 +39,7 @@ export const PreviewMessage = ({message}: {message: Message}) => {
 export const ThinkingMessage = () => {
   return (
     <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2 mb-4" data-role="assistant">
-      <div className="px-4 py-3 rounded-2xl bg-gray-100 dark:bg-gray-800">
+      <div className="px-4 py-3 rounded-2xl bg-secondary text-secondary-foreground">
         <div className="flex gap-1">
           <span className="animate-bounce">●</span>
           <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>●</span>
@@ -103,11 +103,11 @@ export function InputMessage({
             />
           </div>
         )}
-      <div className="border rounded-full shadow-sm bg-white dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div className="border rounded-full shadow-sm bg-background border-input overflow-hidden">
         <div className="flex items-center w-full px-4 py-2">
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex-shrink-0 text-gray-400 hover:text-gray-500 mr-2"
+            className="flex-shrink-0 text-muted-foreground hover:text-foreground mr-2"
           >
             <Paperclip size={18}/>
           </button>
@@ -143,10 +143,10 @@ export function InputMessage({
             onClick={submit}
             disabled={isResponding || (input.trim().length === 0 && !attachmentFile)}
             className={cx(
-              "flex-shrink-0 rounded-full p-2 ml-2",
-              (isResponding || (input.trim().length === 0 && !attachmentFile))
-              ? "text-gray-400 bg-gray-100 dark:bg-gray-800"
-              : "text-white bg-blue-500 hover:bg-blue-600"
+              "flex-shrink-0 rounded-full p-2 ml-2", 
+              (isResponding || (input.trim().length === 0 && !attachmentFile)) 
+              ? "text-muted-foreground bg-muted" 
+              : "text-primary-foreground bg-primary hover:bg-primary/90"
             )}
           >
             <ArrowUp size={18} />
