@@ -2,14 +2,13 @@ import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { BookOpen, ChevronsUpDown, Command, LifeBuoy, Send } from 'lucide-react';
+import { BookOpen, LifeBuoy, Send } from 'lucide-react';
 import { NavPersonas } from '@/components/custom/sidebar-personas';
 import { NavSecondary } from '@/components/custom/sidebar-secondary';
-import { NavUser } from '@/components/custom/sidebar-user';
 
 import './globals.css';
 import { ThemeProvider } from '@/components/custom/theme-provider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
@@ -61,9 +60,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <NavPersonas/>
                 <NavSecondary items={data.navSecondary} className="mt-auto" />
               </SidebarContent>
-              <SidebarFooter>
-                <NavUser/>
-              </SidebarFooter>
             </Sidebar>
             <SidebarInset>
               {children}
