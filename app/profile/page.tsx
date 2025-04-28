@@ -1,11 +1,10 @@
+import { notFound } from 'next/navigation';
+
 import { AppHeader } from '@/components/custom/app-header';
-import GenericForm, {
-  PageSchema,
-  FieldSchema,
-} from '@/components/custom/generic-form';
+import GenericForm, { PageSchema } from '@/components/custom/generic-form';
+
 import { saveProfile } from '@/lib/actions';
 import { getUser, getProfile } from '@/lib/queries';
-import { notFound } from 'next/navigation';
 
 const pages: PageSchema[] = [
   {
