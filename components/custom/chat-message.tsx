@@ -93,7 +93,7 @@ export function InputMessage({
   }, [input, isResponding, handleSubmit, textareaRef]);
 
   return (
-    <div className="w-full mx-auto max-w-3xl px-4 pb-8">
+    <div className="w-full mx-auto max-w-3xl px-4 pb-4">
           {attachmentFile && (
           <div className="px-4 pb-3">
             <ImagePreview

@@ -62,6 +62,11 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
         handleFileRemoved={handleFileRemoved}
         textareaRef={textareaRef}
       />
+
+      <div className="text-xs text-center pb-4 text-red-500">
+        {persona_id === "new" && (<div> This conversation will not be saved. Please connect to your account to save your conversations. </div>)}
+      </div>
+      
     </div>
   );
 }

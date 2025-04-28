@@ -36,7 +36,7 @@ export default function Home() {
     <PreviewChat
       user_id={userId}
       persona_id={"new"}
-      persona_name={"Meet April"}
+      persona_name={"April"}
       initialMessages={[]}
     />
   );
