@@ -34,11 +34,9 @@ export function AppHeader({title, subtitle}: {title: string, subtitle: string}) 
             </Breadcrumb>
             </div>
             {pathname === "/" ? (<SignInDialog/>) : 
-            (
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => router.push('/profile')}>
-                    <UserRound className="size-4"/>
-                </Button>
-            )}
+            (<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => router.push('/profile')}>
+                <UserRound className="size-4"/>
+            </Button>)}
         </header>
     )
 }
