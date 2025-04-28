@@ -2,13 +2,14 @@ import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { BookOpen, Command, LifeBuoy, Send } from 'lucide-react';
+import { BookOpen, ChevronsUpDown, Command, LifeBuoy, Send } from 'lucide-react';
 import { NavPersonas } from '@/components/custom/sidebar-personas';
 import { NavSecondary } from '@/components/custom/sidebar-secondary';
 import { NavUser } from '@/components/custom/sidebar-user';
 
 import './globals.css';
 import { ThemeProvider } from '@/components/custom/theme-provider';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
@@ -42,12 +43,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <SidebarMenuItem>
                     <SidebarMenuButton size="lg" asChild>
                       <a href="/">
-                          <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                            <Command className="size-4" />
+                          <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                            <Avatar className="h-8 w-8 rounded-lg">
+                              <AvatarImage src="/logo.svg" className="rounded-lg"/>
+                            </Avatar> 
                           </div>
                           <div className="flex flex-col gap-0.5 leading-none">
                             <span className="font-semibold">April Intelligence</span>
-                            <span className="">v1.0.0</span>
+                            <span className="text-xs">v1.0.0</span>
                           </div>
                       </a>
                     </SidebarMenuButton>
