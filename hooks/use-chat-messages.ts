@@ -41,7 +41,9 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/frontend', {
+      const url = process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api/frontend' : 'https://april-python.vercel.app/api/frontend';
+
+      const response = await fetch(url, {
         method: 'POST',
         credentials: 'include',
         body: formData,
