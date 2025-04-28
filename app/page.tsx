@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Chat as PreviewChat } from '@/components/custom/chat-main';
-import { anonymousSignIn } from '@/lib/supabase/auth';
+import { anonymousSignIn } from '@/lib/supabase/client';
 
 export default function Home() {
   const [userId, setUserId] = useState<string | null>(null);

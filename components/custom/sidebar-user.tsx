@@ -8,7 +8,6 @@ import {
   Sparkles,
 } from "lucide-react"
 
-import { signIn, signOut } from "@/lib/supabase/auth"
 import { useRouter } from "next/navigation"
 
 import {
@@ -33,7 +32,7 @@ import { Input } from "../ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
-import { createClient } from "@/lib/supabase/client"
+import { getUser, signIn, signOut } from "@/lib/supabase/client"
 
 function SignInDialog({ open, setOpen }: { open: boolean, setOpen: (open: boolean) => void }) {
   const router = useRouter();
@@ -116,15 +115,7 @@ export function NavUser() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   
-  useEffect(() => {
-    async function getUser() {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
-      if (!error && data.user) setUser(data.user);
-      if (error) setUser(null);
-    }
-    getUser();
-  }, []);
+  useEffect(() => {setUser(getUser());}, []);
 
   if (user && !user.is_anonymous) {
     return (
