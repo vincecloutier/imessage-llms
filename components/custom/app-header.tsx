@@ -13,11 +13,14 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { useUser } from "@/components/custom/user-provider";
+import { getUser, signIn } from "@/lib/supabase/client";
 
 export function AppHeader({title, subtitle}: {title: string, subtitle: string})  {
     const router = useRouter();
-    const { user } = useUser();
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {getUser().then(setUser)}, []);
+
     return (
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
             <div className="flex items-center gap-2">
@@ -43,7 +46,6 @@ function SignInDialog() {
   const [email, setEmail] = useState('');
   const [rememberEmail, setRememberEmail] = useState(false);
   const [open, setOpen] = useState(false);
-  const { signIn } = useUser();
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('rememberedEmail');
