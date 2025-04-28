@@ -9,6 +9,7 @@ import { NavSecondary } from '@/components/custom/sidebar-secondary';
 import './globals.css';
 import { ThemeProvider } from '@/components/custom/theme-provider';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { UserProvider } from '@/components/custom/user-provider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
@@ -33,6 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning>
       <head/>
       <body className="antialiased">
+          <UserProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Toaster position="top-center" />
           <SidebarProvider>
@@ -66,6 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </SidebarInset>
           </SidebarProvider>
           </ThemeProvider>
+          </UserProvider>
       </body>
     </html>
   );

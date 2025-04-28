@@ -2,9 +2,9 @@
 
 import { toast } from "sonner"
 import { useState, useEffect } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter} from "next/navigation"
 
-import { LogIn, UserRound } from "lucide-react"
+import {UserRound } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -13,11 +13,11 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { signIn } from "@/lib/supabase/client"
+import { useUser } from "@/components/custom/user-provider";
 
 export function AppHeader({title, subtitle}: {title: string, subtitle: string})  {
-    const pathname = usePathname();
     const router = useRouter();
+    const { user } = useUser();
     return (
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
             <div className="flex items-center gap-2">
@@ -33,19 +33,17 @@ export function AppHeader({title, subtitle}: {title: string, subtitle: string}) 
                 </BreadcrumbList>
             </Breadcrumb>
             </div>
-            {pathname === "/" ? (<SignInDialog/>) : 
-            (<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => router.push('/profile')}>
-                <UserRound className="size-4"/>
-            </Button>)}
+            {user && !user.is_anonymous && (<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => router.push('/profile')}> <UserRound className="size-4"/> </Button>)}
+            {(user && user.is_anonymous) && (<SignInDialog/>)}
         </header>
     )
 }
 
 function SignInDialog() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [rememberEmail, setRememberEmail] = useState(false);
   const [open, setOpen] = useState(false);
+  const { signIn } = useUser();
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('rememberedEmail');
@@ -71,8 +69,6 @@ function SignInDialog() {
       await signIn(email);
       setOpen(false);
       toast.success('Sign in link sent to email');
-      router.push('/');
-      router.refresh();
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -81,9 +77,7 @@ function SignInDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}> 
     <DialogTrigger asChild>
-    <Button variant="ghost" size="icon" className="h-7 w-7">
-        <LogIn className="size-4"/> 
-    </Button>
+        <Button className="h-7">Connect</Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
