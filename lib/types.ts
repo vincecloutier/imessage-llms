@@ -16,3 +16,9 @@ export type Message = {
     file_path?: string | null;
     attachmentFile?: File | null;
 }
+
+export type SaveEntityPayload = {
+    id?: string;
+    attributes: Record<string, any>;
+    sender_address?: string | null;
+  };
