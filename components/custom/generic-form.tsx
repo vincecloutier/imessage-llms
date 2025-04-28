@@ -12,6 +12,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 
 import { searchCity } from "@/lib/actions";
+import { useUser } from "@/components/custom/user-provider";
 
 const deepEqual = (obj1: any, obj2: any): boolean => {
   if (obj1 === obj2) return true;
@@ -72,9 +73,11 @@ export interface GenericFormProps {
     sender_address?: string | null;
   }) => Promise<any>;
   useTabs?: boolean; // Whether to use tabs or not
+  showSignOutButton?: boolean; // Show sign out button if true
 }
 
-export default function GenericForm({startingValues, pages, saveAction, useTabs = true}: GenericFormProps) {  
+export default function GenericForm({startingValues, pages, saveAction, useTabs = true, showSignOutButton = false}: GenericFormProps) {
+  const { signOut } = useUser();
   // build initial form values across all pages
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
@@ -488,7 +491,8 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
             {tabs.map((tabKey) => (
               <TabsContent key={tabKey} value={tabKey}>
                 {pagesByTab[tabKey].map(renderPageContent)}
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-between gap-2">
+                  {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
                   <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
                 </div>
               </TabsContent>
@@ -497,7 +501,8 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         ) : (
           <>
             {pages.map(renderPageContent)}
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-between gap-2">
+              {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
               <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
             </div>
           </>

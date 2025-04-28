@@ -59,6 +59,7 @@ export default async function UserProfilePage() {
           pages={pages}
           saveAction={saveProfile}
           useTabs={false}
+          showSignOutButton={true}
         />
       </div>
     </>
