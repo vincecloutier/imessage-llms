@@ -1,19 +1,21 @@
 'use client';
-
-import { User } from '@supabase/supabase-js';
+import { Persona } from '@/lib/types';
 import Link from 'next/link';
-import { useParams, usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import {
   UserRound,
   MoreHorizontal,
+  Pencil,
+  Trash2,
   Plus,
 } from 'lucide-react';
 
 import {
   SidebarGroup,
+  SidebarGroupAction,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
@@ -22,16 +24,25 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+
 import { createClient } from '@/lib/supabase/client';
-import { Database } from '@/lib/supabase/types';
-import PersonaForm from './persona-form';
+import { useRouter } from 'next/navigation';
+import { deletePersona } from '@/lib/actions';
 
-// Type for a persona record from Supabase
-// Adjust properties as needed; here we assume a persona has at least an id and a title
-
-type persona = Database['public']['Tables']['personas']['Row'];
-
-const fetcher = async (): Promise<persona[]> => {
+const fetcher = async (): Promise<{ personas: Persona[], isAuthenticated: boolean }> => {
   try {
     const supabase = createClient();
     const {
@@ -40,57 +51,41 @@ const fetcher = async (): Promise<persona[]> => {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      console.error('Auth error:', userError);
-      return [];
+      console.error('Personas Navbar Authentication Error:', userError);
+      return { personas: [], isAuthenticated: false };
+    }
+
+    if (user.is_anonymous) {
+      return { personas: [], isAuthenticated: false };
     }
 
     const { data: personas, error: personasError } = await supabase
       .from('personas')
       .select('*')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
 
     if (personasError) {
-      console.error('Personas fetch error:', personasError);
-      return [];
+      console.error('Personas Navbar Fetch Error:', personasError);
+      return { personas: [], isAuthenticated: true };
     }
 
-    return personas || [];
+    return { personas: personas || [], isAuthenticated: true };
   } catch (error) {
-    console.error('Fetcher error:', error);
-    return [];
+    console.error('Personas Navbar Fetcher Error:', error);
+    return { personas: [], isAuthenticated: false };
   }
 };
 
-export function SidebarHistory({ user }: { user: User | undefined }) {
-  const { setOpenMobile, isMobile } = useSidebar();
-  const { id } = useParams();
+export function NavPersonas() {
+  const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
-  const { data: history, isLoading, mutate } = useSWR<persona[]>(
-    user ? ['personas', user.id] : null,
-    fetcher,
-    {
-      fallbackData: [],
-      refreshInterval: 5000,
-      revalidateOnFocus: true,
-    }
-  );
+  const { data, isLoading, mutate } = useSWR('personas', fetcher);
+  
+  const isAuthenticated = data?.isAuthenticated ?? false;
+  const history = data?.personas ?? [];
 
-  useEffect(() => {
-    mutate();
-  }, [pathname, mutate]);
-
-  if (!user) {
-    return (
-      <SidebarGroup>
-        <SidebarGroupLabel>Personas</SidebarGroupLabel>
-        <div className="text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-          <div>Login to save and revisit previous personas!</div>
-        </div>
-      </SidebarGroup>
-    );
-  }
+  useEffect(() => {mutate();}, [pathname, mutate]); 
 
   if (isLoading) {
     return (
@@ -101,93 +96,73 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     );
   }
 
-  return (
+  if (!isAuthenticated) {
+    return (
+      <SidebarGroup>
+        <SidebarGroupLabel>Personas</SidebarGroupLabel>
+            <div className="px-2 py-1 text-xs text-sidebar-foreground/50">Login to save and edit your personas!</div>
+      </SidebarGroup>
+    );
+  }
+
+  return (  
     <>
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
     <SidebarGroupLabel>Personas</SidebarGroupLabel>
+    <SidebarGroupAction onClick={() => {router.push('/persona/new'); setOpenMobile(false);}}>
+        <Plus /> <span className="sr-only">Add Persona</span>
+    </SidebarGroupAction>
         <SidebarMenu>
-          {history?.map((persona) => (
+          {history.map((persona) => (
             <SidebarMenuItem key={persona.id}>
               <SidebarMenuButton asChild>
                 <Link href={`/chat/${persona.id}`} onClick={() => setOpenMobile(false)}>
                   <UserRound />
-                  <span>{persona.name || 'New persona'}</span>
+                  <span>{(() => {
+                    const nameValue = persona.attributes && typeof persona.attributes === 'object' && (persona.attributes as Record<string, unknown>).name;
+                    return (typeof nameValue === 'string' && nameValue) || 'New Persona';
+                  })()}</span>
                 </Link>
               </SidebarMenuButton>
-              <PersonaForm persona={persona} trigger={<SidebarMenuAction showOnHover>
-                <MoreHorizontal />
-                <span className="sr-only">More</span>
-              </SidebarMenuAction>} />
+              <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuAction>
+                  <MoreHorizontal />
+                  <span className="sr-only">More</span>
+                </SidebarMenuAction>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 rounded-lg" side="right" align="center">
+                <DropdownMenuItem onClick={() => {router.push(`/persona/${persona.id}`); setOpenMobile(false);}}>
+                  <Pencil className="text-muted-foreground" />
+                  <span>Edit Persona</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+                      <Trash2 className="text-muted-foreground" />
+                      <span>Delete Persona</span>
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete this persona from our servers.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={async () => {await deletePersona(persona.id);}}> Continue </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </DropdownMenuContent>
+            </DropdownMenu>
             </SidebarMenuItem>
           ))}
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Plus/>
-              <span>Create New Persona</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
     </>
   );
 }
-
-
-// TODO: if you ever want to add memories and assets to be editable, use this as a starting point
-// export function NavMain({
-//   items,
-// }: {
-//   items: {
-//     title: string
-//     url: string
-//     icon: LucideIcon
-//     isActive?: boolean
-//     items?: {
-//       title: string
-//       url: string
-//     }[]
-//   }[]
-// }) {
-//   return (
-//     <SidebarGroup>
-//       <SidebarGroupLabel>Platform</SidebarGroupLabel>
-//       <SidebarMenu>
-//         {items.map((item) => (
-//           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-//             <SidebarMenuItem>
-//               <SidebarMenuButton asChild tooltip={item.title}>
-//                 <a href={item.url}>
-//                   <item.icon />
-//                   <span>{item.title}</span>
-//                 </a>
-//               </SidebarMenuButton>
-//               {item.items?.length ? (
-//                 <>
-//                   <CollapsibleTrigger asChild>
-//                     <SidebarMenuAction className="data-[state=open]:rotate-90">
-//                       <ChevronRight />
-//                       <span className="sr-only">Toggle</span>
-//                     </SidebarMenuAction>
-//                   </CollapsibleTrigger>
-//                   <CollapsibleContent>
-//                     <SidebarMenuSub>
-//                       {item.items?.map((subItem) => (
-//                         <SidebarMenuSubItem key={subItem.title}>
-//                           <SidebarMenuSubButton asChild>
-//                             <a href={subItem.url}>
-//                               <span>{subItem.title}</span>
-//                             </a>
-//                           </SidebarMenuSubButton>
-//                         </SidebarMenuSubItem>
-//                       ))}
-//                     </SidebarMenuSub>
-//                   </CollapsibleContent>
-//                 </>
-//               ) : null}
-//             </SidebarMenuItem>
-//           </Collapsible>
-//         ))}
-//       </SidebarMenu>
-//     </SidebarGroup>
-//   )
-// }
