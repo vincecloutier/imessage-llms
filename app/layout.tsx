@@ -16,9 +16,8 @@ export const metadata: Metadata = {
   description: 'An AI companion service.',
 };
 
-export const viewport = {
-  maximumScale: 1, // disable auto-zoom on mobile Safari
-};
+// disable auto-zoom on mobile Safari
+export const viewport = { maximumScale: 1 };
 
 const data = {
     navSecondary: [
