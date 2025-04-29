@@ -1,14 +1,13 @@
 import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import './globals.css';
 import { BookOpen, LifeBuoy, Send } from 'lucide-react';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { ThemeProvider } from '@/components/custom/theme-provider';
 import { NavPersonas } from '@/components/custom/sidebar-personas';
 import { NavSecondary } from '@/components/custom/sidebar-secondary';
-
-import './globals.css';
-import { ThemeProvider } from '@/components/custom/theme-provider';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
