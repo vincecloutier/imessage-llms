@@ -1,10 +1,9 @@
-import { notFound } from 'next/navigation';
-
 import { AppHeader } from '@/components/custom/app-header';
 import GenericForm, { PageSchema } from '@/components/custom/generic-form';
 
 import { saveProfile } from '@/lib/actions';
-import { getUser, getProfile } from '@/lib/queries';
+import { getProfile, getUser } from '@/lib/queries';
+import { redirect } from 'next/navigation';
 
 const pages: PageSchema[] = [
   {
@@ -28,31 +27,12 @@ const pages: PageSchema[] = [
 
 export default async function UserProfilePage() {
   const user = await getUser();
-
-  if (!user) {
-    return notFound();
-  }
-
+  if (!user) redirect('/');
   let profile = await getProfile(user.id);
-
-  if (!profile) {
-    profile = {
-      id: user.id,
-      attributes: {
-        name: '',
-        birthday: '',
-        location: '',
-        timezone: '',
-        latitude: '',
-        longitude: '',
-      },
-      sender_address: '',
-    };
-  }
-
+  if (!profile) profile = {id: user.id, attributes: {name: '', birthday: '', location: '', timezone: '', latitude: '', longitude: ''}, sender_address: ''};
   return (
     <>
-      <AppHeader title={'Profile'} subtitle={'Personal Information'} />
+      <AppHeader title={'Profile'} subtitle={'Personal Information'}/>
       <div className="mx-16 ">
         <GenericForm
           startingValues={profile}
