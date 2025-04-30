@@ -5,7 +5,7 @@ import { Paperclip, ArrowUp } from 'lucide-react';
 import React, { useRef, useEffect, useCallback } from 'react';
 
 import { Message } from '@/lib/types';
-import { ImagePreview } from '@/components/custom/preview-attachment';
+import { ImagePreview } from '@/components/custom/chat-preview';
 
 export const DisplayMessage = ({message}: {message: Message}) => {
   // Clean up blob URLs when component unmounts
