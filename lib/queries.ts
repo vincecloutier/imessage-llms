@@ -18,12 +18,16 @@ export const getProfile = async (id: string) => {
 
 export const getPersonas = async (userId: string, personaId?: string) => {
   const supabase = await createClient();
-  const { data: personas, error } = await supabase.from('personas').select().eq('user_id', userId); 
+  let query = supabase.from('personas').select().eq('user_id', userId);
   if (personaId) {
-    return personas?.find((persona) => persona.id === personaId);
+    const { data: persona, error } = await query.eq('id', personaId).maybeSingle();;
+    if (error) {console.error(error); return null;}
+    return persona;
+  } else {
+    const { data: personas, error } = await query;
+    if (error) {console.error(error); return [];}
+    return personas;
   }
-  if (error) {console.error(error); return [];}
-  return personas;
 };
 
 export const getMessagesByPersonaId = async (personaId: string) => {
@@ -32,17 +36,3 @@ export const getMessagesByPersonaId = async (personaId: string) => {
   if (error) {console.error(error); return [];}
   return messages;
 };
-
-export async function handleAuth() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/');
-
-  const { data: profile } = await supabase.from('profiles').select().eq('id', user.id).maybeSingle();
-  if (!profile) redirect('/profile');
-
-  const { data: personas } = await supabase.from('personas').select().eq('user_id', user.id);
-  if (!personas || personas.length === 0) redirect('/persona/new');
-
-  return { supabase, user, profile, personas };
-}
