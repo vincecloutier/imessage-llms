@@ -1,16 +1,16 @@
 'use client';
 
-import {useRef, useEffect, FormEvent, KeyboardEvent } from 'react';
-import { PreviewMessage, ThinkingMessage } from '@/components/custom/chat-message';
-import { toast } from 'sonner';
-import { AppHeader } from '@/components/custom/app-header';
+import {useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { InputMessage } from '@/components/custom/chat-message';
-import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
-import { useChatMessages } from '@/hooks/use-chat-messages';
-import { useFileInput } from '@/hooks/use-chat-file-input';
+
 import { Message } from '@/lib/types';
 import { useFileHandler } from '@/hooks/use-file-handler';
+import { useFileInput } from '@/hooks/use-chat-file-input';
+import { useChatMessages } from '@/hooks/use-chat-messages';
+import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
+
+import { AppHeader } from '@/components/custom/app-header';
+import { DisplayMessage, TypingMessage, ChatInput } from '@/components/custom/chat-parts';
 
 export function Chat({ user_id, persona_id, persona_name, initialMessages }: { user_id: string; persona_id: string; persona_name: string; initialMessages: Message[];}) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -47,12 +47,12 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
       </AnimatePresence>
       
       <div className="flex-1 flex flex-col min-w-0 gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
-        {messages.map((message, index) => (<PreviewMessage key={index} message={message}/>))}
-        {isResponding && <ThinkingMessage />}
+        {messages.map((message, index) => (<DisplayMessage key={index} message={message}/>))}
+        {isResponding && <TypingMessage />}
         <div ref={messagesEndRef}/>
       </div>
       
-      <InputMessage
+      <ChatInput
         input={input}
         setInput={setInput}
         isResponding={isResponding}

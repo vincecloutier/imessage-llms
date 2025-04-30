@@ -1,12 +1,13 @@
 'use client';
 
 import cx from 'classnames';
-import { ImagePreview } from './preview-attachment';
-import React, { useRef, useEffect, useCallback } from 'react';
 import { Paperclip, ArrowUp } from 'lucide-react';
-import { Message } from '@/lib/types';
+import React, { useRef, useEffect, useCallback } from 'react';
 
-export const PreviewMessage = ({message}: {message: Message}) => {
+import { Message } from '@/lib/types';
+import { ImagePreview } from '@/components/custom/preview-attachment';
+
+export const DisplayMessage = ({message}: {message: Message}) => {
   // Clean up blob URLs when component unmounts
   useEffect(() => {
     return () => {
@@ -36,7 +37,7 @@ export const PreviewMessage = ({message}: {message: Message}) => {
   );
 };
 
-export const ThinkingMessage = () => {
+export const TypingMessage = () => {
   return (
     <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2 mb-4" data-role="assistant">
       <div className="px-4 py-3 rounded-2xl bg-secondary text-secondary-foreground">
@@ -50,25 +51,7 @@ export const ThinkingMessage = () => {
   );
 };
 
-export function InputMessage({
-  input,
-  setInput,
-  isResponding,
-  handleSubmit,
-  attachmentFile,
-  handleFileAdded,
-  handleFileRemoved,
-  textareaRef
-}:{
-  input: string;
-  setInput: (value: string) => void;
-  isResponding: boolean;
-  handleSubmit: () => void;
-  attachmentFile: File | null;
-  handleFileAdded: (file: File) => boolean;
-  handleFileRemoved: () => void;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
-}) {
+export function ChatInput({input, setInput, isResponding, handleSubmit, attachmentFile, handleFileAdded, handleFileRemoved, textareaRef}:{input: string, setInput: (value: string) => void, isResponding: boolean, handleSubmit: () => void, attachmentFile: File | null, handleFileAdded: (file: File) => boolean, handleFileRemoved: () => void, textareaRef: React.RefObject<HTMLTextAreaElement>}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const adjustHeight = useCallback(() => {
