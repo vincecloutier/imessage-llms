@@ -3,8 +3,8 @@ import { notFound, redirect } from 'next/navigation';
 import { Chat } from '@/components/custom/chat-main';
 import { getMessagesByPersonaId, getUser, getPersonas } from '@/lib/queries';
 
-export default async function Page(props: { params: Promise<any> }) {
-  const { id } = await props.params;
+export default async function Page({ params }: { params: { id: string } }) {
+  const { id } = params;
 
   const user = await getUser();
   if (!user || user.is_anonymous) redirect('/');

@@ -33,14 +33,15 @@ const pages: PageSchema[] = [
   ];
   
   
-export default async function Page(props: { params: Promise<any> }) {
-  const { id } = await props.params;
-
+export default async function Page({ params }: { params: { id: string } }) {
+  const { id } = params;
+  
   const user = await getUser();
   if (!user || user.is_anonymous) redirect('/');
 
-  const persona = id == 'new' ? {id: null, attributes: {name: 'New Persona'}, sender_address: null, user_id: user.id} : await getPersonas(user.id, id);
-
+  const defaultPersona = { id: null, attributes: { name: 'New Persona' }, sender_address: null, user_id: user.id };
+  const persona = id == 'new' ? defaultPersona : await getPersonas(user.id, id);
+  
   return (
     <>
       <AppHeader
