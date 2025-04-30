@@ -32,7 +32,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
 
   return (
     <div className="relative h-dvh transition-colors duration-200 ease-in-out flex flex-col" {...handlers}>      
-      <AppHeader title="Chat" subtitle={persona_name}/>
+      <AppHeader title="Chat" subtitle={persona_name} isAnonymous={persona_id === "new"}/>
       <AnimatePresence>
       {isDraggingOver && (
         <motion.div 

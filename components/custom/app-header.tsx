@@ -13,14 +13,10 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { getUser, signIn } from "@/lib/supabase/client";
+import { signIn } from "@/lib/supabase/client";
 
-export function AppHeader({title, subtitle}: {title: string, subtitle: string})  {
+export function AppHeader({title, subtitle, isAnonymous = false}: {title: string, subtitle: string, isAnonymous?: boolean})  {
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
-
-    useEffect(() => {getUser().then(setUser)}, []);
-
     return (
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
             <div className="flex items-center gap-2">
@@ -36,8 +32,8 @@ export function AppHeader({title, subtitle}: {title: string, subtitle: string}) 
                 </BreadcrumbList>
             </Breadcrumb>
             </div>
-            {user && !user.is_anonymous && (<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => router.push('/profile')}> <UserRound className="size-4"/> </Button>)}
-            {(user && user.is_anonymous) && (<SignInDialog/>)}
+            {isAnonymous && (<SignInDialog/>)}
+            {!isAnonymous && (<Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => router.push('/profile')}> <UserRound className="size-4"/> </Button>)}
         </header>
     )
 }
