@@ -27,7 +27,7 @@ const pages: PageSchema[] = [
 
 export default async function UserProfilePage() {
   const user = await getUser();
-  if (!user) redirect('/');
+  if (!user || user.is_anonymous) redirect('/');
   let profile = await getProfile(user.id);
   if (!profile) profile = {id: user.id, attributes: {name: '', birthday: '', location: '', timezone: '', latitude: '', longitude: ''}, sender_address: ''};
   return (
