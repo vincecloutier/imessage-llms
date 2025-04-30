@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getPersonasByUserId, getProfile } from '../queries';
+import {getPersonas, getProfile } from '../queries';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -58,7 +58,7 @@ export async function updateSession(request: NextRequest) {
 
   // if user is authenticated force them to set up a persona 
   if (user && !isAnon && (path.startsWith('/chat') || (path.startsWith('/persona') && path !== '/persona/new') || path === '/')){
-    const personas = await getPersonasByUserId(user.id)
+    const personas = await getPersonas(user.id)
     if (personas.length === 0) {
       const url = request.nextUrl.clone()
       url.pathname = '/persona/new'
