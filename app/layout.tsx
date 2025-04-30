@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
 import './globals.css';
-import { BookOpen, LifeBuoy, Send } from 'lucide-react';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { ThemeProvider } from '@/components/custom/theme-provider';
 import { NavPersonas } from '@/components/custom/sidebar-personas';
@@ -17,14 +16,6 @@ export const metadata: Metadata = {
 
 // disable auto-zoom on mobile Safari
 export const viewport = { maximumScale: 1 };
-
-const data = {
-    navSecondary: [
-    { title: "Support", url: "mailto:support@aprilintelligence.com", icon: LifeBuoy },
-    { title: "Feedback", url: "mailto:info@aprilintelligence.com", icon: Send },
-    { title: "Privacy Policy", url: "/privacy", icon: BookOpen },
-  ]
-}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -56,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </SidebarHeader>
               <SidebarContent>
                 <NavPersonas />
-                <NavSecondary items={data.navSecondary} className="mt-auto" />
+                <NavSecondary className="mt-auto" />
               </SidebarContent>
             </Sidebar>
             <SidebarInset>
