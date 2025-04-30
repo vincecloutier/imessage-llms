@@ -1,42 +1,19 @@
-'use client';
+import { Chat } from '@/components/custom/chat-main';
+import { createClient } from '@/lib/supabase/server';
 
-import { useEffect, useState } from 'react';
-import { Chat as PreviewChat } from '@/components/custom/chat-main';
-import { anonymousSignIn } from '@/lib/supabase/client';
-
-export default function Home() {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    anonymousSignIn()
-      .then((session) => {
-        if (isMounted) {
-          setUserId(session.user?.id || null);
-          setIsLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.error('Anonymous sign-in failed:', err);
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  if (isLoading) return null;
-
-  if (!userId) return null;
+export default async function Home() {
+  const supabase = await createClient();
+  let { user } = (await supabase.auth.getUser()).data;
+  if (!user || user.is_anonymous) {
+    user = (await supabase.auth.signInAnonymously()).data.user;
+  }
+  if (!user) return null;
 
   return (
-    <PreviewChat
-      user_id={userId}
-      persona_id={"new"}
-      persona_name={"April"}
+    <Chat
+      user_id={user.id}
+      persona_id="new"
+      persona_name="April"
       initialMessages={[]}
     />
   );

@@ -1,6 +1,6 @@
-import { notFound } from 'next/navigation';
+import {redirect } from 'next/navigation';
 
-import { getPersonaById, getUser } from '@/lib/queries';
+import { getPersonas, getUser} from '@/lib/queries';
 import { AppHeader } from '@/components/custom/app-header';
 import GenericForm, {PageSchema } from '@/components/custom/generic-form';
 import { savePersona } from '@/lib/actions';
@@ -37,21 +37,9 @@ export default async function Page(props: { params: Promise<any> }) {
   const { id } = await props.params;
 
   const user = await getUser();
+  if (!user || user.is_anonymous) redirect('/');
 
-  if (!user) {
-    return notFound();
-  }
-
-  const persona = id == 'new' ? {
-    id: null,
-    attributes: {name: 'New Persona'},
-    sender_address: null,
-    user_id: user.id,
-  } : await getPersonaById(id);
-
-  if (!persona || user.id !== persona.user_id) {
-    return notFound();
-  }
+  const persona = id == 'new' ? {id: null, attributes: {name: 'New Persona'}, sender_address: null, user_id: user.id} : await getPersonas(user.id, id);
 
   return (
     <>
