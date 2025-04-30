@@ -12,8 +12,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 
 import { searchCity } from "@/lib/actions";
-import { signOut } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const deepEqual = (obj1: any, obj2: any): boolean => {
   if (obj1 === obj2) return true;
@@ -79,6 +79,14 @@ export interface GenericFormProps {
 
 export default function GenericForm({startingValues, pages, saveAction, useTabs = true, showSignOutButton = false}: GenericFormProps) {
   const router = useRouter();
+  
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
+  }
+  
   // build initial form values across all pages
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
@@ -493,7 +501,7 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
               <TabsContent key={tabKey} value={tabKey}>
                 {pagesByTab[tabKey].map(renderPageContent)}
                 <div className="mt-4 flex justify-between gap-2">
-                  {showSignOutButton && <Button variant="outline" type="button" onClick={async () => {await signOut(); router.push('/')}}>Sign Out</Button>}
+                  {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
                   <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
                 </div>
               </TabsContent>
@@ -503,7 +511,7 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
           <>
             {pages.map(renderPageContent)}
             <div className="mt-4 flex justify-between gap-2">
-              {showSignOutButton && <Button variant="outline" type="button" onClick={async () => {await signOut(); router.push('/')}}>Sign Out</Button>}
+              {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
               <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
             </div>
           </>
