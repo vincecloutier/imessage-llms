@@ -108,7 +108,7 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: ImageP
   return (
     <>
       <div className="relative inline-block group">
-        <div className="border rounded-md overflow-hidden relative w-32 h-32">
+        <div className="border rounded-2xl overflow-hidden relative w-32 h-32">
           <div className="w-full h-full cursor-pointer">
              {renderPreviewContent()}
           </div>
