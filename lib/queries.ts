@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
 export const getUser = async () => {
@@ -10,21 +11,17 @@ export const getUser = async () => {
 
 export const getProfile = async (id: string) => {
   const supabase = await createClient();
-  const { data: users, error } = await supabase.from('profiles').select().eq('id', id).maybeSingle();
+  const { data: profile, error } = await supabase.from('profiles').select().eq('id', id).maybeSingle();
   if (error) {console.error(error); return null;}
-  return users;
+  return profile;
 };
 
-export const getPersonaById = async (personaId: string) => {
+export const getPersonas = async (userId: string, personaId?: string) => {
   const supabase = await createClient();
-  const { data: persona, error } = await supabase.from('personas').select().eq('id', personaId).single();
-  if (error) {console.error(error); return null;}
-  return persona;
-};
-
-export const getPersonasByUserId = async (userId: string) => {
-  const supabase = await createClient();
-  const { data: personas, error } = await supabase.from('personas').select().eq('user_id', userId);
+  const { data: personas, error } = await supabase.from('personas').select().eq('user_id', userId); 
+  if (personaId) {
+    return personas?.find((persona) => persona.id === personaId);
+  }
   if (error) {console.error(error); return [];}
   return personas;
 };
@@ -35,3 +32,17 @@ export const getMessagesByPersonaId = async (personaId: string) => {
   if (error) {console.error(error); return [];}
   return messages;
 };
+
+export async function handleAuth() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/');
+
+  const { data: profile } = await supabase.from('profiles').select().eq('id', user.id).maybeSingle();
+  if (!profile) redirect('/profile');
+
+  const { data: personas } = await supabase.from('personas').select().eq('user_id', user.id);
+  if (!personas || personas.length === 0) redirect('/persona/new');
+
+  return { supabase, user, profile, personas };
+}
