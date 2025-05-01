@@ -31,7 +31,7 @@ export async function signOut() {
 export async function saveProfile(payload: SaveEntityPayload) {
     'use server';
     const { supabase, user } = await getSupabaseUser();
-    const profile = {id: user.id, attributes: payload.attributes, sender_address: payload.sender_address ?? user.email};
+    const profile = {id: user.id, attributes: payload.attributes, sender_address: payload.sender_address};
     const { data, error } = await supabase.from('profiles').upsert(profile).select().single();
     if (error) throw new Error(error.message);
     return data;
