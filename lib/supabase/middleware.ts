@@ -1,6 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import {getPersonas, getProfile } from '../queries';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -31,46 +30,15 @@ export async function updateSession(request: NextRequest) {
   // do not run code here (see supabase docs)
 
   const {data: { user }} = await supabase.auth.getUser()
-  const isAnon = user?.is_anonymous ?? false
-  
-  // just to simplify checks below
-  const path = request.nextUrl.pathname
 
   // notice we specify protected routes explicity since an inverse check 
   // like !== x is too broad and prevents assets/fonts from loading
 
   // if user is unauthenticated force to '/'
-  if ((!user || isAnon) && (path.startsWith('/chat') || path.startsWith('/persona') || path.startsWith('/profile'))) {
+  if ((!user || user.is_anonymous) && (request.nextUrl.pathname.startsWith('/chat'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
-  }
-
-  // if user is authenticated force them to setup a profile 
-  if (user && !isAnon && (path.startsWith('/chat') || path.startsWith('/persona') || path === '/')){
-    const profile = await getProfile(user.id)
-    if (!profile) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/profile'
-      return NextResponse.redirect(url)
-    }
-  }
-
-  // if user is authenticated force them to set up a persona 
-  if (user && !isAnon && (path.startsWith('/chat') || (path.startsWith('/persona') && path !== '/persona/new') || path === '/')){
-    const personas = await getPersonas(user.id)
-    if (personas.length === 0) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/persona/new'
-      return NextResponse.redirect(url)
-    }
-    
-    // if user is authenticated and on root path, redirect to first persona
-    if (path === '/' && personas.length > 0) {
-      const url = request.nextUrl.clone()
-      url.pathname = `/chat/${personas[0].id}`
-      return NextResponse.redirect(url)
-    }
   }
 
   return supabaseResponse
