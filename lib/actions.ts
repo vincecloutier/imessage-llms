@@ -14,20 +14,6 @@ async function getSupabaseUser() {
   return { supabase, user };
 }
 
-export async function signIn(email: string) {
-  const supabase = await createClient();
-  // await supabase.auth.signOut(); // in case there's an anon token
-  const url = (process.env.NODE_ENV === 'production') ? 'https://april-nextjs.vercel.app/' : 'http://localhost:3000/';
-  const { error } = await supabase.auth.signInWithOtp({ email: email, options: { emailRedirectTo: `${url}/auth/callback` } });
-  if (error) throw new Error(error.message);
-  return { success: true };
-}
-
-export async function signOut() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-}
-
 export async function saveProfile(payload: SaveEntityPayload) {
     'use server';
     const { supabase, user } = await getSupabaseUser();
