@@ -18,7 +18,7 @@ export const DisplayMessage = ({message}: {message: Message}) => {
   }, [message.file_path]);
 
   return (
-    <div className="w-full mx-auto max-w-3xl px-4 flex flex-col mb-4" data-role={message.role}>
+    <div className="w-full mx-auto max-w-3xl px-4 flex flex-col" data-role={message.role}>
       {(message.file_path || message.attachmentFile) && (
         <div className="self-end">
           <ImagePreview 
@@ -39,7 +39,7 @@ export const DisplayMessage = ({message}: {message: Message}) => {
 
 export const TypingMessage = () => {
   return (
-    <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2 mb-4" data-role="assistant">
+    <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2" data-role="assistant">
       <div className="px-4 py-3 rounded-2xl bg-secondary text-secondary-foreground">
         <div className="flex gap-1">
           <span className="animate-bounce">●</span>
@@ -76,9 +76,9 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
   }, [input, isResponding, handleSubmit, textareaRef]);
 
   return (
-    <div className="w-full mx-auto max-w-3xl px-4 pb-4">
+     <div className="sticky bottom-4 w-full max-w-3xl mx-auto">          
           {attachmentFile && (
-          <div className="px-4 pb-3">
+          <div className="px-4">
             <ImagePreview
               source={attachmentFile}
               onDelete={handleFileRemoved}
@@ -86,7 +86,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
             />
           </div>
         )}
-      <div className="border rounded-full shadow-sm bg-background border-input overflow-hidden">
+      <div className="mx-4 border rounded-full bg-background/50 backdrop-blur-sm border-input/50 overflow-hidden"> 
         <div className="flex items-center w-full px-4 py-2">
           <button
             onClick={() => fileInputRef.current?.click()}

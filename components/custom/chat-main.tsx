@@ -31,42 +31,41 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
   useEffect(() => {messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages]);
 
   return (
-    <div className="relative h-dvh transition-colors duration-200 ease-in-out flex flex-col" {...handlers}>      
-      <AppHeader title="Chat" subtitle={persona_name} isAnonymous={persona_id === "new"}/>
+    <div className="h-dvh flex flex-col transition-colors duration-200 ease-in-out" {...handlers}>
+      <AppHeader title="Chat" subtitle={persona_name} isAnonymous={persona_id === "new"} />
       <AnimatePresence>
-      {isDraggingOver && (
-        <motion.div 
-          className="absolute top-16 inset-4 pointer-events-none z-10 flex flex-col items-center justify-center gap-1 rounded-xl bg-muted/90" 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }}
-        >
-          <div className="text-sm text-muted-foreground">{"Images Only"}</div>
-        </motion.div>
-      )}
+        {isDraggingOver && (
+          <motion.div 
+            className="absolute top-16 inset-4 pointer-events-none z-10 flex flex-col items-center justify-center gap-1 rounded-xl bg-muted/90" 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+          >
+            <div className="text-sm text-muted-foreground">{"Images Only"}</div>
+          </motion.div>
+        )}
       </AnimatePresence>
-      
-      <div className="flex-1 flex flex-col min-w-0 gap-6 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
+
+      <div className="flex-1 flex flex-col min-w-0 gap-4 pt-4 overflow-y-scroll scrollbar-hide px-4 relative">
         {messages.map((message, index) => (<DisplayMessage key={index} message={message}/>))}
         {isResponding && <TypingMessage />}
-        <div ref={messagesEndRef}/>
-      </div>
-      
-      <ChatInput
-        input={input}
-        setInput={setInput}
-        isResponding={isResponding}
-        handleSubmit={() => sendMessage(input, attachmentFile, setAttachmentFile)}
-        attachmentFile={attachmentFile}
-        handleFileAdded={handleFileAdded}
-        handleFileRemoved={handleFileRemoved}
-        textareaRef={textareaRef}
-      />
+        <div ref={messagesEndRef} />
 
-      <div className="text-xs text-center pb-4 text-destructive">
-        {persona_id === "new" && (<div> This conversation will not be saved. Please connect to your account to save your conversations. </div>)}
+        <ChatInput
+          input={input}
+          setInput={setInput}
+          isResponding={isResponding}
+          handleSubmit={() => sendMessage(input, attachmentFile, setAttachmentFile)}
+          attachmentFile={attachmentFile}
+          handleFileAdded={handleFileAdded}
+          handleFileRemoved={handleFileRemoved}
+          textareaRef={textareaRef}
+        />
       </div>
-      
+
+      <div className="text-xs text-center text-destructive">
+        {persona_id === "new" && (<div> This conversation will not be saved. Please connect to your account to save your conversations. </div> )}
+      </div>
     </div>
   );
 }
