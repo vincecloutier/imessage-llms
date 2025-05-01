@@ -41,9 +41,9 @@ export interface FieldSchema {
   label: string;
   description?: string;
   type: "text" | "number" | "email" | "tel" | "calendar" | "enum" | "city";
-  required: boolean;
   options?: string[];
-  rowId?: string;
+  required: boolean;
+  rowId: string;
 }
 
 export interface GenericFormProps {
@@ -265,16 +265,12 @@ export default function GenericForm({
   };
 
   const getFieldGroups = (fieldsToGroup: FieldSchema[]) => {
-    const defaultFields = fieldsToGroup.filter(f => !f.rowId);
-    const rowGroups = fieldsToGroup
-      .filter(f => f.rowId)
-      .reduce((groups, field) => {
+    return fieldsToGroup.reduce((groups, field) => {
         if (!field.rowId) return groups;
         if (!groups[field.rowId]) groups[field.rowId] = [];
         groups[field.rowId].push(field);
         return groups;
       }, {} as Record<string, FieldSchema[]>);
-    return { defaultFields, rowGroups };
   };
 
   const noWhitespaceOnly = (value: string) => {
@@ -366,8 +362,8 @@ export default function GenericForm({
     }
   }
 
-  const { defaultFields, rowGroups } = getFieldGroups(fields);
-
+  const rowGroups = getFieldGroups(fields);
+  
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
@@ -376,21 +372,13 @@ export default function GenericForm({
       <DialogContent className="sm:max-w-[60%] md:max-w-[50%] lg:max-w-[40%] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{formTitle}</DialogTitle>
-          {formDescription && (
-            <DialogDescription>{formDescription}</DialogDescription>
-          )}
+          {formDescription && (<DialogDescription>{formDescription}</DialogDescription>)}
         </DialogHeader>
-        
-        {fields && fields.length > 0 ? (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4 pt-4">
               {Object.entries(rowGroups).map(([rowId, groupedFields]) => {                
                 return (
-                  <div key={rowId} className={`grid gap-4`} style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`,
-                    gap: '1rem'
-                  }}>
+                  <div key={rowId} className={`grid gap-4`} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
                     {groupedFields.map((field) => (
                       <FormField
                         key={field.name}
@@ -414,36 +402,12 @@ export default function GenericForm({
                   </div>
                 );
               })}
-          
-              {defaultFields.map((field) => (
-                <FormField
-                  key={field.name}
-                  control={form.control}
-                  name={field.name}
-                  rules={getValidationRules(field)}
-                  render={({ field: ctrl }) => (
-                    <FormItem>
-                      <FormLabel>{field.label}</FormLabel>
-                      <FormControl>
-                        {renderFormField(field, ctrl)}
-                      </FormControl>
-                      {field.description && (
-                        <FormDescription>{field.description}</FormDescription>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
             </form>
             <DialogFooter>
               {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
               <Button type="submit" form="generic-dialog-form" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
             </DialogFooter>
-          </Form>
-        ) : (
-           <p className="py-4">No form fields configured.</p>
-        )}
+        </Form>
       </DialogContent>
     </Dialog>
   );
