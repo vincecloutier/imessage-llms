@@ -6,14 +6,11 @@ import React, { useMemo, useEffect, useState, useCallback } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 import { searchCity } from "@/lib/actions";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 const deepEqual = (obj1: any, obj2: any): boolean => {
   if (obj1 === obj2) return true;
@@ -58,10 +55,12 @@ export interface GenericFormProps {
     attributes: Record<string, any>;
     sender_address?: string | null;
   }) => Promise<any>;
-  showSignOutButton?: boolean;
-  triggerLabel?: string;
+  destructiveButton?: React.ReactNode;
   formTitle: string;
   formDescription: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  forceAnswer?: boolean;
 }
 
 interface CityFieldProps {
@@ -131,21 +130,13 @@ export default function GenericForm({
   startingValues,
   fields,
   saveAction,
-  showSignOutButton = false,
-  triggerLabel = "Open Form",
+  destructiveButton,
   formTitle,
-  formDescription
-}: GenericFormProps) {
-  const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  async function signOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push('/');
-    router.refresh();
-  }
-  
+  formDescription,
+  open,
+  onOpenChange,
+  forceAnswer = false
+}: GenericFormProps) {  
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
     const allFields = fields;
@@ -193,9 +184,9 @@ export default function GenericForm({
       form.reset(currentValues); 
       setFormHasChanges(false);
       setSaveSuccessful(false);
-      setIsDialogOpen(false); 
+      onOpenChange(false);
     }
-  }, [saveSuccessful, currentValues, form]);
+  }, [saveSuccessful, currentValues, form, onOpenChange]);
   
   useEffect(() => {
     if (!isSubmitting) {
@@ -351,25 +342,36 @@ export default function GenericForm({
     return rules;
   };
 
-  const handleOpenChange = (open: boolean) => {
-    setIsDialogOpen(open);
-    if (!open) {
-      setIsDialogOpen(false);
-    } else {
+  const handleOpenChange = (newOpenState: boolean) => {
+    if (forceAnswer && !newOpenState) {
+      return; 
+    }
+    if (newOpenState && !open) { 
+      form.reset(initialValues);
+      setLastSavedValues(initialValues);
+      setFormHasChanges(false);
+    } 
+    onOpenChange(newOpenState);
+  }
+  
+  useEffect(() => {
+    if (open) {
       form.reset(initialValues);
       setLastSavedValues(initialValues);
       setFormHasChanges(false);
     }
-  }
+  }, [initialValues, open, form]);
 
   const rowGroups = getFieldGroups(fields);
-  
+
   return (
-    <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline">{triggerLabel}</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[60%] md:max-w-[50%] lg:max-w-[40%] max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent 
+        className="sm:max-w-[60%] md:max-w-[50%] lg:max-w-[40%] max-h-[90vh] overflow-y-auto"
+        showCloseButton={!forceAnswer}
+        onEscapeKeyDown={(e) => {if (forceAnswer) e.preventDefault();}}
+        onPointerDownOutside={(e) => {if (forceAnswer) e.preventDefault();}}
+      >
         <DialogHeader>
           <DialogTitle>{formTitle}</DialogTitle>
           {formDescription && (<DialogDescription>{formDescription}</DialogDescription>)}
@@ -404,8 +406,10 @@ export default function GenericForm({
               })}
             </form>
             <DialogFooter>
-              {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
-              <Button type="submit" form="generic-dialog-form" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
+            <div className="flex justify-between w-full">
+            {destructiveButton}
+            <Button type="submit" form="generic-dialog-form" disabled={!formHasChanges || isSubmitting}>Save</Button>
+          </div>
             </DialogFooter>
         </Form>
       </DialogContent>
