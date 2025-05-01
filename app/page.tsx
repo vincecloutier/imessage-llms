@@ -1,5 +1,6 @@
 import { Chat } from '@/components/custom/chat-main';
 import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -8,6 +9,7 @@ export default async function Home() {
     user = (await supabase.auth.signInAnonymously()).data.user;
   }
   if (!user) return null;
+  if (!user.is_anonymous) redirect('/chat');
 
   return (
     <Chat
