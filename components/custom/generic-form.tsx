@@ -6,10 +6,10 @@ import React, { useMemo, useEffect, useState, useCallback } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 import { searchCity } from "@/lib/actions";
 import { useRouter } from "next/navigation";
@@ -43,22 +43,7 @@ export interface FieldSchema {
   type: "text" | "number" | "email" | "tel" | "calendar" | "enum" | "city";
   required: boolean;
   options?: string[];
-  rowId?: string; // Fields with the same rowId will be rendered in the same row
-  columnSpan?: number; // How many columns this field should span (default: 1)
-}
-
-export interface RowLayout {
-  id: string;
-  columns: number; // Number of equal columns in this row
-}
-
-export interface PageSchema {
-  key: string;
-  label: string;
-  description?: string;
-  fields: FieldSchema[];
-  rowLayouts?: RowLayout[]; // Define rows and their column counts
-  tabKey?: string; // Optional tab this page belongs to
+  rowId?: string;
 }
 
 export interface GenericFormProps {
@@ -67,17 +52,18 @@ export interface GenericFormProps {
     attributes?: Record<string, any>;
     sender_address?: string | null;
   };
-  pages: PageSchema[];
+  fields: FieldSchema[];
   saveAction: (payload: {
     id?: string;
     attributes: Record<string, any>;
     sender_address?: string | null;
   }) => Promise<any>;
-  useTabs?: boolean; // Whether to use tabs or not
-  showSignOutButton?: boolean; // Show sign out button if true
+  showSignOutButton?: boolean;
+  triggerLabel?: string;
+  formTitle: string;
+  formDescription: string;
 }
 
-// --- New: CityField component ---
 interface CityFieldProps {
   value: any;
   onChange: (val: any) => void;
@@ -140,10 +126,18 @@ const CityField: React.FC<CityFieldProps> = ({ value, onChange }) => {
     </div>
   );
 };
-// --- End CityField ---
 
-export default function GenericForm({startingValues, pages, saveAction, useTabs = true, showSignOutButton = false}: GenericFormProps) {
+export default function GenericForm({
+  startingValues,
+  fields,
+  saveAction,
+  showSignOutButton = false,
+  triggerLabel = "Open Form",
+  formTitle,
+  formDescription
+}: GenericFormProps) {
   const router = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   async function signOut() {
     const supabase = createClient();
@@ -152,10 +146,9 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
     router.refresh();
   }
   
-  // build initial form values across all pages
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
-    const allFields = pages.flatMap((p) => p.fields);
+    const allFields = fields;
     const initialData = allFields.reduce((acc, field) => {
       let value = attrs[field.name] ?? "";
       if (field.type === "number") value = Number(value) || 0;
@@ -165,7 +158,6 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         value = attrs[field.name] ? new Date(attrs[field.name]) : eighteenYearsAgo;
       }
       if (field.type === "city") {
-        // Reconstruct city object from flattened fields
         value = {
           name: attrs["location"] || "",
           lat: attrs["latitude"],
@@ -176,14 +168,12 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
       acc[field.name] = value;
       return acc;
     }, {} as Record<string, any>);
-    // add sender_address if it exists
     if (startingValues?.sender_address !== undefined) {
       initialData.sender_address = startingValues.sender_address;
     }
     return initialData;
-  }, [pages, startingValues]);
+  }, [fields, startingValues]);
 
-  // Track the last saved values for comparison after submit
   const [lastSavedValues, setLastSavedValues] = useState(initialValues);
 
   const form = useForm({
@@ -191,27 +181,22 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
     mode: "onChange",
   });
 
-  // Track if form has changes
   const [formHasChanges, setFormHasChanges] = useState(false);
-  // Track form submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveSuccessful, setSaveSuccessful] = useState(false);
   
-  // Watch for form changes
   const currentValues = form.watch();
   
-  // Reset form state after successful save
   useEffect(() => {
     if (saveSuccessful) {
-      // Update our reference values to match the current values
       setLastSavedValues(currentValues);
-      form.reset(currentValues);
+      form.reset(currentValues); 
       setFormHasChanges(false);
       setSaveSuccessful(false);
+      setIsDialogOpen(false); 
     }
   }, [saveSuccessful, currentValues, form]);
   
-  // Detect form changes - compare with lastSavedValues instead of initialValues
   useEffect(() => {
     if (!isSubmitting) {
       const isEqual = deepEqual(lastSavedValues, currentValues);
@@ -222,23 +207,18 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
   const onSubmit = async (data: Record<string, any>) => {
     try {
       setIsSubmitting(true);
-      
-      // Convert all Date objects to YYYY-MM-DD format
       const formattedData = {...data};
       
-      // Find calendar fields
-      const calendarFields = pages.flatMap(p => p.fields).filter(f => f.type === "calendar").map(f => f.name);
+      const allFields = fields;
       
-      // Format calendar dates to YYYY-MM-DD
+      const calendarFields = allFields.filter(f => f.type === "calendar").map(f => f.name);
       calendarFields.forEach(fieldName => {
         if (formattedData[fieldName] instanceof Date) {
           formattedData[fieldName] = formattedData[fieldName].toISOString().slice(0, 10);
         }
       });
       
-      // Find and flatten all city fields
-      const cityFields = pages.flatMap(p => p.fields).filter(f => f.type === "city").map(f => f.name);
-      
+      const cityFields = allFields.filter(f => f.type === "city").map(f => f.name);
       cityFields.forEach(fieldName => {
         const cityData = formattedData[fieldName];
         if (cityData && typeof cityData === 'object' && cityData.name) {
@@ -246,10 +226,16 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
           formattedData[`longitude`] = cityData.lon;
           formattedData[`timezone`] = cityData.timezone;
           formattedData[`location`] = cityData.name;
+          delete formattedData[fieldName];
+        } else {
+          formattedData[`latitude`] = null;
+          formattedData[`longitude`] = null;
+          formattedData[`timezone`] = null;
+          formattedData[`location`] = null;
+          delete formattedData[fieldName];
         }
       });
       
-      // Extract sender_address if it exists
       const { sender_address, ...attributes } = formattedData;
       
       const payload = {
@@ -258,20 +244,18 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         sender_address: sender_address ?? null,
       };
       
+      let saveWasSuccessful = false;
       toast.promise(
         saveAction(payload)
           .then((result) => {
-            setSaveSuccessful(true);
+            saveWasSuccessful = true; 
+            setSaveSuccessful(true); 
             return result;
           })
           .finally(() => {
             setIsSubmitting(false);
           }),
-        {
-          loading: 'Saving changes...',
-          success: 'Changes saved successfully',
-          error: 'Failed to save changes'
-        }
+        { loading: 'Saving changes...', success: 'Changes saved successfully', error: 'Failed to save changes' }
       );
     } catch (error) {
       setIsSubmitting(false);
@@ -280,31 +264,9 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
     }
   };
 
-  // Group pages by tab for optional tab rendering
-  const pagesByTab = useMemo(() => {
-    if (!useTabs) {
-      return { noTab: pages };
-    }
-    
-    return pages.reduce((acc, page) => {
-      const tabKey = page.tabKey || page.key;
-      if (!acc[tabKey]) acc[tabKey] = [];
-      acc[tabKey].push(page);
-      return acc;
-    }, {} as Record<string, PageSchema[]>);
-  }, [pages, useTabs]);
-
-  // Get tabs from the grouped pages
-  const tabs = useMemo(() => Object.keys(pagesByTab), [pagesByTab]);
-  const defaultTab = tabs[0] || 'noTab';
-
-  // Group fields by rowId for each page
-  const getFieldGroups = (fields: FieldSchema[], rowLayouts?: RowLayout[]) => {
-    // Fields without rowId will go in their own individual rows
-    const defaultFields = fields.filter(f => !f.rowId);
-    
-    // Group fields that share rowIds
-    const rowGroups = fields
+  const getFieldGroups = (fieldsToGroup: FieldSchema[]) => {
+    const defaultFields = fieldsToGroup.filter(f => !f.rowId);
+    const rowGroups = fieldsToGroup
       .filter(f => f.rowId)
       .reduce((groups, field) => {
         if (!field.rowId) return groups;
@@ -312,8 +274,7 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         groups[field.rowId].push(field);
         return groups;
       }, {} as Record<string, FieldSchema[]>);
-    
-    return { defaultFields, rowGroups, rowLayouts };
+    return { defaultFields, rowGroups };
   };
 
   const noWhitespaceOnly = (value: string) => {
@@ -321,7 +282,6 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
     return value.trim() !== '' || 'Input cannot be whitespace only';
   };
 
-  // The field renderer with location support
   const renderFormField = (field: FieldSchema, ctrl: any) => {
     switch (field.type) {
       case "text": 
@@ -341,21 +301,12 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
         );
       case "enum": 
         return (
-          <Select
-            value={ctrl.value}
-            onValueChange={ctrl.onChange}
-          >
+          <Select value={ctrl.value} onValueChange={ctrl.onChange}>
             <SelectTrigger>
-              <SelectValue
-                placeholder={`Select ${field.label}`}
-              />
+              <SelectValue placeholder={`Select ${field.label}`}/>
             </SelectTrigger>
             <SelectContent>
-              {field.options?.map((opt) => (
-                <SelectItem key={opt} value={opt}>
-                  {opt}
-                </SelectItem>
-              ))}
+              {field.options?.map((opt) => (<SelectItem key={opt} value={opt}>{opt}</SelectItem>))}
             </SelectContent>
           </Select>
         );
@@ -365,7 +316,6 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
     }
   };
 
-  // Get validation rules based on field type
   const getValidationRules = (field: FieldSchema) => {
     const rules: any = { required: field.required ? 'This field is required' : false };
     
@@ -405,115 +355,96 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
     return rules;
   };
 
-  const renderPageContent = (page: PageSchema) => {
-    const { defaultFields, rowGroups, rowLayouts } = getFieldGroups(page.fields, page.rowLayouts);
-    
-    return (
-      <Card key={page.key} className="mb-4">
-        <CardHeader>
-          <CardTitle>{page.label}</CardTitle>
-          {page.description && (
-            <CardDescription>{page.description}</CardDescription>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Object.entries(rowGroups).map(([rowId, fields]) => {
-            const rowLayout = rowLayouts?.find(r => r.id === rowId);
-            const columns = rowLayout?.columns || fields.length;
-            
-            return (
-              <div key={rowId} className={`grid gap-4`} style={{ 
-                display: 'grid', 
-                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                gap: '1rem'
-              }}>
-                {fields.map((field) => (
-                  <FormField
-                    key={field.name}
-                    control={form.control}
-                    name={field.name}
-                    rules={getValidationRules(field)}
-                    render={({ field: ctrl }) => (
-                      <FormItem style={{ 
-                        gridColumn: field.columnSpan ? `span ${field.columnSpan}` : 'span 1'
-                      }}>
-                        <FormLabel>{field.label}</FormLabel>
-                        <FormControl>
-                          {renderFormField(field, ctrl)}
-                        </FormControl>
-                        {field.description && (
-                          <FormDescription>{field.description}</FormDescription>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ))}
-              </div>
-            );
-          })}
-          
-          {defaultFields.map((field) => (
-            <FormField
-              key={field.name}
-              control={form.control}
-              name={field.name}
-              rules={getValidationRules(field)}
-              render={({ field: ctrl }) => (
-                <FormItem>
-                  <FormLabel>{field.label}</FormLabel>
-                  <FormControl>
-                    {renderFormField(field, ctrl)}
-                  </FormControl>
-                  {field.description && (
-                    <FormDescription>{field.description}</FormDescription>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-        </CardContent>
-      </Card>
-    );
-  };
+  const handleOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setIsDialogOpen(false);
+    } else {
+      form.reset(initialValues);
+      setLastSavedValues(initialValues);
+      setFormHasChanges(false);
+    }
+  }
+
+  const { defaultFields, rowGroups } = getFieldGroups(fields);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        {useTabs && tabs.length > 1 ? (
-          <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className={`grid w-full grid-cols-${Math.min(tabs.length, 4)}`}>
-              {tabs.map((tabKey) => {
-                const firstPage = pagesByTab[tabKey][0];
+    <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline">{triggerLabel}</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[60%] md:max-w-[50%] lg:max-w-[40%] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{formTitle}</DialogTitle>
+          {formDescription && (
+            <DialogDescription>{formDescription}</DialogDescription>
+          )}
+        </DialogHeader>
+        
+        {fields && fields.length > 0 ? (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4 pt-4">
+              {Object.entries(rowGroups).map(([rowId, groupedFields]) => {                
                 return (
-                  <TabsTrigger key={tabKey} value={tabKey}>
-                    {firstPage.tabKey ? tabKey : firstPage.label}
-                  </TabsTrigger>
+                  <div key={rowId} className={`grid gap-4`} style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`,
+                    gap: '1rem'
+                  }}>
+                    {groupedFields.map((field) => (
+                      <FormField
+                        key={field.name}
+                        control={form.control}
+                        name={field.name}
+                        rules={getValidationRules(field)}
+                        render={({ field: ctrl }) => (
+                          <FormItem style={{ gridColumn: 'span 1'}}>
+                            <FormLabel>{field.label}</FormLabel>
+                            <FormControl>
+                              {renderFormField(field, ctrl)}
+                            </FormControl>
+                            {field.description && (
+                              <FormDescription>{field.description}</FormDescription>
+                            )}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
                 );
               })}
-            </TabsList>
-            
-            {tabs.map((tabKey) => (
-              <TabsContent key={tabKey} value={tabKey}>
-                {pagesByTab[tabKey].map(renderPageContent)}
-                <div className="mt-4 flex justify-between gap-2">
-                  {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
-                  <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        ) : (
-          <>
-            {pages.map(renderPageContent)}
-            <div className="mt-4 flex justify-between gap-2">
+          
+              {defaultFields.map((field) => (
+                <FormField
+                  key={field.name}
+                  control={form.control}
+                  name={field.name}
+                  rules={getValidationRules(field)}
+                  render={({ field: ctrl }) => (
+                    <FormItem>
+                      <FormLabel>{field.label}</FormLabel>
+                      <FormControl>
+                        {renderFormField(field, ctrl)}
+                      </FormControl>
+                      {field.description && (
+                        <FormDescription>{field.description}</FormDescription>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </form>
+            <DialogFooter>
               {showSignOutButton && <Button variant="outline" type="button" onClick={signOut}>Sign Out</Button>}
-              <Button type="submit" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
-            </div>
-          </>
+              <Button type="submit" form="generic-dialog-form" disabled={!formHasChanges || isSubmitting}>Save Changes</Button>
+            </DialogFooter>
+          </Form>
+        ) : (
+           <p className="py-4">No form fields configured.</p>
         )}
-      </form>
-    </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
