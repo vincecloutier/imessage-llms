@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import React, { useMemo, useEffect, useState} from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -76,6 +76,71 @@ export interface GenericFormProps {
   useTabs?: boolean; // Whether to use tabs or not
   showSignOutButton?: boolean; // Show sign out button if true
 }
+
+// --- New: CityField component ---
+interface CityFieldProps {
+  value: any;
+  onChange: (val: any) => void;
+}
+
+const CityField: React.FC<CityFieldProps> = ({ value, onChange }) => {
+  const [cityInputText, setCityInputText] = useState(value?.name || "");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleCitySearch = useCallback(async () => {
+    if (cityInputText.length < 3) {
+      setErrorMessage("Please enter at least 3 characters");
+      return;
+    }
+    setIsSearching(true);
+    setErrorMessage("Searching...");
+    try {
+      const result = await searchCity(cityInputText);
+      if (result && !result.error) {
+        onChange(result);
+        setCityInputText(result.name || "");
+        setErrorMessage("");
+      } else {
+        setErrorMessage(result.error || "No matching location found");
+        onChange(null);
+      }
+    } catch (error) {
+      setErrorMessage("Error searching for city. Please try again.");
+      onChange(null);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [cityInputText, onChange]);
+
+  useEffect(() => {
+    if (value && value.name) setCityInputText(value.name);
+  }, [value]);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2">
+        <Input
+          type="text"
+          value={cityInputText}
+          onChange={e => setCityInputText(e.target.value)}
+          placeholder="Enter city name"
+          onKeyDown={e => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleCitySearch();
+            }
+          }}
+        />
+        <Button type="button" onClick={handleCitySearch} disabled={isSearching}>
+          Search
+        </Button>
+      </div>
+      {errorMessage && <p className="text-sm">{errorMessage}</p>}
+    </div>
+  );
+};
+// --- End CityField ---
 
 export default function GenericForm({startingValues, pages, saveAction, useTabs = true, showSignOutButton = false}: GenericFormProps) {
   const router = useRouter();
@@ -295,75 +360,7 @@ export default function GenericForm({startingValues, pages, saveAction, useTabs 
           </Select>
         );
       case "city":
-        // Store input text separately from the actual city value
-        const [cityInputText, setCityInputText] = useState("");
-        const [errorMessage, setErrorMessage] = useState("");
-        const [isSearching, setIsSearching] = useState(false);
-        
-        const handleCitySearch = async () => {
-          if (cityInputText.length < 3) {
-            setErrorMessage("Please enter at least 3 characters");
-            return;
-          }
-          
-          setIsSearching(true);
-          setErrorMessage("Searching...");
-          
-          try {
-            // Call the server action
-            const result = await searchCity(cityInputText);
-            
-            if (result && !result.error) {
-              ctrl.onChange(result);
-              setCityInputText(result.name || '');
-              setErrorMessage("");
-            } else {
-              setErrorMessage(result.error || "No matching location found");
-              ctrl.onChange(null);
-            }
-          } catch (error) {
-            console.error("City search error:", error);
-            setErrorMessage("Error searching for city. Please try again.");
-            ctrl.onChange(null);
-          } finally {
-            setIsSearching(false);
-          }
-        };
-        
-        // Initialize input field with existing value
-        useEffect(() => {
-          if (ctrl.value && ctrl.value.name) {
-            setCityInputText(ctrl.value.name);
-          }
-        }, []);
-        
-        return (
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                value={cityInputText}
-                onChange={(e) => setCityInputText(e.target.value)}
-                placeholder="Enter city name"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleCitySearch();
-                  }
-                }}
-              />
-              <Button 
-                type="button"
-                onClick={handleCitySearch}
-                disabled={isSearching}
-              >
-                Search
-              </Button>
-
-            </div>
-            {errorMessage && <p className="text-sm">{errorMessage}</p>}
-          </div>
-        );
+        return <CityField value={ctrl.value} onChange={ctrl.onChange} />;
       default: return <Input {...ctrl} />;
     }
   };
