@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { Chat } from '@/components/custom/chat-main';
 import { getCachedUser, getCachedUserPersonas, getCachedUserProfile } from '@/lib/data';
 import { AppHeader } from '@/components/custom/app-header';
@@ -7,24 +7,20 @@ import { createClient } from '@/lib/supabase/server';
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
+  // check user is logged in
   const user = await getCachedUser();
   if (!user || user.is_anonymous) redirect('/');
 
+  // check user has a profile
   const profile = await getCachedUserProfile(user.id);
+  if (!profile) return null;
 
-  if (!profile) {
-    return <div className="flex h-dvh items-center justify-center">Please complete your profile first.</div>;
-  }
-
+  // check user has personas
   const personas = await getCachedUserPersonas(user.id);
-
-  if (!personas || personas.length === 0) { return <div className="flex h-dvh items-center justify-center">Please create a persona first.</div>;}
-
-  // Find the specific persona for this chat page
-  // Handle the 'new' case if you intend to support it via URL directly
+  if (!personas || personas.length === 0) return null;
   const persona = personas.find((p) => p.id === id) || personas[0];
 
-  // Fetch messages specifically for this persona - this is unique to the page
+  // load messages for the persona
   const supabase = await createClient();
   const { data: messages } = await supabase
       .from('messages')
@@ -33,7 +29,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       .eq('user_id', user.id)
       .order('created_at', { ascending: true })
       .limit(20);
-
 
   return (
     <>
