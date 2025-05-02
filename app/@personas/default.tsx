@@ -20,7 +20,7 @@ export default async function DefaultPersonas() {
       <SidebarGroupLabel>Personas</SidebarGroupLabel>
       <SidebarMenu>
         <PersonaForm persona={null} />
-        {personas.length === 0 && (<div className="px-2 py-1 text-xs text-sidebar-foreground/50">Please create a persona first!</div>)}
+        {personas.length === 0 && (<div className="px-2 py-1 text-xs text-sidebar-foreground/50">Please create a persona by clicking the plus button above.</div>)}
         {personas.map((persona) => {
           return (
             <SidebarMenuItem key={persona.id}>
