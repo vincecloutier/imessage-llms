@@ -34,7 +34,6 @@ export function Chat({ user_id, persona_id, initialMessages, persona_name, user,
 
   return (
     <div className="h-dvh flex flex-col transition-colors duration-200 ease-in-out" {...handlers}>
-      <AppHeader personaName={persona_name} user={user} profile={profile} />
       <AnimatePresence>
         {isDraggingOver && (
           <motion.div 
