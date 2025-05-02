@@ -210,24 +210,27 @@ export default function GenericForm({
       });
       
       const cityFields = allFields.filter(f => f.type === "city").map(f => f.name);
+      const locationAttrs: Record<string, any> = {};
+
       cityFields.forEach(fieldName => {
         const cityData = formattedData[fieldName];
-        if (cityData && typeof cityData === 'object' && cityData.name) {
-          formattedData[`latitude`] = cityData.lat;
-          formattedData[`longitude`] = cityData.lon;
-          formattedData[`timezone`] = cityData.timezone;
-          formattedData[`location`] = cityData.name;
-          delete formattedData[fieldName];
+        if (cityData && typeof cityData === 'object' && cityData.name && cityData.lat !== undefined && cityData.lon !== undefined && cityData.timezone) {
+          locationAttrs[`latitude`] = cityData.lat;
+          locationAttrs[`longitude`] = cityData.lon;
+          locationAttrs[`timezone`] = cityData.timezone;
+          locationAttrs[`location`] = cityData.name;
         } else {
-          formattedData[`latitude`] = null;
-          formattedData[`longitude`] = null;
-          formattedData[`timezone`] = null;
-          formattedData[`location`] = null;
-          delete formattedData[fieldName];
+          locationAttrs[`latitude`] = null;
+          locationAttrs[`longitude`] = null;
+          locationAttrs[`timezone`] = null;
+          locationAttrs[`location`] = null;
         }
+        delete formattedData[fieldName];
       });
       
-      const { sender_address, ...attributes } = formattedData;
+      const finalFormattedData = { ...formattedData, ...locationAttrs };
+      
+      const { sender_address, ...attributes } = finalFormattedData;
       
       const payload = {
         id: startingValues?.id,
@@ -235,11 +238,9 @@ export default function GenericForm({
         sender_address: sender_address ?? null,
       };
       
-      let saveWasSuccessful = false;
       toast.promise(
         saveAction(payload)
           .then((result) => {
-            saveWasSuccessful = true; 
             setSaveSuccessful(true); 
             return result;
           })
