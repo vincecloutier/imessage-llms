@@ -2,7 +2,6 @@ import { redirect, notFound } from 'next/navigation';
 
 import { createClient } from '@/lib/supabase/server';
 import { Chat } from '@/components/custom/chat-main';
-import { AppHeader, SignInDialog } from '@/components/custom/app-header';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -14,14 +13,5 @@ export default async function Home() {
   // if there is still no user, give up
   if (!user) return notFound();
 
-  return (
-    <>  
-      <AppHeader title="Chat" subtitle="April" button={<SignInDialog/>} />
-      <Chat
-        user_id={user.id}
-        persona_id="new"
-        initialMessages={[]}
-      />
-    </>
-  );
+  return <Chat user_id={user.id} persona_id="new" initialMessages={[]} />;
 }
