@@ -11,17 +11,8 @@ export default async function Home() {
   // if there is still no user, give up
   if (!user) return notFound();
 
-  return (
-    <>
-    <AppHeader personaName={"April (Unsaved Persona"} user={user} profile={null} />
-    <Chat 
-      user_id={user.id} 
-      persona_id="new" 
-      initialMessages={[]} 
-      persona_name="April (Unsaved Persona)" 
-      user={user} 
-      profile={null} 
-    />
-    </>
-  );
+  // create dummy persona
+  const persona = {id: 'new', attributes: {name: 'April (Unsaved Persona)'}, sender_address: ''}
+
+  return <Chat user={user} persona={persona} profile={null} initialMessages={[]}/>
 }

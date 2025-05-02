@@ -5,7 +5,7 @@ import './globals.css';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { ThemeProvider } from '@/components/custom/theme-provider';
 import { NavSecondary } from '@/components/custom/sidebar-secondary';
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),

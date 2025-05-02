@@ -26,7 +26,7 @@ const personaFields: FieldSchema[] = [
   { name: 'gender', label: 'Gender', description: 'What gender is this persona?', rowId: 'b2', type: 'enum', required: true, options: ['Male', 'Female', 'Other'] },
 ];
 
-export function PersonaForm({persona}: {persona: Persona | null}) {
+export function PersonaForm({persona, freshProfile = false}: {persona: Persona | null, freshProfile?: boolean}) {
   const router = useRouter();
   
   const [editingPersonaId, setEditingPersonaId] = useState<string | null>(null);
@@ -81,8 +81,9 @@ export function PersonaForm({persona}: {persona: Persona | null}) {
           fields={personaFields}
           startingValues={{attributes: { name: 'New Persona' }, sender_address: null}}
           saveAction={handleSaveNewPersona}
-          open={editingPersonaId === 'new'}
+          open={editingPersonaId === 'new' || freshProfile}
           onOpenChange={handleNewPersonaOpenChange}
+          forceAnswer={freshProfile}
         />
       </>
     )

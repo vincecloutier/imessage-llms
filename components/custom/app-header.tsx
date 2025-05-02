@@ -1,8 +1,7 @@
 "use client"
 
 import { toast } from "sonner"
-import { useState, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -11,21 +10,12 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { signIn, signOut } from "@/lib/supabase/client";
-import { UserRound } from "lucide-react";
-import GenericForm, { FieldSchema } from "@/components/custom/generic-form";
-import { saveProfile } from "@/lib/actions"
-import { Profile } from "@/lib/types";
+import { signIn, } from "@/lib/supabase/client";
+import { Profile, Persona } from "@/lib/types";
 import { User } from "@supabase/supabase-js";
+import { ProfileForm } from "@/components/custom/profile-form";
 
-const profileFields: FieldSchema[] = [ 
-  { name: 'name', label: 'Name', rowId: 'a1', type: 'text', required: true },
-  { name: 'birthday', label: 'Birthday', rowId: 'a2', type: 'calendar', required: true },
-  { name: 'telephone', label: 'Telephone', rowId: 'a3', type: 'tel', required: true },
-  { name: 'location', label: 'Location', rowId: 'a4', type: 'city', required: true },
-]
-
-export function AppHeader({personaName, user, profile}: {personaName: string, user: User, profile: Profile | null}) {
+export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   return (
     <header className="relative top-0 left-0 right-0 flex h-16 shrink-0 items-center justify-between gap-2 px-4">
         <div className="flex items-center gap-2">
@@ -36,14 +26,14 @@ export function AppHeader({personaName, user, profile}: {personaName: string, us
                 <BreadcrumbItem className="hidden md:block">Chat</BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>{personaName}</BreadcrumbPage>
+                    <BreadcrumbPage>{(persona.attributes.name || 'April (Unsaved Persona)').toString()}</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
         </div>
         <div>
           {user.is_anonymous && <SignInDialog/>}
-          {!user.is_anonymous && <UserProfile user={user} profile={profile}/>}
+          {!user.is_anonymous && <ProfileForm user={user} profile={profile}/>}
         </div>
     </header>
   );
@@ -101,47 +91,5 @@ export function SignInDialog() {
       </form>
     </DialogContent>
     </Dialog>
-  )
-}
-
-export function UserProfile({user, profile}: {user: User, profile: Profile | null}) {
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
-  async function handleSignOut() {
-    await signOut();
-    setOpen(false);
-    router.push('/');
-    router.refresh();
-  }
-
-  const handleSaveProfile = async (payload: any) => {
-    const result = await saveProfile(payload);
-    setOpen(false);
-    if (result.success && result.data) {
-      toast.success("Profile saved!");
-    } else {
-      toast.error(result.error || "Failed to save profile.");
-    }
-    return result;
-  };
-
-  const defaultValues = useMemo(() => (profile || { id: user?.id, attributes: {}, sender_address: "" }
-  ), [profile, user]);
-
-  return (
-    <>
-      <Button variant="ghost" className="h-7 w-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>
-      <GenericForm
-        formTitle={"User Profile"}
-        formDescription="Update the details of your profile to ensure your personas are personalized to you."
-        fields={profileFields}
-        startingValues={defaultValues}
-        saveAction={handleSaveProfile}
-        open={open}
-        onOpenChange={setOpen}
-        destructiveButton={<Button variant="outline" onClick={handleSignOut}>Sign Out</Button>}
-        forceAnswer={!profile}
-      />
-    </>
   )
 }

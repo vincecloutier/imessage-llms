@@ -30,17 +30,5 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       .order('created_at', { ascending: true })
       .limit(20);
 
-  return (
-    <>
-    <AppHeader personaName={(persona.attributes.name || 'Unnamed Persona').toString()} user={user} profile={profile} />
-    <Chat
-      user_id={user.id}
-      persona_id={persona.id}
-      persona_name={(persona.attributes.name || 'Unnamed Persona').toString()}
-      initialMessages={messages || []}
-      user={user}
-      profile={profile}
-    />
-    </>
-  );
+  return <Chat user={user} persona={persona} profile={profile} initialMessages={messages || []}/>
 }
