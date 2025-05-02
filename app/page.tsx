@@ -1,14 +1,11 @@
 import { redirect, notFound } from 'next/navigation';
-
-import { createClient } from '@/lib/supabase/server';
+import { getCachedUser } from '@/lib/data'; // Use cached functions
 import { Chat } from '@/components/custom/chat-main';
 import { AppHeader } from '@/components/custom/app-header';
 
 export default async function Home() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
-  // if user is signed in, redirect to chat
   if (user && !user.is_anonymous) redirect('/chat/0');
 
   // if there is still no user, give up
