@@ -38,7 +38,7 @@ export async function deletePersona(id: string) {
   'use server';
   const { supabase, user } = await getSupabaseUser();
   const { error } = await supabase.from('personas').delete().eq('id', id).eq('user_id', user.id);
-  if (error) throw new Error(error.message);
+  if (error) return { success: false, error: error.message };
   return { success: true };
 }
 
