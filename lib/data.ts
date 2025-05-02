@@ -10,6 +10,7 @@ export const getCachedUser = cache(async () => {
     console.error("Error fetching user:", error.message);
     return null;
   }
+  console.log("User fetched successfully");
   return user;
 });
 
@@ -26,6 +27,7 @@ export const getCachedUserPersonas = cache(async (userId: string): Promise<Perso
         console.error('Error fetching personas:', error);
         return [];
     }
+    console.log("Personas fetched successfully:", personas);
     return personas || [];
 });
 
@@ -44,5 +46,6 @@ export const getCachedUserProfile = cache(async (userId: string) => {
         console.error('Error fetching profile:', error);
         return null;
     }
+    console.log("Profile fetched successfully:", profile);
     return profile;
 }); 
