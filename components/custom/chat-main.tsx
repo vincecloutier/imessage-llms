@@ -11,8 +11,10 @@ import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 
 import { AppHeader } from '@/components/custom/app-header';
 import { DisplayMessage, TypingMessage, ChatInput } from '@/components/custom/chat-parts';
+import {User} from '@supabase/supabase-js';
+import {Profile} from '@/lib/types';
 
-export function Chat({ user_id, persona_id, initialMessages }: { user_id: string; persona_id: string; initialMessages: Message[]; }) {
+export function Chat({ user_id, persona_id, initialMessages, persona_name, user, profile }: { user_id: string; persona_id: string; initialMessages: Message[]; persona_name: string; user: User; profile: Profile | null }) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,7 +34,7 @@ export function Chat({ user_id, persona_id, initialMessages }: { user_id: string
 
   return (
     <div className="h-dvh flex flex-col transition-colors duration-200 ease-in-out" {...handlers}>
-      <AppHeader />
+      <AppHeader personaName={persona_name} user={user} profile={profile} />
       <AnimatePresence>
         {isDraggingOver && (
           <motion.div 

@@ -1,7 +1,7 @@
 "use client"
 
 import { toast } from "sonner"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 
 import { Input } from "@/components/ui/input"
@@ -25,25 +25,28 @@ const profileFields: FieldSchema[] = [
   { name: 'location', label: 'Location', rowId: 'a4', type: 'city', required: true },
 ]
 
-export function AppHeader({title, subtitle, button}: {title: string, subtitle: string, button: React.ReactNode})  {
-    return (
-        <header className="relative top-0 left-0 right-0 flex h-16 shrink-0 items-center justify-between gap-2 px-4">
-            <div className="flex items-center gap-2">
-            <SidebarTrigger/>   
-            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem className="hidden md:block">{title}</BreadcrumbItem>
-                    <BreadcrumbSeparator className="hidden md:block" />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>{subtitle}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-            </div>
-            {button}
-        </header>
-    )
+export function AppHeader({personaName, user, profile}: {personaName: string, user: User, profile: Profile | null}) {
+  return (
+    <header className="relative top-0 left-0 right-0 flex h-16 shrink-0 items-center justify-between gap-2 px-4">
+        <div className="flex items-center gap-2">
+        <SidebarTrigger/>
+        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+        <Breadcrumb>
+            <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">Chat</BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                    <BreadcrumbPage>{personaName}</BreadcrumbPage>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+        </div>
+        <div>
+          {user.is_anonymous && <SignInDialog/>}
+          {!user.is_anonymous && <UserProfile user={user} profile={profile}/>}
+        </div>
+    </header>
+  );
 }
 
 export function SignInDialog() {
@@ -61,17 +64,11 @@ export function SignInDialog() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     try {
       const formData = new FormData(event.currentTarget);
       const email = formData.get('email') as string;
-      
-      if (rememberEmail) {
-        localStorage.setItem('rememberedEmail', email);
-      } else {
-        localStorage.removeItem('rememberedEmail');
-      }
-      
+      if (rememberEmail) localStorage.setItem('rememberedEmail', email);
+      else localStorage.removeItem('rememberedEmail');
       await signIn(email);
       setOpen(false);
       toast.success('Sign in link sent to email');
@@ -107,26 +104,39 @@ export function SignInDialog() {
   )
 }
 
-
 export function UserProfile({user, profile}: {user: User, profile: Profile | null}) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   async function handleSignOut() {
     await signOut();
+    setOpen(false);
     router.push('/');
     router.refresh();
-    setOpen(false);
   }
 
-  return (  
+  const handleSaveProfile = async (payload: any) => {
+    const result = await saveProfile(payload);
+    setOpen(false);
+    if (result.success && result.data) {
+      toast.success("Profile saved!");
+    } else {
+      toast.error(result.error || "Failed to save profile.");
+    }
+    return result;
+  };
+
+  const defaultValues = useMemo(() => (profile || { id: user?.id, attributes: {}, sender_address: "" }
+  ), [profile, user]);
+
+  return (
     <>
-      <Button variant="ghost" className="h-7 w-7" onClick={() => setOpen(true)}><UserRound size={16}/></Button>
+      <Button variant="ghost" className="h-7 w-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>
       <GenericForm
-        formTitle="Edit Profile"
-        formDescription="Update the details for your profile. Please note your location will only be used to provide your personas with localized time, weather, and search results."
+        formTitle={"User Profile"}
+        formDescription="Update the details of your profile to ensure your personas are personalized to you."
         fields={profileFields}
-        startingValues={profile || {id: user.id, attributes: {},  sender_address: ""}}
-        saveAction={saveProfile}
+        startingValues={defaultValues}
+        saveAction={handleSaveProfile}
         open={open}
         onOpenChange={setOpen}
         destructiveButton={<Button variant="outline" onClick={handleSignOut}>Sign Out</Button>}

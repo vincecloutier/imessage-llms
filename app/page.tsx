@@ -13,5 +13,14 @@ export default async function Home() {
   // if there is still no user, give up
   if (!user) return notFound();
 
-  return <Chat user_id={user.id} persona_id="new" initialMessages={[]} />;
+  return (
+    <Chat 
+      user_id={user.id} 
+      persona_id="new" 
+      initialMessages={[]} 
+      persona_name="April (Unsaved Persona)" 
+      user={user} 
+      profile={null} 
+    />
+  );
 }
