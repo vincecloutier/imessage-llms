@@ -12,7 +12,7 @@ import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 import { AppHeader } from '@/components/custom/app-header';
 import { DisplayMessage, TypingMessage, ChatInput } from '@/components/custom/chat-parts';
 
-export function Chat({ user_id, persona_id, persona_name, initialMessages }: { user_id: string; persona_id: string; persona_name: string; initialMessages: Message[];}) {
+export function Chat({ user_id, persona_id, initialMessages }: { user_id: string; persona_id: string; initialMessages: Message[]; }) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -20,7 +20,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
   const { attachmentFile, setAttachmentFile, handleFileAdded, handleFileRemoved } = useFileHandler(textareaRef);
   
   // Custom hooks for handling messages and API calls
-  const { messages, isResponding, input, setInput, sendMessage } = useChatMessages({ initialMessages, user_id, persona_id });
+  const { messages, isResponding, input, setInput, sendMessage } = useChatMessages({ user_id, persona_id, initialMessages });
   
   // Now use the file input hook with the handlers from useFileHandler
   const { isDraggingOver, handlers } = useFileInput(textareaRef, setInput, handleFileAdded, attachmentFile);
@@ -32,7 +32,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
 
   return (
     <div className="h-dvh flex flex-col transition-colors duration-200 ease-in-out" {...handlers}>
-      <AppHeader title="Chat" subtitle={persona_name} isAnonymous={persona_id === "new"} />
+      <AppHeader />
       <AnimatePresence>
         {isDraggingOver && (
           <motion.div 
@@ -63,7 +63,7 @@ export function Chat({ user_id, persona_id, persona_name, initialMessages }: { u
         />
       </div>
 
-      <div className="text-xs text-center text-destructive">
+      <div className="text-xs text-center text-destructive px-4 pb-4">
         {persona_id === "new" && (<div> This conversation will not be saved. Please connect to your account to save your conversations. </div> )}
       </div>
     </div>
