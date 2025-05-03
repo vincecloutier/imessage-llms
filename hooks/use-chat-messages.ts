@@ -38,8 +38,8 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
   const sendMessage = async (content: string, attachmentFile: File | null, setAttachmentFile: (file: File | null) => void) => {
     const trimmedContent = content.trim();
     
-    if (!trimmedContent && !attachmentFile) { toast.error('Please enter a message or add an attachment.'); return; }
-    if (trimmedContent.length > 500) { toast.error('Message cannot exceed 500 characters.'); return; }
+    if (!trimmedContent && !attachmentFile) { toast.error('Please enter a message or add an attachment.'); setInput(''); return; }
+    if (trimmedContent.length > 250) { toast.error('Message cannot exceed 250 characters.'); setInput(''); return; }
     if (isResponding) { toast.error('Please wait for the previous response to complete.'); return; }
     
     setIsResponding(true);
