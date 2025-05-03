@@ -91,6 +91,7 @@ export async function searchLocation(query: string) {
   const data = await response.json();
   const tzlookup = require("@photostructure/tz-lookup");
   const firstCity = data[0];
+  if (!firstCity) {return { error: 'No matching location found' };}
   return {
     name: firstCity.canonical_name.replace(/,/g, ', '),
     lat: firstCity.gps[1],
