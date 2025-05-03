@@ -378,7 +378,7 @@ export default function GenericForm({
           {formDescription && (<DialogDescription>{formDescription}</DialogDescription>)}
         </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4 pt-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4">
               {Object.entries(rowGroups).map(([rowId, groupedFields]) => {                
                 return (
                   <div key={rowId} className={`grid gap-4`} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
@@ -407,10 +407,10 @@ export default function GenericForm({
               })}
             </form>
             <DialogFooter>
-            <div className="flex justify-between w-full">
-            {destructiveButton}
-            <Button type="submit" form="generic-dialog-form" disabled={!formHasChanges || isSubmitting}>Save</Button>
-          </div>
+            <div className={`flex w-full gap-2 ${destructiveButton ? 'justify-between' : 'justify-end'}`}>
+              {destructiveButton}
+              <Button type="submit" form="generic-dialog-form" disabled={!formHasChanges || isSubmitting}>Save</Button>
+            </div>
             </DialogFooter>
         </Form>
       </DialogContent>
