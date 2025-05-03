@@ -13,8 +13,8 @@ import { saveProfile } from "@/lib/actions";
 const profileFields: FieldSchema[] = [ 
     { name: 'name', label: 'Name', rowId: 'a1', type: 'text' },
     { name: 'birthday', label: 'Birthday', rowId: 'a2', type: 'calendar' },
-    { name: 'sender_address', label: 'Sender Address', description: 'The phone number or email address you use for sending iMessages.', rowId: 'a3', type: 'text' },
     { name: 'location', label: 'Location', rowId: 'a4', type: 'location' },
+    { name: 'sender_address', label: 'iMessage Address', description: 'This phone number or email address you use for sending iMessages.', rowId: 'a3', type: 'text' },
   ]
 
 export function ProfileForm({user, profile}: {user: User, profile: Profile | null}) {
@@ -33,8 +33,8 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
       <>
         {profile && (<Button variant="ghost" className="h-7 w-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>)}
         <GenericForm
-          formTitle={"User Profile"}
-          formDescription="Update the details of your profile to ensure your personas are personalized to you."
+          formTitle={"Profile"}
+          formDescription="Your profile is used to personalize your personas."
           fields={profileFields}
           startingValues={defaultValues}
           saveAction={saveProfile}
