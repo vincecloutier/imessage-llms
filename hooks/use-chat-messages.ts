@@ -9,7 +9,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
   const initialPromptSent = useRef(false);
 
   useEffect(() => {
-    if (initialMessages.length === 0 && messages.length === 0 && !initialPromptSent.current && !isResponding) {
+    if (initialMessages.length === 0 && messages.length === 0 && !initialPromptSent.current && !isResponding && persona_id === 'new') {
       const sendInitialPrompt = async () => {
         setIsResponding(true);
         initialPromptSent.current = true;
