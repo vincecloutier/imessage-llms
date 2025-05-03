@@ -76,7 +76,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
   }, [input, isResponding, handleSubmit, textareaRef]);
 
   return (
-     <div className="sticky bottom-4 w-full max-w-3xl mx-auto">          
+    <div className="w-full max-w-3xl mx-auto pointer-events-auto">
           {attachmentFile && (
           <div className="px-4">
             <ImagePreview
@@ -86,7 +86,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
             />
           </div>
         )}
-      <div className="mx-4 border rounded-full bg-background/50 backdrop-blur-sm border-input/50 overflow-hidden"> 
+      <div className="border rounded-full bg-background/50 backdrop-blur-sm border-input/50 overflow-hidden"> 
         <div className="flex items-center w-full px-4 py-2">
           <button
             onClick={() => fileInputRef.current?.click()}
