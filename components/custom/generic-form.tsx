@@ -12,6 +12,7 @@ import { LocationField, } from "@/components/ui/location-input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export interface FieldSchema {
   name: string;
@@ -110,6 +111,7 @@ export interface GenericFormProps {
 }
 
 export default function GenericForm({startingValues, fields, saveAction, destructiveButton, formTitle, formDescription, open, onOpenChange, forceAnswer = false}: GenericFormProps) {
+  const router = useRouter();
   const [saveSuccessful, setSaveSuccessful] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -175,6 +177,8 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
         .finally(() => {setIsSaving(false);}),
       { loading: 'Saving changes...', success: 'Changes saved successfully', error: (err) => `Failed to save changes: ${err.message || 'Unknown error'}`}
     );
+    router.push('/chat/0');
+    router.refresh();
   };
 
   const getFieldGroups = (fieldsToGroup: FieldSchema[]) => {

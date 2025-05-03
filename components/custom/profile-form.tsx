@@ -27,16 +27,6 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
       router.refresh();
     }
   
-    const handleSaveProfile = async (payload: any) => {
-      const result = await saveProfile(payload);
-      setOpen(false);
-      if (!profile) {
-        router.push('/chat/0');
-        router.refresh();
-      }
-      return result;
-    };
-  
     const defaultValues = useMemo(() => (profile || { id: user?.id, attributes: {}, sender_address: "" }), [profile, user]);
   
     return (
@@ -47,7 +37,7 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
           formDescription="Update the details of your profile to ensure your personas are personalized to you."
           fields={profileFields}
           startingValues={defaultValues}
-          saveAction={handleSaveProfile}
+          saveAction={saveProfile}
           open={open || !profile}
           onOpenChange={setOpen}
           destructiveButton={<Button variant="outline" onClick={handleSignOut}>Sign Out</Button>}
