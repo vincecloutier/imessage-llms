@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import React, { useMemo, useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { cn } from "@/lib/utils";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -223,10 +224,11 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
 
   const { isDirty, isValid } = form.formState;
 
+  const dialogWidthClass = (fields.length <= 5) ? "sm:max-w-md" : "sm:max-w-[60%] md:max-w-[50%] lg:max-w-[40%]";
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="sm:max-w-[60%] md:max-w-[50%] lg:max-w-[40%] max-h-[90vh] overflow-y-auto"
+        className={cn("max-h-[90vh] overflow-y-auto", dialogWidthClass)}
         showCloseButton={!forceAnswer}
         onEscapeKeyDown={(e) => { if (forceAnswer) e.preventDefault(); }}
         onPointerDownOutside={(e) => { if (forceAnswer) e.preventDefault(); }}
