@@ -31,7 +31,7 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
       const result = await saveProfile(payload);
       setOpen(false);
       if (!profile) {
-        router.push('/');
+        router.push('/chat/0');
         router.refresh();
       }
       return result;
