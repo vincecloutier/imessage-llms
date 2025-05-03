@@ -27,12 +27,14 @@ export const DisplayMessage = ({message}: {message: Message}) => {
           />
         </div>
       )}
+      {message.content && (
       <div className={cx(
         'flex flex-col gap-2 px-4 py-3 rounded-2xl max-w-[75%]',
         message.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'mr-auto bg-secondary text-secondary-foreground'
-      )}>
-        {message.content}
-      </div>
+        )}>
+          {message.content}
+        </div>
+      )}
     </div>
   );
 };
