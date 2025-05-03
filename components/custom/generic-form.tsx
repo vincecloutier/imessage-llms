@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import React, { useMemo, useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import isEqual from 'lodash-es/isEqual';
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -111,10 +110,11 @@ export interface GenericFormProps {
 }
 
 export default function GenericForm({startingValues, fields, saveAction, destructiveButton, formTitle, formDescription, open, onOpenChange, forceAnswer = false}: GenericFormProps) {
-  
+  const [saveSuccessful, setSaveSuccessful] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   const formSchema = useMemo(() => generateTransformedSchema(fields), [fields]);
   type FormInputValues = z.input<typeof formSchema>;
-  type FormOutputValues = z.output<typeof formSchema>;
 
   const initialValues = useMemo(() => {
     const attrs = startingValues?.attributes ?? {};
@@ -149,49 +149,32 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
     return initialData as FormInputValues;
   }, [fields, startingValues]);
 
-  const [lastSavedValues, setLastSavedValues] = useState(initialValues);
-
   const form = useForm<FormInputValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialValues,
     mode: "onChange",
   });
 
-  const [formHasChanges, setFormHasChanges] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [saveSuccessful, setSaveSuccessful] = useState(false);
-
-  const currentValues = form.watch();
-
   useEffect(() => {
     if (saveSuccessful) {
-      setLastSavedValues(currentValues);
-      form.reset(currentValues);
-      setFormHasChanges(false);
+      const savedData = form.getValues();
+      form.reset(savedData);
       setSaveSuccessful(false);
       onOpenChange(false);
     }
-  }, [saveSuccessful, currentValues, form, onOpenChange]);
+  }, [saveSuccessful, form, onOpenChange]);
 
-  useEffect(() => {
-    if (!isSubmitting) {
-      const changed = JSON.stringify(lastSavedValues) !== JSON.stringify(currentValues);
-      setFormHasChanges(changed);
-    }
-  }, [currentValues, lastSavedValues, isSubmitting]);
+  useEffect(() => {if (open) {form.reset(initialValues);}}, [open, initialValues, form]);
 
-  const onSubmit = async (data: FormOutputValues) => {
-    try {
-      setIsSubmitting(true);
-      toast.promise(
-        saveAction({id: startingValues?.id, ...data}).then((result) => {setSaveSuccessful(true); return result;}).finally(() => {setIsSubmitting(false);}),
-        { loading: 'Saving changes...', success: 'Changes saved successfully', error: 'Failed to save changes' }
-      );
-    } catch (error) {
-      setIsSubmitting(false);
-      console.error(`Error submitting form:`, error);
-      toast.error("Failed to save changes");
-    }
+  const onSubmit = async (data: any) => {
+    setIsSaving(true);
+    await toast.promise(
+      saveAction({ id: startingValues?.id, ...data })
+        .then((result) => {setSaveSuccessful(true); return result; })
+        .catch((err) => {console.error(`Error saving form:`, err); throw err;})
+        .finally(() => {setIsSaving(false);}),
+      { loading: 'Saving changes...', success: 'Changes saved successfully', error: (err) => `Failed to save changes: ${err.message || 'Unknown error'}`}
+    );
   };
 
   const getFieldGroups = (fieldsToGroup: FieldSchema[]) => {
@@ -229,23 +212,12 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
 
   const handleOpenChange = (newOpenState: boolean) => {
     if (forceAnswer && !newOpenState) { return; }
-    if (newOpenState && !open) {
-      form.reset(initialValues);
-      setLastSavedValues(initialValues);
-      setFormHasChanges(false);
-    }
     onOpenChange(newOpenState);
   };
 
-  useEffect(() => {
-    if (open) {
-        form.reset(initialValues);
-        setLastSavedValues(initialValues);
-        setFormHasChanges(false);
-    }
-  }, [initialValues, open, form]);
-
   const rowGroups = getFieldGroups(fields);
+
+  const { isDirty, isValid } = form.formState;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -260,7 +232,7 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
           {formDescription && (<DialogDescription>{formDescription}</DialogDescription>)}
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit as any)} id="generic-dialog-form" className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4">
              {Object.entries(rowGroups).map(([rowId, groupedFields]) => (
                <div key={rowId} className={`grid gap-4`} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
                   {groupedFields.map((field) => (
@@ -286,7 +258,7 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
           <DialogFooter>
              <div className={`flex w-full gap-2 ${destructiveButton ? 'justify-between' : 'justify-end'}`}>
                 {destructiveButton}
-                <Button type="submit" form="generic-dialog-form" disabled={!formHasChanges || isSubmitting || !form.formState.isValid}>Save</Button>
+                <Button type="submit" form="generic-dialog-form" disabled={!isDirty || isSaving || !isValid}> {isSaving ? 'Saving...' : 'Save'}</Button>
             </div>
           </DialogFooter>
         </Form>
