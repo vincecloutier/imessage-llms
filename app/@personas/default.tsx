@@ -1,7 +1,7 @@
 import { getCachedUser,getCachedUserPersonas, getCachedUserProfile } from '@/lib/data';
 import Link from 'next/link';
-import { Plus, UserRound} from 'lucide-react';
-import { SidebarGroup, SidebarGroupAction, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { UserRound} from 'lucide-react';
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { PersonaForm } from '@/components/custom/persona-form';
 import { ProfileForm } from '@/components/custom/profile-form';
 
