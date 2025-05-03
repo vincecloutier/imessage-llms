@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 import { Chat } from '@/components/custom/chat-main';
-import { getCachedUser, getCachedUserPersonas, getCachedUserProfile } from '@/lib/data';
-import { AppHeader } from '@/components/custom/app-header';
+import { getCachedUser, getCachedPersonas, getCachedUserProfile } from '@/lib/supabase/server';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -16,19 +15,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   if (!profile) return null;
 
   // check user has personas
-  const personas = await getCachedUserPersonas(user.id);
+  const personas = await getCachedPersonas(user.id);
   if (!personas || personas.length === 0) return null;
   const persona = personas.find((p) => p.id === id) || personas[0];
 
   // load messages for the persona
   const supabase = await createClient();
-  const { data: messages } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('persona_id', persona.id)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: true })
-      .limit(20);
+  const { data: messages } = await supabase.from('messages').select('*').eq('persona_id', persona.id).eq('user_id', user.id).order('created_at', { ascending: true }).limit(20);
 
   return <Chat user={user} persona={persona} profile={profile} initialMessages={messages || []}/>
 }

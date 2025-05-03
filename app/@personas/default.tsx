@@ -1,4 +1,4 @@
-import { getCachedUser,getCachedUserPersonas, getCachedUserProfile } from '@/lib/data';
+import { getCachedUser,getCachedPersonas, getCachedUserProfile } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { UserRound} from 'lucide-react';
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
@@ -18,7 +18,7 @@ export default async function DefaultPersonas() {
   const profile = await getCachedUserProfile(user.id);
   if (!profile) return <ProfileForm user={user} profile={null} />;
 
-  const personas = await getCachedUserPersonas(user.id);
+  const personas = await getCachedPersonas(user.id);
   if (personas.length === 0) return <PersonaForm persona={null} freshProfile={true}/>;
 
   return (
