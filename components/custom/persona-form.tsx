@@ -13,16 +13,16 @@ import { SidebarGroupAction, SidebarMenuAction } from '@/components/ui/sidebar';
 
 
 const personaFields: FieldSchema[] = [
-  { name: 'name', label: 'Name', description: 'The name of the persona', rowId: 'a1', type: 'text', required: true },
-  { name: 'birthday', label: 'Birthday', description: 'The birthday of the persona', rowId: 'a1', type: 'calendar', required: true },
-  { name: 'occupation', label: 'Occupation', description: 'What do they do for a living?', rowId: 'a2', type: 'text', required: true },
-  { name: 'relationship', label: 'Relationship', description: 'Who are they to you?', rowId: 'a2', type: 'enum', required: true, options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
+  { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a1', type: 'text', required: true },
+  { name: 'occupation', label: 'Occupation', description: 'What do they do for a living?', rowId: 'a1', type: 'text', required: true },
+  { name: 'birthday', label: 'Birthday', description: 'What is their birthday?', rowId: 'a2', type: 'calendar', required: true },
   { name: 'location', label: 'Location', description: 'Where do they live?', rowId: 'a2', type: 'text', required: true },
-  { name: 'ethnicity', label: 'Ethnicity', description: 'The ethnicity of the persona', rowId: 'b1', type: 'enum', required: true, options: ['White', 'Black', 'Asian', 'Hispanic', 'Indian', 'Middle Eastern', 'Other'] },
-  { name: 'hair_length', label: 'Hair Length', description: 'What length is their hair?', rowId: 'b1', type: 'enum', required: true, options: ['Bald', 'Short', 'Medium', 'Long'] },
-  { name: 'hair_color', label: 'Hair Color', description: 'What color is their hair?', rowId: 'b1', type: 'enum', required: true, options: ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White'] },
+  { name: 'relationship', label: 'Relationship', description: 'Who are they to you?', rowId: 'a2', type: 'enum', required: true, options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
+  { name: 'ethnicity', label: 'Ethnicity', description: 'What is their ethnicity?', rowId: 'b1', type: 'enum', required: true, options: ['Caucasian', 'African American', 'Asian', 'Hispanic', 'Indian', 'Middle Eastern', 'Native American', 'Other'] },
+  { name: 'gender', label: 'Gender', description: 'What is their gender?', rowId: 'b1', type: 'enum', required: true, options: ['Male', 'Female', 'Other'] },
+  { name: 'hair_length', label: 'Hair Length', description: 'What length is their hair?', rowId: 'b2', type: 'enum', required: true, options: ['Bald', 'Short', 'Medium', 'Long'] },
+  { name: 'hair_color', label: 'Hair Color', description: 'What color is their hair?', rowId: 'b2', type: 'enum', required: true, options: ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White'] },
   { name: 'eye_color', label: 'Eye Color', description: 'What color are their eyes?', rowId: 'b2', type: 'enum', required: true, options: ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Violet', 'Other'] },
-  { name: 'gender', label: 'Gender', description: 'What gender is this persona?', rowId: 'b2', type: 'enum', required: true, options: ['Male', 'Female', 'Other'] },
 ];
 
 export function PersonaForm({persona, freshProfile = false}: {persona: Persona | null, freshProfile?: boolean}) {
@@ -77,7 +77,7 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
           formTitle="Create New Persona"
           formDescription="Define the details for a new persona."
           fields={personaFields}
-          startingValues={{attributes: { name: 'New Persona' }, sender_address: null}}
+          startingValues={{attributes: {  }, sender_address: null}}
           saveAction={handleSaveNewPersona}
           open={editingPersonaId === 'new' || freshProfile}
           onOpenChange={handleNewPersonaOpenChange}
