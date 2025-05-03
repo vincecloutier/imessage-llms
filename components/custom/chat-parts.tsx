@@ -72,7 +72,6 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
     handleSubmit();
 
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
       textareaRef.current.focus();
     }
   }, [input, isResponding, handleSubmit, textareaRef]);
@@ -88,7 +87,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
             />
           </div>
         )}
-      <div className="border rounded-full bg-background/50 backdrop-blur-sm border-input/50 overflow-hidden"> 
+      <div className="border rounded-full bg-background/50 backdrop-blur-sm border-input/50 overflow-hidden">
         <div className="flex items-center w-full px-4 py-2">
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -108,8 +107,8 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
           <textarea
             ref={textareaRef}
             value={input}
-            onChange={(event) => {setInput(event.target.value);}}
-            maxLength={300}
+            onChange={(event) => {setInput(event.target.value.replace(/\n/g, ''));}} // remove newlines
+            maxLength={250}
             className={cx(
               'flex-grow resize-none scrollbar-hide border-none focus:ring-0 focus:outline-none py-1 bg-transparent',
               'leading-tight text-sm md:text-base',
@@ -128,9 +127,9 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
             onClick={submit}
             disabled={isResponding || (input.trim().length === 0 && !attachmentFile)}
             className={cx(
-              "flex-shrink-0 rounded-full p-2 ml-2", 
-              (isResponding || (input.trim().length === 0 && !attachmentFile)) 
-              ? "text-muted-foreground bg-muted" 
+              "flex-shrink-0 rounded-full p-2 ml-2",
+              (isResponding || (input.trim().length === 0 && !attachmentFile))
+              ? "text-muted-foreground bg-muted"
               : "text-primary-foreground bg-primary hover:bg-primary/90"
             )}
           >
