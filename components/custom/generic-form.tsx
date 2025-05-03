@@ -265,11 +265,6 @@ export default function GenericForm({
       }, {} as Record<string, FieldSchema[]>);
   };
 
-  const noWhitespaceOnly = (value: string) => {
-    if (typeof value !== 'string') return true;
-    return value.trim() !== '' || 'Input cannot be whitespace only';
-  };
-
   const renderFormField = (field: FieldSchema, ctrl: any) => {
     switch (field.type) {
       case "text": 
@@ -309,7 +304,7 @@ export default function GenericForm({
     
     if (field.type === 'text' || field.type === 'email' || field.type === 'tel') {
       rules.maxLength = { value: 50, message: 'Maximum 50 characters allowed' };
-      rules.validate = { noWhitespaceOnly };
+      rules.validate = { ...(rules.validate || {}), noWhitespaceOnly: (value: string) => value.trim() !== '' || 'Input cannot be whitespace only' };
     }
     if (field.type === 'calendar') {
       rules.validate = {
@@ -391,12 +386,10 @@ export default function GenericForm({
                         render={({ field: ctrl }) => (
                           <FormItem style={{ gridColumn: 'span 1'}}>
                             <FormLabel>{field.label}</FormLabel>
-                            <FormControl>
+                            <FormControl> 
                               {renderFormField(field, ctrl)}
                             </FormControl>
-                            {field.description && (
-                              <FormDescription>{field.description}</FormDescription>
-                            )}
+                            {field.description && (<FormDescription>{field.description}</FormDescription>)}
                             <FormMessage />
                           </FormItem>
                         )}
