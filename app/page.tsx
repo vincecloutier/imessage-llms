@@ -1,7 +1,6 @@
 import { redirect, notFound } from 'next/navigation';
-import { getCachedUser } from '@/lib/data'; // Use cached functions
+import { getCachedUser } from '@/lib/data'; 
 import { Chat } from '@/components/custom/chat-main';
-import { AppHeader } from '@/components/custom/app-header';
 
 export default async function Home() {
   const user = await getCachedUser();
