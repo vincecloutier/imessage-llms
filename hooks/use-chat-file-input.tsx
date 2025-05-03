@@ -5,6 +5,7 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   
   const handlePaste = useCallback((event: ClipboardEvent<HTMLDivElement> | ClipboardEvent) => {
+    if (!!document.querySelector('[role="dialog"][data-state="open"]')) {return;} // to prevent pasting in the textarea when a dialog is open
     const items = event.clipboardData?.items;
     if (!items) return;
     
@@ -20,6 +21,7 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
     
     const textItem = Array.from(items).find(item => item.kind === 'string' && item.type === 'text/plain');
     if (textItem) {
+      if (event.target === textareaRef.current) {return;} // to prevent double pasting in the textarea
       event.preventDefault();
       textItem.getAsString((text) => {
         setInput(prev => prev + text);
