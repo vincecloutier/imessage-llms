@@ -26,21 +26,13 @@ const personaFields: FieldSchema[] = [
 ];
 
 export function PersonaForm({persona, freshProfile = false}: {persona: Persona | null, freshProfile?: boolean}) {
-  const router = useRouter();
   
   const [editingPersonaId, setEditingPersonaId] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handlePersonaDelete = () => {
-    setEditingPersonaId(null);
-    router.push('/chat/0');
-    router.refresh();
-  };
+  const handlePersonaOpenChange = (isOpen: boolean) => {if (!isOpen) setEditingPersonaId(null);};
 
-  const handleNewPersonaOpenChange = (isOpen: boolean) => {
-    if (!isOpen) setEditingPersonaId(null);
-  };
-
-  const handleSaveNewPersona = async (payload: any) => {
+  const handleSavePersona = async (payload: any) => {
     const result = await savePersona(payload);
     setEditingPersonaId(null);
     router.push('/chat/0');
@@ -60,10 +52,10 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
             formDescription="Update the details for this persona."
             fields={personaFields}
             startingValues={persona}
-            saveAction={handleSaveNewPersona}
+            saveAction={handleSavePersona}
             open={editingPersonaId === persona.id}
-            onOpenChange={handleNewPersonaOpenChange}
-            destructiveButton={<PersonaDestructiveButton personaId={persona.id} onDelete={handlePersonaDelete} />}
+            onOpenChange={handlePersonaOpenChange}
+            destructiveButton={<PersonaDestructiveButton personaId={persona.id} setEditingPersonaId={setEditingPersonaId} />}
           />
         </>
         )
@@ -78,9 +70,9 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
           formDescription="Define the details for a new persona."
           fields={personaFields}
           startingValues={{attributes: {  }, sender_address: null}}
-          saveAction={handleSaveNewPersona}
+          saveAction={handleSavePersona}
           open={editingPersonaId === 'new' || freshProfile}
-          onOpenChange={handleNewPersonaOpenChange}
+          onOpenChange={handlePersonaOpenChange}
           forceAnswer={freshProfile}
         />
       </>
@@ -89,15 +81,16 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
 }
 
 
-export function PersonaDestructiveButton({ personaId, onDelete }: { personaId: string, onDelete: () => void }) {
+export function PersonaDestructiveButton({ personaId, setEditingPersonaId }: { personaId: string, setEditingPersonaId: (id: string | null) => void }) {
     const [isOpen, setIsOpen] = useState(false);
-
+    const router = useRouter();
     async function handleDelete() {
         setIsOpen(false);
         await deletePersona(personaId);
-        onDelete();
+        setEditingPersonaId(null);
+        router.push('/chat/0');
+        router.refresh();    
     }
-
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
