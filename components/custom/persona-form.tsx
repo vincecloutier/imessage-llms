@@ -6,7 +6,6 @@ import { deletePersona, savePersona } from '@/lib/actions';
 import GenericForm, { FieldSchema } from './generic-form';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 
 import { MoreHorizontal, Plus } from 'lucide-react';
 
@@ -43,7 +42,6 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
 
   const handleSaveNewPersona = async (payload: any) => {
     const result = await savePersona(payload);
-    toast.success("Persona created!");
     setEditingPersonaId(null);
     router.push('/chat/0');
     router.refresh();
@@ -96,9 +94,7 @@ export function PersonaDestructiveButton({ personaId, onDelete }: { personaId: s
 
     async function handleDelete() {
         setIsOpen(false);
-        toast.info("Deleting persona...");
         await deletePersona(personaId);
-        toast.success("Persona deleted.");
         onDelete();
     }
 

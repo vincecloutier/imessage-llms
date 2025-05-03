@@ -5,7 +5,6 @@ import { useState, useMemo } from "react";
 import { Profile } from "@/lib/types";
 import { signOut } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UserRound } from "lucide-react";
 import GenericForm from "./generic-form";
@@ -31,10 +30,9 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
     const handleSaveProfile = async (payload: any) => {
       const result = await saveProfile(payload);
       setOpen(false);
-      if (result.success && result.data) {
-        toast.success("Profile saved!");
-      } else {
-        toast.error(result.error || "Failed to save profile.");
+      if (!profile) {
+        router.push('/');
+        router.refresh();
       }
       return result;
     };
@@ -43,9 +41,7 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
   
     return (
       <>
-        {profile && (
-          <Button variant="ghost" className="h-7 w-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>
-        )}
+        {profile && (<Button variant="ghost" className="h-7 w-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>)}
         <GenericForm
           formTitle={"User Profile"}
           formDescription="Update the details of your profile to ensure your personas are personalized to you."
