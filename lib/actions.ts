@@ -85,26 +85,16 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
 }); 
 
 
-export async function searchCity(query: string) {
-  if (!query || query.length < 3) {
-    return { error: 'Query must be at least 3 characters' };
-  }
-  try {
-    const response = await fetch(`https://serpapi.com/locations.json?q=${encodeURIComponent(query)}&limit=1`);
-    if (!response.ok) {
-      throw new Error(`API returned ${response.status}`);
-    }
-    const data = await response.json();
-    const tzlookup = require("@photostructure/tz-lookup");
-    const firstCity = data[0];
-    return {
-      name: firstCity.canonical_name.replace(/,/g, ', '),
-      lat: firstCity.gps[1],
-      lon: firstCity.gps[0],
-      timezone: tzlookup(firstCity.gps[1], firstCity.gps[0])
-    };
-  } catch (error) {
-    console.error('Error fetching city:', error);
-    return { error: 'Failed to fetch city. Please try again with a different query.' };
-  }
+export async function searchLocation(query: string) {
+  const response = await fetch(`https://serpapi.com/locations.json?q=${encodeURIComponent(query)}&limit=1`);
+  if (!response.ok) {return { error: 'Failed to fetch city. Please try again with a different query.' };}
+  const data = await response.json();
+  const tzlookup = require("@photostructure/tz-lookup");
+  const firstCity = data[0];
+  return {
+    name: firstCity.canonical_name.replace(/,/g, ', '),
+    lat: firstCity.gps[1],
+    lon: firstCity.gps[0],
+    timezone: tzlookup(firstCity.gps[1], firstCity.gps[0])
+  };
 }

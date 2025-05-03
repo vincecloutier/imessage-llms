@@ -6,11 +6,10 @@ import React, { useMemo, useEffect, useState, useCallback } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { LocationField } from "@/components/ui/location-input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-
-import { searchCity } from "@/lib/actions";
 
 const deepEqual = (obj1: any, obj2: any): boolean => {
   if (obj1 === obj2) return true;
@@ -37,7 +36,7 @@ export interface FieldSchema {
   name: string;
   label: string;
   description?: string;
-  type: "text" | "number" | "email" | "tel" | "calendar" | "enum" | "city";
+  type: "text" | "number" | "email" | "tel" | "calendar" | "enum" | "location";
   options?: string[];
   required: boolean;
   rowId: string;
@@ -63,69 +62,6 @@ export interface GenericFormProps {
   forceAnswer?: boolean;
 }
 
-interface CityFieldProps {
-  value: any;
-  onChange: (val: any) => void;
-}
-
-const CityField: React.FC<CityFieldProps> = ({ value, onChange }) => {
-  const [cityInputText, setCityInputText] = useState(value?.name || "");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-
-  const handleCitySearch = useCallback(async () => {
-    if (cityInputText.length < 3) {
-      setErrorMessage("Please enter at least 3 characters");
-      return;
-    }
-    setIsSearching(true);
-    setErrorMessage("Searching...");
-    try {
-      const result = await searchCity(cityInputText);
-      if (result && !result.error) {
-        onChange(result);
-        setCityInputText(result.name || "");
-        setErrorMessage("");
-      } else {
-        setErrorMessage(result.error || "No matching location found");
-        onChange(null);
-      }
-    } catch (error) {
-      setErrorMessage("Error searching for city. Please try again.");
-      onChange(null);
-    } finally {
-      setIsSearching(false);
-    }
-  }, [cityInputText, onChange]);
-
-  useEffect(() => {
-    if (value && value.name) setCityInputText(value.name);
-  }, [value]);
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-2">
-        <Input
-          type="text"
-          value={cityInputText}
-          onChange={e => setCityInputText(e.target.value)}
-          placeholder="Enter city name"
-          onKeyDown={e => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleCitySearch();
-            }
-          }}
-        />
-        <Button type="button" onClick={handleCitySearch} disabled={isSearching}>
-          Search
-        </Button>
-      </div>
-      {errorMessage && <p className="text-sm">{errorMessage}</p>}
-    </div>
-  );
-};
-
 export default function GenericForm({
   startingValues,
   fields,
@@ -148,7 +84,7 @@ export default function GenericForm({
         const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
         value = attrs[field.name] ? new Date(attrs[field.name]) : eighteenYearsAgo;
       }
-      if (field.type === "city") {
+      if (field.type === "location") {
         value = {
           name: attrs["location"] || "",
           lat: attrs["latitude"],
@@ -209,16 +145,16 @@ export default function GenericForm({
         }
       });
       
-      const cityFields = allFields.filter(f => f.type === "city").map(f => f.name);
+      const locationFields = allFields.filter(f => f.type === "location").map(f => f.name);
       const locationAttrs: Record<string, any> = {};
 
-      cityFields.forEach(fieldName => {
-        const cityData = formattedData[fieldName];
-        if (cityData && typeof cityData === 'object' && cityData.name && cityData.lat !== undefined && cityData.lon !== undefined && cityData.timezone) {
-          locationAttrs[`latitude`] = cityData.lat;
-          locationAttrs[`longitude`] = cityData.lon;
-          locationAttrs[`timezone`] = cityData.timezone;
-          locationAttrs[`location`] = cityData.name;
+      locationFields.forEach(fieldName => {
+        const locationData = formattedData[fieldName];
+        if (locationData && typeof locationData === 'object' && locationData.name && locationData.lat !== undefined && locationData.lon !== undefined && locationData.timezone) {
+          locationAttrs[`latitude`] = locationData.lat;
+          locationAttrs[`longitude`] = locationData.lon;
+          locationAttrs[`timezone`] = locationData.timezone;
+          locationAttrs[`location`] = locationData.name;
         } else {
           locationAttrs[`latitude`] = null;
           locationAttrs[`longitude`] = null;
@@ -293,8 +229,8 @@ export default function GenericForm({
             </SelectContent>
           </Select>
         );
-      case "city":
-        return <CityField value={ctrl.value} onChange={ctrl.onChange} />;
+      case "location":
+        return <LocationField value={ctrl.value} onChange={ctrl.onChange} />;
       default: return <Input {...ctrl} />;
     }
   };
@@ -323,7 +259,7 @@ export default function GenericForm({
         enum: (value: string) => field.options?.includes(value) || `Invalid option: ${value}`
       };
     }
-    if (field.type === "city") {
+    if (field.type === "location") {
       rules.validate = {
         ...(rules.validate || {}),
         location: (v: any) =>
