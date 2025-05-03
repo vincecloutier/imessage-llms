@@ -1,6 +1,6 @@
 'use client';
 
-import {useRef, useEffect } from 'react';
+import {useRef, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { Message } from '@/lib/types';
@@ -14,23 +14,43 @@ import {User} from '@supabase/supabase-js';
 import {Persona, Profile} from '@/lib/types';
 import { AppHeader } from '@/components/custom/app-header';
 
+const INITIAL_INPUT_AREA_HEIGHT = 70; // approximate initial height of the input area + bottom margin
+const BOTTOM_SPACING = 16; // additional space between last message and input area to bottom-4 (1rem)
+
 export function Chat({ user, persona, profile, initialMessages }: { user: User; persona: Persona; profile: Profile | null, initialMessages: Message[] }) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement | null>(null); // ref for the input container
+  const [inputAreaHeight, setInputAreaHeight] = useState(INITIAL_INPUT_AREA_HEIGHT); // state for height
 
-  // First get the file handler which manages the core file state
+  // first get the file handler which manages the core file state
   const { attachmentFile, setAttachmentFile, handleFileAdded, handleFileRemoved } = useFileHandler(textareaRef);
   
-  // Custom hooks for handling messages and API calls
+  // custom hook for handling messages and API calls
   const { messages, isResponding, input, setInput, sendMessage } = useChatMessages({ user_id: user.id, persona_id: persona.id, initialMessages });
   
-  // Now use the file input hook with the handlers from useFileHandler
+  // now use the file input hook with the handlers from useFileHandler
   const { isDraggingOver, handlers } = useFileInput(textareaRef, setInput, handleFileAdded, attachmentFile);
   
+  // custom hook for handling keyboard focus
   useKeyboardFocus(textareaRef);
 
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages]);
+  // auto-scroll to bottom when messages change OR input area height changes
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages, inputAreaHeight]);
+  
+  // effect to observe input container height so we can dynamically adjust the padding-bottom of the message container
+  useEffect(() => {
+    const inputElement = inputContainerRef.current;
+    if (!inputElement) return;
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const height = entry.contentRect.height;
+        setInputAreaHeight(height + BOTTOM_SPACING);
+      }
+    });
+    resizeObserver.observe(inputElement);
+    return () => {resizeObserver.unobserve(inputElement);};
+  }, []);
 
   return (
     <div className="h-dvh flex flex-col relative transition-colors duration-200 ease-in-out" {...handlers}>
@@ -48,7 +68,7 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
         )}
       </AnimatePresence>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 pt-4 pb-20 min-h-0">
+      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 pt-4 min-h-0" style={{ paddingBottom: `${inputAreaHeight}px` }}>
         <div className="flex flex-col gap-4">
             {messages.map((message, index) => (<DisplayMessage key={index} message={message}/>))}
             {isResponding && <TypingMessage />}
@@ -56,7 +76,7 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
         </div>
       </div>
 
-      <div className="absolute bottom-4 left-0 right-0 px-4 z-5 pointer-events-none">
+      <div ref={inputContainerRef} className="absolute bottom-4 left-0 right-0 px-4 z-5 pointer-events-none">
            <ChatInput
             input={input}
             setInput={setInput}
