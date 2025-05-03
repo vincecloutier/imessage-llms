@@ -13,7 +13,7 @@ import { saveProfile } from "@/lib/actions";
 const profileFields: FieldSchema[] = [ 
     { name: 'name', label: 'Name', rowId: 'a1', type: 'text' },
     { name: 'birthday', label: 'Birthday', rowId: 'a2', type: 'calendar' },
-    { name: 'sender_address', label: 'Sender Address', description: 'The phone number or email address you use for sending iMessages.', rowId: 'a3', type: 'tel' },
+    { name: 'sender_address', label: 'Sender Address', description: 'The phone number or email address you use for sending iMessages.', rowId: 'a3', type: 'text' },
     { name: 'location', label: 'Location', rowId: 'a4', type: 'location' },
   ]
 
