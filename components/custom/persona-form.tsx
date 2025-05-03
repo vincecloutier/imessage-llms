@@ -16,7 +16,7 @@ const personaFields: FieldSchema[] = [
   { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a1', type: 'text' },
   { name: 'occupation', label: 'Occupation', description: 'What do they do for a living?', rowId: 'a1', type: 'text' },
   { name: 'birthday', label: 'Birthday', description: 'What is their birthday?', rowId: 'a2', type: 'calendar' },
-  { name: 'location', label: 'Location', description: 'Where do they live?', rowId: 'a2', type: 'location' },
+  { name: 'location', label: 'Location', description: 'Where do they live?', rowId: 'a2', type: 'text' },
   { name: 'relationship', label: 'Relationship', description: 'Who are they to you?', rowId: 'a2', type: 'enum', options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
   { name: 'ethnicity', label: 'Ethnicity', description: 'What is their ethnicity?', rowId: 'b1', type: 'enum', options: ['Caucasian', 'African American', 'Asian', 'Hispanic', 'Indian', 'Middle Eastern', 'Native American', 'Other'] },
   { name: 'gender', label: 'Gender', description: 'What is their gender?', rowId: 'b1', type: 'enum', options: ['Male', 'Female', 'Other'] },
