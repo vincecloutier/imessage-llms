@@ -14,7 +14,7 @@ const profileFields: FieldSchema[] = [
     { name: 'name', label: 'Name', rowId: 'a1', type: 'text' },
     { name: 'birthday', label: 'Birthday', rowId: 'a2', type: 'calendar' },
     { name: 'location', label: 'Location', rowId: 'a4', type: 'location' },
-    { name: 'sender_address', label: 'iMessage Address', description: 'This phone number or email address you use for sending iMessages.', rowId: 'a3', type: 'text' },
+    { name: 'sender_address', label: 'iMessage Address', description: 'The phone number or email address you use with iMessages.', rowId: 'a3', type: 'text' },
   ]
 
 export function ProfileForm({user, profile}: {user: User, profile: Profile | null}) {
