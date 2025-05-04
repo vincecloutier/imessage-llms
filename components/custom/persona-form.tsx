@@ -80,7 +80,7 @@ export function PersonaDestructiveButton({ personaId, setEditingPersonaId }: { p
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
-                <Button variant="outline"> <Trash2 /> Delete </Button>
+                <Button variant="outline"> Delete </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
@@ -88,8 +88,8 @@ export function PersonaDestructiveButton({ personaId, setEditingPersonaId }: { p
                     <AlertDialogDescription> This cannot be undone. This will permanently delete this persona and all associated messages, memories and images from our servers. </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
+                    <AlertDialogAction onClick={handleDelete}> Delete </AlertDialogAction>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}> <Trash2 /> Delete </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
