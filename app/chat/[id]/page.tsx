@@ -30,5 +30,5 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     .order('created_at', { ascending: false })
     .limit(20);
 
-  return <Chat user={user} persona={persona} profile={profile} initialMessages={messages || []}/>
+  return <Chat user={user} persona={persona} profile={profile} initialMessages={messages?.reverse() || []}/>
 }
