@@ -4,8 +4,9 @@ import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { SaveEntityPayload } from '@/lib/types';
 
-const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour - adjust as needed
+const SIGNED_URL_EXPIRY_SECONDS = 3600; // one hour
 
+// supabase actions //
 async function getSupabaseUser() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
@@ -60,6 +61,7 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
   return { error: null, signedUrl: storageData.signedUrl };
 }); 
 
+// non supabase actions //
 export async function searchLocation(query: string) {
   const response = await fetch(`https://serpapi.com/locations.json?q=${encodeURIComponent(query)}&limit=1`);
   if (!response.ok) {return { error: 'Failed to fetch city. Please try again with a different query.' };}
