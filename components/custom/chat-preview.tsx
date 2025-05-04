@@ -15,7 +15,7 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: {sourc
   const handlePreviewClick = () => {if (resolvedUrl && !error && !isLoading) setIsModalOpen(true);};
   const renderPreviewContent = () => {
     if (isLoading) return <Skeleton className="w-full h-full" />;
-    if (resolvedUrl) return <Image src={resolvedUrl} alt={alt} fill sizes="(max-width: 128px) 100vw, 128px" className="object-cover" onClick={handlePreviewClick}/>;
+    if (resolvedUrl) return <Image src={resolvedUrl} alt={alt} fill sizes="(max-width: 128px) 100vw, 128px" priority className="object-cover" onClick={handlePreviewClick}/>;
     return <div className="w-full h-full flex items-center justify-center bg-muted"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div>
   }
 
@@ -39,7 +39,7 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: {sourc
       {isModalOpen && resolvedUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setIsModalOpen(false)}>
           <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <Image src={resolvedUrl} alt={alt} width={1024} height={768} sizes="100vw" priority
+            <Image src={resolvedUrl} alt={alt} width={1024} height={768} sizes="100vw"
               className="block max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-md min-h-[500px]"
               onClick={(e) => {e.stopPropagation(); setIsModalOpen(false)}}
             />
