@@ -3,7 +3,7 @@ import { BookOpen, LifeBuoy, Send } from "lucide-react"
 
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 
-export function NavSecondary({...props}: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+export function SidebarSecondary({...props}: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const items = [
     { title: "Support", url: "mailto:support@aprilintelligence.com", icon: LifeBuoy },
     { title: "Feedback", url: "mailto:info@aprilintelligence.com", icon: Send },

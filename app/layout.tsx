@@ -4,7 +4,7 @@ import { Toaster } from 'sonner';
 import './globals.css';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { ThemeProvider } from '@/components/custom/theme-provider';
-import { NavSecondary } from '@/components/custom/sidebar-secondary';
+import { SidebarSecondary } from '@/components/custom/sidebar-secondary';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default async function RootLayout({children, personas}: {children: React.
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Toaster position="top-center" />
           <SidebarProvider>
-            <Sidebar variant="floating">
+            <Sidebar>
               <SidebarHeader>
                 <SidebarMenu>
                   <SidebarMenuItem>
@@ -46,7 +46,7 @@ export default async function RootLayout({children, personas}: {children: React.
               </SidebarHeader>
               <SidebarContent>
                 {personas}
-                <NavSecondary className="mt-auto" />
+                <SidebarSecondary className="mt-auto" />
               </SidebarContent>
             </Sidebar>
             <SidebarInset>
