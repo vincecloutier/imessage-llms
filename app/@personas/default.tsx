@@ -1,9 +1,10 @@
-import { getCachedUser,getCachedPersonas, getCachedUserProfile } from '@/lib/supabase/server';
 import Link from 'next/link';
+
 import { UserRound} from 'lucide-react';
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { PersonaForm } from '@/components/custom/persona-form';
 import { ProfileForm } from '@/components/custom/profile-form';
+import { getCachedUser,getCachedPersonas, getCachedUserProfile } from '@/lib/supabase/server';
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 
 export default async function DefaultPersonas() {
   const user = await getCachedUser();

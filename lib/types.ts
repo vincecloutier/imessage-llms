@@ -1,3 +1,5 @@
+export type { User } from "@supabase/supabase-js";
+
 export type Profile = {
     id: string;
     attributes: Record<string, unknown>;
@@ -21,4 +23,4 @@ export type SaveEntityPayload = {
     id?: string;
     attributes: Record<string, any>;
     sender_address?: string | null;
-  };
+}

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
+
 import { Chat } from '@/components/custom/chat-main';
-import { getCachedUser, getCachedPersonas, getCachedUserProfile } from '@/lib/supabase/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getCachedUser, getCachedPersonas, getCachedUserProfile } from '@/lib/supabase/server';
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -21,7 +21,14 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   // load messages for the persona
   const supabase = await createClient();
-  const { data: messages } = await supabase.from('messages').select('*').eq('persona_id', persona.id).eq('user_id', user.id).order('created_at', { ascending: true }).limit(20);
+  const { data: messages } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('persona_id', persona.id)
+    .eq('user_id', user.id)
+    .eq('channel', 'web')
+    .order('created_at', { ascending: true })
+    .limit(20);
 
   return <Chat user={user} persona={persona} profile={profile} initialMessages={messages || []}/>
 }

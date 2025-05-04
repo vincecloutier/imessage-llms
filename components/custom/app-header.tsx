@@ -4,16 +4,15 @@ import { toast } from "sonner"
 import { useState, useEffect } from "react"
 
 import { Input } from "@/components/ui/input"
+import { signIn } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Profile, Persona, User } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { ProfileForm } from "@/components/custom/profile-form";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { signIn, } from "@/lib/supabase/client";
-import { Profile, Persona } from "@/lib/types";
-import { User } from "@supabase/supabase-js";
-import { ProfileForm } from "@/components/custom/profile-form";
 
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   return (

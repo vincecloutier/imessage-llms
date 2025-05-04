@@ -3,16 +3,13 @@
 import {useRef, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { Message } from '@/lib/types';
 import { useFileHandler } from '@/hooks/use-file-handler';
+import { AppHeader } from '@/components/custom/app-header';
 import { useFileInput } from '@/hooks/use-chat-file-input';
 import { useChatMessages } from '@/hooks/use-chat-messages';
+import { Message, Persona, Profile, User } from '@/lib/types';
 import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
-
 import { DisplayMessage, TypingMessage, ChatInput } from '@/components/custom/chat-parts';
-import {User} from '@supabase/supabase-js';
-import {Persona, Profile} from '@/lib/types';
-import { AppHeader } from '@/components/custom/app-header';
 
 const INITIAL_INPUT_AREA_HEIGHT = 70; // approximate initial height of the input area + bottom margin
 const BOTTOM_SPACING = 16; // additional space between last message and input area to bottom-4 (1rem)

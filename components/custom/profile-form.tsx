@@ -1,14 +1,14 @@
 'use client';
-import { User } from "@supabase/supabase-js";
-import { FieldSchema } from "./generic-form";
-import { useState, useMemo } from "react"; 
-import { Profile } from "@/lib/types";
-import { signOut } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+
 import { UserRound } from "lucide-react";
-import GenericForm from "./generic-form";
+import { useState, useMemo } from "react"; 
+import { useRouter } from "next/navigation";
+
 import { saveProfile } from "@/lib/actions";
+import { Profile, User } from "@/lib/types";
+import { signOut } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import GenericForm, { FieldSchema } from "@/components/custom/generic-form";
 
 const profileFields: FieldSchema[] = [ 
     { name: 'name', label: 'Name', rowId: 'a1', type: 'text' },

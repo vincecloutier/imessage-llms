@@ -1,6 +1,7 @@
 import { redirect, notFound } from 'next/navigation';
-import { getCachedUser } from '@/lib/supabase/server'; 
+
 import { Chat } from '@/components/custom/chat-main';
+import { getCachedUser } from '@/lib/supabase/server'; 
 
 export default async function Home() {
   const user = await getCachedUser();
