@@ -49,7 +49,7 @@ export const createSignedAttachmentUrl = cache(async (filePath: string) => {
   const { data: cachedData } = await supabase.from('cached_signed_urls').select('signed_url, expires_at').eq('file_path', filePath).eq('user_id', user.id).single();
   if (cachedData?.signed_url && new Date(cachedData.expires_at) > new Date()) {return { error: null, signedUrl: cachedData.signed_url };}
 
-  // next generate new signed url and return error if it fails
+  // generate new signed url and return error if it fails
   const { data: storageData, error: storageError } = await supabase.storage.from('attachments').createSignedUrl(filePath, SIGNED_URL_EXPIRY_SECONDS);
   if (storageError || !storageData?.signedUrl) {return { error: storageError?.message || 'Failed to generate signed URL.', signedUrl: null };}
 
