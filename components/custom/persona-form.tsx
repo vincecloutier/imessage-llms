@@ -80,7 +80,7 @@ export function PersonaDestructiveButton({ personaId, setEditingPersonaId }: { p
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
-                <Button variant="outline"> Delete </Button>
+                <Button variant="destructive"> Delete </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
