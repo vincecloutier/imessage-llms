@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { fontFamily } from 'tailwindcss/defaultTheme';
 
 const config: Config = {
   darkMode: ['class'],
@@ -73,7 +74,22 @@ const config: Config = {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			}
-  		}
+  		},
+  		keyframes: {
+  			"smooth-bounce": {
+  				"0%, 100%": {
+  					transform: "none",
+  					animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
+  				},
+  				"50%": {
+  					transform: "translateY(-25%)",
+  					animationTimingFunction: "cubic-bezier(0.8, 0, 1, 1)",
+  				},
+  			},
+  		},
+  		animation: {
+  			"smooth-bounce": "smooth-bounce 1s infinite",
+  		},
   	}
   },
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],

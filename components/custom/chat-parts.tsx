@@ -29,9 +29,9 @@ export const TypingMessage = () => {
     <div className="w-full mx-auto max-w-3xl px-4 flex items-end gap-2" data-role="assistant">
       <div className="px-4 py-3 rounded-2xl bg-secondary text-secondary-foreground">
         <div className="flex gap-1">
-          <span className="animate-bounce">●</span>
-          <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>●</span>
-          <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>●</span>
+          <span className="animate-smooth-bounce">●</span>
+          <span className="animate-smooth-bounce" style={{ animationDelay: '0.2s' }}>●</span>
+          <span className="animate-smooth-bounce" style={{ animationDelay: '0.4s' }}>●</span>
         </div>
       </div>
     </div>
