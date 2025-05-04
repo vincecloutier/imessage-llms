@@ -8,30 +8,15 @@ import { Message } from '@/lib/types';
 import { ImagePreview } from '@/components/custom/chat-preview';
 
 export const DisplayMessage = ({message}: {message: Message}) => {
-  // Clean up blob URLs when component unmounts
-  useEffect(() => {
-    return () => {
-      if (message.file_path && message.file_path.startsWith('blob:')) {
-        URL.revokeObjectURL(message.file_path);
-      }
-    };
-  }, [message.file_path]);
-
   return (
     <div className="w-full mx-auto max-w-3xl px-4 flex flex-col" data-role={message.role}>
       {(message.file_path || message.attachmentFile) && (
         <div className="self-end">
-          <ImagePreview 
-            source={message.attachmentFile || message.file_path} 
-            alt={message.content || "Attachment"} 
-          />
+          <ImagePreview source={message.attachmentFile || message.file_path} alt={message.content || "Attachment"} />
         </div>
       )}
       {message.content && (
-      <div className={cx(
-        'flex flex-col gap-2 px-4 py-3 rounded-2xl max-w-[75%]',
-        message.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'mr-auto bg-secondary text-secondary-foreground'
-        )}>
+        <div className={cx('flex flex-col gap-2 px-4 py-3 rounded-2xl max-w-[75%]', message.role === 'user' ? 'ml-auto bg-primary text-primary-foreground' : 'mr-auto bg-secondary text-secondary-foreground')}>
           {message.content}
         </div>
       )}
@@ -70,29 +55,19 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
 
   const submit = useCallback(() => {
     handleSubmit();
-
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
+    if (textareaRef.current) textareaRef.current.focus();
   }, [input, isResponding, handleSubmit, textareaRef]);
 
   return (
     <div className="w-full max-w-3xl mx-auto pointer-events-auto">
-          {attachmentFile && (
-          <div className="px-4">
-            <ImagePreview
-              source={attachmentFile}
-              onDelete={handleFileRemoved}
-              alt={attachmentFile.name || "Selected image"}
-            />
-          </div>
-        )}
+      {attachmentFile && (
+        <div className="px-4">
+          <ImagePreview source={attachmentFile} onDelete={handleFileRemoved} alt={attachmentFile.name || "Selected image"} />
+        </div>
+      )}
       <div className="border rounded-full bg-background/50 backdrop-blur-sm border-input/50 overflow-hidden">
         <div className="flex items-center w-full px-4 py-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="flex-shrink-0 text-muted-foreground hover:text-foreground mr-2"
-          >
+          <button onClick={() => fileInputRef.current?.click()} className="flex-shrink-0 text-muted-foreground hover:text-foreground mr-2">
             <Paperclip size={18}/>
           </button>
 
@@ -115,12 +90,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
               'min-h-[24px] max-h-[120px]'
             )}
             rows={1}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                submit();
-              }
-            }}
+            onKeyDown={(event) => {if (event.key === 'Enter' && !event.shiftKey) event.preventDefault(); submit();}}
           />
 
           <button
