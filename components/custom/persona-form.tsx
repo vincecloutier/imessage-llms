@@ -1,16 +1,15 @@
 'use client';
-import { Persona } from '@/lib/types';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { deletePersona, savePersona } from '@/lib/actions';
-import GenericForm, { FieldSchema } from './generic-form';
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 
+import { Persona } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { deletePersona, savePersona } from '@/lib/actions';
+import GenericForm, { FieldSchema } from '@/components/custom/generic-form';
 import { SidebarGroupAction, SidebarMenuAction } from '@/components/ui/sidebar';
-
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 const personaFields: FieldSchema[] = [
   { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a1', type: 'text' },
@@ -28,37 +27,35 @@ const personaFields: FieldSchema[] = [
 export function PersonaForm({persona, freshProfile = false}: {persona: Persona | null, freshProfile?: boolean}) {
   const [editingPersonaId, setEditingPersonaId] = useState<string | null>(null);
   const handlePersonaOpenChange = (isOpen: boolean) => {if (!isOpen) setEditingPersonaId(null)};
-
   if (persona) {
     return (  
       <>
         <SidebarMenuAction onClick={() => setEditingPersonaId(persona.id)}>
-            <MoreHorizontal />
-            <span className="sr-only">More</span>
-          </SidebarMenuAction>
-            <GenericForm
-            formTitle="Edit Persona"
-            formDescription="Update the details for this persona."
-            fields={personaFields}
-            startingValues={persona}
-            saveAction={savePersona}
-            open={editingPersonaId === persona.id}
-            onOpenChange={handlePersonaOpenChange}
-            destructiveButton={<PersonaDestructiveButton personaId={persona.id} setEditingPersonaId={setEditingPersonaId} />}
-          />
-        </>
-        )
+          <MoreHorizontal/> <span className="sr-only">More</span>
+        </SidebarMenuAction>
+        <GenericForm
+          formTitle="Edit Persona"
+          formDescription="Update the details for this persona."
+          fields={personaFields}
+          startingValues={persona}
+          saveAction={savePersona}
+          open={editingPersonaId === persona.id}
+          onOpenChange={handlePersonaOpenChange}
+          destructiveButton={<PersonaDestructiveButton personaId={persona.id} setEditingPersonaId={setEditingPersonaId} />}
+        />
+      </>
+    )
   } else {  
     return (
       <>
         <SidebarGroupAction onClick={() => {setEditingPersonaId('new');}}>
-          <Plus /> <span className="sr-only">Add Persona</span>
+          <Plus/> <span className="sr-only">Add Persona</span>
         </SidebarGroupAction>
         <GenericForm
           formTitle="Create New Persona"
           formDescription="Define the details for a new persona."
           fields={personaFields}
-          startingValues={{attributes: {  }, sender_address: null}}
+          startingValues={{attributes: {}, sender_address: null}}
           saveAction={savePersona}
           open={editingPersonaId === 'new' || freshProfile}
           onOpenChange={handlePersonaOpenChange}
