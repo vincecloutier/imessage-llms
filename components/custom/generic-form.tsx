@@ -238,9 +238,9 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
           {formDescription && (<DialogDescription>{formDescription}</DialogDescription>)}
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4 pb-1.5">
              {Object.entries(rowGroups).map(([rowId, groupedFields]) => (
-               <div key={rowId} className={`grid gap-4`} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
+               <div key={rowId} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
                   {groupedFields.map((field) => (
                     <FormField
                       key={field.name}
@@ -261,13 +261,13 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
                 </div>
               ))}
           </form>
-          <DialogFooter>
-             <div className={`flex w-full gap-2 ${destructiveButton ? 'justify-between' : 'justify-end'}`}>
+        </Form>
+        <DialogFooter>
+             <div className={`flex w-full gap-4 ${destructiveButton ? 'justify-between' : 'justify-end'}`}>
                 {destructiveButton}
                 <Button type="submit" form="generic-dialog-form" disabled={!isDirty || isSaving || !isValid}> {isSaving ? 'Saving...' : 'Save'}</Button>
             </div>
-          </DialogFooter>
-        </Form>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
