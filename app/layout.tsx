@@ -24,7 +24,7 @@ export default async function RootLayout({children, personas}: {children: React.
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Toaster position="top-center" />
           <SidebarProvider>
-            <Sidebar>
+            <Sidebar variant="inset">
               <SidebarHeader>
                 <SidebarMenu>
                   <SidebarMenuItem>
