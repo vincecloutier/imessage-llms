@@ -1,8 +1,8 @@
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
 import './globals.css';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { ThemeProvider } from '@/components/custom/theme-provider';
 import { SidebarSecondary } from '@/components/custom/sidebar-secondary';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
@@ -31,9 +31,7 @@ export default async function RootLayout({children, personas}: {children: React.
                     <SidebarMenuButton size="lg" asChild>
                       <a href="/">
                         <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                          <Avatar className="h-8 w-8 rounded-lg">
-                            <AvatarImage src="/logo.svg" className="rounded-lg" />
-                          </Avatar>
+                          <Image src="/logo.svg" alt="April Intelligence" width={32} height={32} />
                         </div>
                         <div className="flex flex-col gap-0.5 leading-none">
                           <span className="font-semibold">April Intelligence</span>
