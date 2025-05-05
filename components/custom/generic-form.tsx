@@ -238,7 +238,7 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
           {formDescription && (<DialogDescription>{formDescription}</DialogDescription>)}
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4 pb-1.5">
+          <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4">
              {Object.entries(rowGroups).map(([rowId, groupedFields]) => (
                <div key={rowId} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
                   {groupedFields.map((field) => (
