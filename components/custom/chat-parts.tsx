@@ -65,7 +65,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
           <ImagePreview source={attachmentFile} onDelete={handleFileRemoved} alt={attachmentFile.name || "Selected image"} />
         </div>
       )}
-      <div className="border rounded-full bg-background border-input/50 overflow-hidden">
+      <div className="border rounded-full bg-background border-input overflow-hidden">
         <div className="flex items-center w-full px-4 py-2">
           <button onClick={() => fileInputRef.current?.click()} className="shrink-0 text-muted-foreground hover:text-foreground mr-2">
             <Paperclip size={18}/>
