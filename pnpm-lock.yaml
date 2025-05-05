@@ -21,7 +21,7 @@ importers:
         specifier: github:photostructure/tz-lookup
         version: https://codeload.github.com/photostructure/tz-lookup/tar.gz/c787ff93952955ccd801f35922894f7e26503016
       '@radix-ui/react-alert-dialog':
-        specifier: ^1.1.2
+        specifier: ^1.1.7
         version: 1.1.7(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@19.0.0-rc-45804af1-20241021(react@19.0.0-rc-45804af1-20241021))(react@19.0.0-rc-45804af1-20241021)
       '@radix-ui/react-checkbox':
         specifier: ^1.2.3
