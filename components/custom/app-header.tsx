@@ -1,6 +1,8 @@
 "use client"
 
 import { toast } from "sonner"
+import { useTheme } from "next-themes"
+import { Moon, Sun } from "lucide-react"
 import { useState, useEffect } from "react"
 
 import { Input } from "@/components/ui/input"
@@ -15,6 +17,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbS
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
+  const { theme, setTheme } = useTheme()
   return (
     <header className="relative top-0 left-0 right-0 flex h-16 shrink-0 items-center justify-between gap-2 px-4">
         <div className="flex items-center gap-2">
@@ -30,9 +33,16 @@ export function AppHeader({user, persona, profile}: {user: User, persona: Person
             </BreadcrumbList>
         </Breadcrumb>
         </div>
-        <div>
+        <div className="flex items-center gap-2"> 
+        <Button variant="ghost" className="h-7 w-7" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+            <Sun size={4} className="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon size={4} className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+          <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
           {user.is_anonymous && <SignInDialog/>}
           {!user.is_anonymous && <ProfileForm user={user} profile={profile}/>}
+
         </div>
     </header>
   );
@@ -69,7 +79,7 @@ export function SignInDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}> 
     <DialogTrigger asChild>
-        <Button className="h-7">Connect</Button>
+        <Button className="h-7 ml-2">Connect</Button>
     </DialogTrigger>
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
