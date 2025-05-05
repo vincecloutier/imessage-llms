@@ -51,8 +51,8 @@ export const LocationField: React.FC<LocationFieldProps> = ({ value, onChange })
             autoComplete="off"
           />
           <Button type="button" size="icon" variant="ghost" onClick={handleLocationSearch} disabled={isSearching}
-            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground hover:text-primary">
-            {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            className="absolute right-1 top-1/2 size-7 -translate-y-1/2 text-muted-foreground hover:text-primary">
+            {isSearching ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
           </Button>
         </div>
         {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}

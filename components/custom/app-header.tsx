@@ -34,7 +34,7 @@ export function AppHeader({user, persona, profile}: {user: User, persona: Person
         </Breadcrumb>
         </div>
         <div className="flex items-center gap-2"> 
-        <Button variant="ghost" className="h-7 w-7" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+        <Button variant="ghost" className="size-7" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             <Sun size={4} className="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon size={4} className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>

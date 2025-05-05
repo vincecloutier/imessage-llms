@@ -31,7 +31,7 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
   
     return (
       <>
-        {profile && (<Button variant="ghost" className="h-7 w-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>)}
+        {profile && (<Button variant="ghost" className="size-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>)}
         <GenericForm
           formTitle={"Profile"}
           formDescription="Your profile is used to personalize your personas."

@@ -19,17 +19,17 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: {sourc
 
   return (
     <>
-      <div className="relative inline-block group w-32 h-32">
-        <div className="border rounded-2xl overflow-hidden relative w-full h-full">
-          <div className={`w-full h-full ${resolvedUrl && !error && !isLoading ? 'cursor-pointer' : ''}`}>
+      <div className="relative inline-block group size-32">
+        <div className="border rounded-2xl overflow-hidden relative size-full">
+          <div className={`size-full ${resolvedUrl && !error && !isLoading ? 'cursor-pointer' : ''}`}>
              {renderPreviewContent()}
           </div>
           {onDelete && (
             <Button
               variant="destructive" size="icon" disabled={isLoading} aria-label="Delete image" 
-              className="absolute top-1 right-1 w-6 h-6 rounded-full opacity-80 hover:opacity-100 disabled:opacity-50" 
+              className="absolute top-1 right-1 size-6 rounded-full opacity-80 hover:opacity-100 disabled:opacity-50" 
               onClick={(e) => { e.stopPropagation(); if (onDelete) onDelete()}}>
-              <X className="h-3 w-3" />
+              <X className="size-3" />
             </Button>
           )}
         </div>
@@ -38,7 +38,7 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: {sourc
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setIsModalOpen(false)}>
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <Image src={resolvedUrl} alt={alt} width={1024} height={768} sizes="100vw"
-              className="block max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-md min-h-[500px]"
+              className="block max-w-full max-h-[90vh] size-auto object-contain rounded-md min-h-[500px]"
               onClick={(e) => {e.stopPropagation(); setIsModalOpen(false)}}
             />
           </div>
