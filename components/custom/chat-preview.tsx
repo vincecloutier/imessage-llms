@@ -2,10 +2,9 @@
 
 import Image from "next/image"
 import { useState } from "react"
-import { X, Image as ImageIcon} from "lucide-react"
+import { X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useResolvedImageUrl } from "@/hooks/use-chat-resolved-image"
 
 export function ImagePreview({ source, onDelete, alt = "Preview image" }: {source: string | null | undefined | File, onDelete?: () => void, alt?: string}) {
@@ -14,9 +13,8 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: {sourc
 
   const handlePreviewClick = () => {if (resolvedUrl && !error && !isLoading) setIsModalOpen(true);};
   const renderPreviewContent = () => {
-    if (isLoading) return <Skeleton className="w-full h-full" />;
     if (resolvedUrl) return <Image src={resolvedUrl} alt={alt} fill sizes="(max-width: 128px) 100vw, 128px" priority className="object-cover" onClick={handlePreviewClick}/>;
-    return <div className="w-full h-full flex items-center justify-center bg-muted"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div>
+    return <div className="w-full h-full animate-pulse rounded-md bg-muted" />;
   }
 
   return (
