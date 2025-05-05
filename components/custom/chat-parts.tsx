@@ -67,7 +67,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
       )}
       <div className="border rounded-full bg-background border-input/50 overflow-hidden">
         <div className="flex items-center w-full px-4 py-2">
-          <button onClick={() => fileInputRef.current?.click()} className="flex-shrink-0 text-muted-foreground hover:text-foreground mr-2">
+          <button onClick={() => fileInputRef.current?.click()} className="shrink-0 text-muted-foreground hover:text-foreground mr-2">
             <Paperclip size={18}/>
           </button>
 
@@ -85,7 +85,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
             onChange={(event) => {setInput(event.target.value.replace(/\n/g, ''));}} // remove newlines
             maxLength={250}
             className={cx(
-              'flex-grow resize-none scrollbar-hide border-none focus:ring-0 focus:outline-none py-1 bg-background',
+              'grow resize-none scrollbar-hide border-none focus:ring-0 focus:outline-hidden py-1 bg-background',
               'leading-tight text-sm md:text-base',
               'min-h-[24px] max-h-[120px]'
             )}
@@ -97,7 +97,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
             onClick={submit}
             disabled={isResponding || (input.trim().length === 0 && !attachmentFile)}
             className={cx(
-              "flex-shrink-0 rounded-full p-2 ml-2",
+              "shrink-0 rounded-full p-2 ml-2",
               (isResponding || (input.trim().length === 0 && !attachmentFile))
               ? "text-muted-foreground bg-muted"
               : "text-primary-foreground bg-primary hover:bg-primary/90"
