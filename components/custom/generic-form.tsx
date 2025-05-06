@@ -61,7 +61,16 @@ const generateBaseSchemaShape = (fields: FieldSchema[]) => {
     }
     shape[field.name] = fieldSchema;
   });
-  shape["sender_address"] = z.string().email({ message: "Invalid email or phone number format for sender address"}).or(z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format for sender address"})).nullable().optional();
+  shape["sender_address"] = z.preprocess(
+    (val) => (val === "" ? null : val),
+    z.string().email({ message: "Invalid email or phone number format for sender address"})
+      .or(z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format for sender address"}))
+      .nullable()
+      .optional()
+  );
+  shape["telegram_username"] = z.string().refine(val => val === null || val === undefined || !val.includes("@"), {
+    message: "Please enter your username without the '@'.",
+  }).nullable().optional();
   return shape;
 };
 
@@ -86,8 +95,8 @@ const generateTransformedSchema = (fields: FieldSchema[]) => {
                 delete transformedData[fieldName];
             }
         });
-        const { sender_address, ...attributes } = {...transformedData, ...locationAttrs};
-        return {attributes, sender_address: sender_address ?? null};
+        const { sender_address, telegram_username, ...attributes } = {...transformedData, ...locationAttrs};
+        return {attributes, sender_address: sender_address ?? null, telegram_username: telegram_username ?? null};
     });
 };
 
@@ -96,12 +105,14 @@ export interface GenericFormProps {
     id?: string;
     attributes?: Record<string, any>;
     sender_address?: string | null;
+    telegram_username?: string | null;
   };
   fields: FieldSchema[];
   saveAction: (payload: {
     id?: string;
     attributes: Record<string, any>;
     sender_address?: string | null;
+    telegram_username?: string | null;
   }) => Promise<any>;
   destructiveButton?: React.ReactNode;
   formTitle: string;
@@ -148,6 +159,11 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
       initialData.sender_address = startingValues.sender_address;
     } else {
       initialData.sender_address = null 
+    }
+    if (startingValues?.telegram_username !== undefined) {
+      initialData.telegram_username = startingValues.telegram_username;
+    } else {
+      initialData.telegram_username = null;
     }
     return initialData as FormInputValues;
   }, [fields, startingValues]);

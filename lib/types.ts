@@ -4,6 +4,7 @@ export type Profile = {
     id: string;
     attributes: Record<string, unknown>;
     sender_address: string;
+    telegram_username: string;
   }
   
 export type Persona = {
@@ -23,4 +24,5 @@ export type SaveEntityPayload = {
     id?: string;
     attributes: Record<string, any>;
     sender_address?: string | null;
+    telegram_username?: string | null;
 }

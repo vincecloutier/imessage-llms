@@ -18,7 +18,7 @@ async function getSupabaseUser() {
 
 export async function saveProfile(payload: SaveEntityPayload) {
   const { supabase, user } = await getSupabaseUser();
-  const profile = {id: user.id, attributes: payload.attributes, sender_address: payload.sender_address};
+  const profile = {id: user.id, attributes: payload.attributes, sender_address: payload.sender_address, telegram_username: payload.telegram_username};
   const { data, error } = await supabase.from('profiles').upsert(profile).select().single();
   if (error) throw new Error(error.message);
   return data;
