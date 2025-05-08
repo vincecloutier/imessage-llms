@@ -90,7 +90,12 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
               'min-h-[24px] max-h-[120px]'
             )}
             rows={1}
-            onKeyDown={(event) => {if (event.key === 'Enter' && !event.shiftKey) {event.preventDefault(); submit();}}}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !isResponding && (attachmentFile || (0 < input.trim().length && input.trim().length <= 250))){
+                event.preventDefault(); 
+                submit();
+              }
+            }}
           />
 
           <button

@@ -36,14 +36,8 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
   }, [initialMessages, messages, user_id, persona_id, isResponding]);
 
   const sendMessage = async (content: string, attachmentFile: File | null, setAttachmentFile: (file: File | null) => void) => {
-    const trimmedContent = content.trim();
-    
-    if (!trimmedContent && !attachmentFile) { toast.error('Please enter a message or add an attachment.'); setInput(''); return; }
-    if (trimmedContent.length > 250) { toast.error('Message cannot exceed 250 characters.'); setInput(''); return; }
-    if (isResponding) { toast.error('Please wait for the previous response to complete.'); return; }
-    
     setIsResponding(true);
-    
+    const trimmedContent = content.trim();
     const userMessage: Message = { role: 'user', content: trimmedContent };
     if (attachmentFile) {
       userMessage.attachmentFile = attachmentFile;
@@ -67,7 +61,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
       setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content}]);
     } catch (err: any) {
       console.error("Send message error:", err);
-      toast.error(`Failed to send message. Please report this issue by emailing support@aprilintelligence.com`);
+      toast.error(`Failed to send message. Please report this issue by emailing our support team.`);
     } finally {
       setIsResponding(false);
     }
