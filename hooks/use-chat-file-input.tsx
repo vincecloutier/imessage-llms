@@ -65,7 +65,7 @@ export function useFileInput(textareaRef: RefObject<HTMLTextAreaElement>, setInp
       if (imageFile) {
         handleFileAdded(imageFile);
       } else {
-        toast.info("Only image files can be dropped as attachments.");
+        toast.info("Failed to upload file.", {description: 'Only image files can be uploaded.'});
       }
       e.dataTransfer.clearData();
     }

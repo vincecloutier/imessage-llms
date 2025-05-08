@@ -70,9 +70,9 @@ export function SignInDialog() {
       else localStorage.removeItem('rememberedEmail');
       await signIn(email);
       setOpen(false);
-      toast.success('Sign in link sent to email');
+      toast.success('One time link was sent successfully.', {description: `Please check your email to sign in.`});
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error("One time link could not be sent.", {description: error.message});
     }
   }
   

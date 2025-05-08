@@ -27,7 +27,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
         setMessages([{role: 'assistant', content: result.message.content}]);
       } catch (err: any) {
         console.error("Initial prompt error:", err);
-        toast.error('Failed to start conversation. Please try refreshing.');
+        toast.error(`Failed to connect to April.`, {description: 'Please contact support if the issue persists.'});
       } finally {
         setIsResponding(false);
       }
@@ -61,7 +61,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
       setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content}]);
     } catch (err: any) {
       console.error("Send message error:", err);
-      toast.error(`Failed to send message. Please report this issue by emailing our support team.`);
+      toast.error(`Failed to connect to April.`, {description: 'Please contact support if the issue persists.'});
     } finally {
       setIsResponding(false);
     }

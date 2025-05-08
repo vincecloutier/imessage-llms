@@ -6,11 +6,11 @@ export function useFileHandler(textareaRef: RefObject<HTMLTextAreaElement>) {
 
   const handleFileAdded = useCallback((file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size exceeds 5MB limit.");
+      toast.error("Failed to upload file.", {description: 'Only files smaller than 5MB can be uploaded.'});
       return false;
     }
     if (!file.type.startsWith('image/')) {
-      toast.error("Please select an image file.");
+      toast.error("Failed to upload file.", {description: 'Only image files can be uploaded.'});
       return false;
     }
     
