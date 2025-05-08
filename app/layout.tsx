@@ -22,7 +22,7 @@ export default async function RootLayout({children, personas}: {children: React.
       <head />
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <Toaster position="top-center" />
+          <Toaster position="top-center" richColors/>
           <SidebarProvider>
             <Sidebar>
               <SidebarHeader>
