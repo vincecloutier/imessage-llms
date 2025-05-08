@@ -192,7 +192,7 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
         .then((result) => {setSaveSuccessful(true); return result; })
         .catch((err) => {console.error(`Error saving form:`, err); throw err;})
         .finally(() => {setIsSaving(false);}),
-      { loading: 'Saving changes...', success: 'Changes saved successfully', error: (err) => `Failed to save changes: ${err.message || 'Unknown error'}`}
+      { loading: 'Saving changes...', success: 'Changes saved successfully!', error: (err) => `Failed to save changes: ${err.message || 'unknown error.'}`}
     );
     router.push('/chat/0');
     router.refresh();
