@@ -72,7 +72,7 @@ export function SignInDialog() {
       setOpen(false);
       toast.success('One time link was sent successfully.', {description: `Please check your email to sign in.`});
     } catch (error: any) {
-      toast.error("One time link could not be sent.", {description: error.message});
+      toast.error("One time link could not be sent.", {description: `${error.message}.`});
     }
   }
   
