@@ -14,7 +14,7 @@ export function SidebarSecondary({...props}: React.ComponentPropsWithoutRef<type
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.title} className="text-muted-foreground">
               <SidebarMenuButton asChild size="sm">
                 <a href={item.url}>
                   <item.icon/>
