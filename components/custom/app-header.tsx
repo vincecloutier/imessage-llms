@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { signIn } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Profile, Persona, User } from "@/lib/types";
+import { User, Persona, Profile } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ProfileForm } from "@/components/custom/profile-form";
@@ -48,7 +48,7 @@ export function AppHeader({user, persona, profile}: {user: User, persona: Person
   );
 }
 
-export function SignInDialog() {
+export function SignInDialog({retry = false}: {retry?: boolean}) {
   const [email, setEmail] = useState('');
   const [rememberEmail, setRememberEmail] = useState(false);
   const [open, setOpen] = useState(false);
@@ -78,8 +78,8 @@ export function SignInDialog() {
   
   return (
     <Dialog open={open} onOpenChange={setOpen}> 
-    <DialogTrigger asChild>
-        <Button className="h-7">Connect</Button>
+    <DialogTrigger asChild> 
+    {retry ? <Button>Try Again</Button> : <Button className="h-7">Connect</Button> }
     </DialogTrigger>
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
