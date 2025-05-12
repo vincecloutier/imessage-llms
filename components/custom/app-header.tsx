@@ -19,6 +19,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   // const { theme, setTheme } = useTheme()
   return (
+    // if you do absolute, the header will allow the chat to scroll behind it
     <header className="relative top-0 left-0 right-0 flex h-16 shrink-0 items-center justify-between gap-2 px-4">
         <div className="flex items-center gap-2">
         <SidebarTrigger/>
