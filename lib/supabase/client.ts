@@ -8,7 +8,7 @@ export const createClient = () =>
 
 export async function signIn(email: string) {
   const supabase = createClient();
-  const url = (process.env.NODE_ENV === 'production') ? 'https://april-nextjs.vercel.app' : 'http://localhost:3000';
+  const url = (process.env.NODE_ENV === 'production') ? 'https://app.aprilintelligence.com' : 'http://localhost:3000';
   const { data, error } = await supabase.auth.signInWithOtp({email: email, options: {emailRedirectTo: `${url}/auth/callback`}})
   if (error) throw new Error(error.message);
   return data;
