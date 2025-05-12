@@ -19,7 +19,10 @@ export const viewport = { maximumScale: 1 };
 export default async function RootLayout({children, personas}: {children: React.ReactNode, personas: React.ReactNode}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      {/* <head>
+        <meta name="theme-color" content="#18181b" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#18181b" media="(prefers-color-scheme: dark)" />
+      </head> */}
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Toaster position="top-center" richColors/>
