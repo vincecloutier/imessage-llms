@@ -14,6 +14,13 @@ export async function signIn(email: string) {
   return data;
 }
 
+export async function verifyOTP(email: string, otp: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.verifyOtp({email: email, token: otp, type: 'email'});
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function signOut() {
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();

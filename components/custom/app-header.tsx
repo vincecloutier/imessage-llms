@@ -5,8 +5,9 @@ import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 import { useState, useEffect } from "react"
 
+import React from "react"
 import { Input } from "@/components/ui/input"
-import { signIn } from "@/lib/supabase/client";
+import { signIn, verifyOTP } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { User, Persona, Profile } from "@/lib/types";
@@ -15,7 +16,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ProfileForm } from "@/components/custom/profile-form";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
+import { useRouter } from "next/navigation";
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   // const { theme, setTheme } = useTheme()
   return (
@@ -48,10 +50,13 @@ export function AppHeader({user, persona, profile}: {user: User, persona: Person
   );
 }
 
-export function SignInDialog({retry = false}: {retry?: boolean}) {
+export function SignInDialog() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [rememberEmail, setRememberEmail] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState('');
 
   useEffect(() => {
     const savedEmail = localStorage.getItem('rememberedEmail');
@@ -61,7 +66,7 @@ export function SignInDialog({retry = false}: {retry?: boolean}) {
     }
   }, []);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleEmailSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
       const formData = new FormData(event.currentTarget);
@@ -69,36 +74,76 @@ export function SignInDialog({retry = false}: {retry?: boolean}) {
       if (rememberEmail) localStorage.setItem('rememberedEmail', email);
       else localStorage.removeItem('rememberedEmail');
       await signIn(email);
-      setOpen(false);
-      toast.success('One time link was sent successfully.', {description: `Please check your email to sign in.`});
+      setShowOTP(true);
+      toast.success('OTP sent successfully.', {description: `Please check your email for the verification code.`});
     } catch (error: any) {
-      toast.error("One time link could not be sent.", {description: `${error.message}.`});
+      toast.error("OTP could not be sent.", {description: `${error.message}${error.message.endsWith('.') ? '' : '.'}`});
+    }
+  }
+
+  async function handleOTPSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    try {
+      await verifyOTP(email, otp);
+      setOpen(false);
+      toast.success('Successfully signed in!');
+      router.push('/chat/0');
+      router.refresh();
+    } catch (error: any) {
+      toast.error("Invalid OTP.", {description: `${error.message}.`});
     }
   }
   
   return (
     <Dialog open={open} onOpenChange={setOpen}> 
-    <DialogTrigger asChild> 
-    {retry ? <Button>Try Again</Button> : <Button className="h-7">Connect</Button> }
-    </DialogTrigger>
-    <DialogContent className="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle>Connect</DialogTitle>
-        <DialogDescription>Enter your email below to receive a sign in link.</DialogDescription>
-      </DialogHeader>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@mail.com" required type="email"/>
-        <DialogFooter>
-          <div className="flex justify-between w-full">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember" checked={rememberEmail} onCheckedChange={(checked) => setRememberEmail(checked === true)}/>
-              <label htmlFor="remember" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Remember Me?</label>
+      <DialogTrigger asChild> 
+        <Button className="h-7">Connect</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Connect</DialogTitle>
+          <DialogDescription>
+            {showOTP ? "Enter the verification code sent to your email." : "Enter your email below to receive a verification code."}
+          </DialogDescription>
+        </DialogHeader>
+        {!showOTP ? (
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
+            <Input id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@mail.com" required type="email"/>
+            <DialogFooter>
+              <div className="flex justify-between w-full">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="remember" checked={rememberEmail} onCheckedChange={(checked) => setRememberEmail(checked === true)}/>
+                  <label htmlFor="remember" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Remember Me?
+                  </label>
+                </div>
+                <Button type="submit">Send Code</Button>
+              </div>
+            </DialogFooter>
+          </form>
+        ) : (
+          <form onSubmit={handleOTPSubmit} className="space-y-4">
+            <div className="flex justify-center">
+              <InputOTP maxLength={6} value={otp} onChange={(value) => setOtp(value)} containerClassName="gap-2">
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
             </div>
-            <Button type="submit">Receive Link</Button>
-          </div>
-        </DialogFooter>
-      </form>
-    </DialogContent>
+            <DialogFooter>
+              <div className="flex justify-between w-full">
+                <Button type="button" variant="ghost" onClick={() => setShowOTP(false)}>Back</Button>
+                <Button type="submit">Verify</Button>
+              </div>
+            </DialogFooter>
+          </form>
+        )}
+      </DialogContent>
     </Dialog>
-  )
+  );
 }
