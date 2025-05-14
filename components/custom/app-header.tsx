@@ -73,8 +73,8 @@ export function SignInDialog() {
       const email = formData.get('email') as string;
       if (rememberEmail) localStorage.setItem('rememberedEmail', email);
       else localStorage.removeItem('rememberedEmail');
-      await signIn(email);
       setShowOTP(true);
+      await signIn(email);
       toast.success('OTP sent successfully.', {description: `Please check your email for the verification code.`});
     } catch (error: any) {
       toast.error("OTP could not be sent.", {description: `${error.message}${error.message.endsWith('.') ? '' : '.'}`});
