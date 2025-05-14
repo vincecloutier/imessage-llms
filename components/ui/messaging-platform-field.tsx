@@ -33,10 +33,10 @@ export const MessagingPlatformField: React.FC<MessagingPlatformFieldProps> = ({ 
         </div>
         <Tooltip>
             <TooltipTrigger asChild>
-            <InfoIcon className="size-4 text-muted-foreground cursor-help" />
+                <InfoIcon className="size-4 text-muted-foreground cursor-help" />
             </TooltipTrigger>
             <TooltipContent>
-            <p>Each messaging platform can have only one active persona. A persona can be enabled for both platforms simultaneously. All personas remain accessible through the web interface regardless of platform settings.</p>
+                <p>Each messaging platform can have only one active persona but any <br></br> given persona can be enabled for multiple platforms simultaneously. <br></br> Further, all personas will remain accessible through the web interface.</p>
             </TooltipContent>
         </Tooltip>
     </div>
