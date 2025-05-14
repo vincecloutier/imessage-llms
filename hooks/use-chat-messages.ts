@@ -2,7 +2,7 @@ import { Message } from '@/lib/types';
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api/frontend' : 'https://april-python.vercel.app/api/frontend';
+const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api/responder?channel=web' : 'https://april-python.vercel.app/api/responder?channel=web';
 
 export function useChatMessages({user_id, persona_id, initialMessages}: {user_id: string; persona_id: string; initialMessages: Message[];}) {
   const [messages, setMessages] = useState<Message[]>(initialMessages || []);
