@@ -10,7 +10,8 @@ import React, { useMemo, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LocationField, } from "@/components/ui/location-input";
+import { LocationField } from "@/components/ui/location-input";
+import { MessagingPlatformField } from "@/components/ui/messaging-platform-field";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -19,7 +20,7 @@ export interface FieldSchema {
   name: string;
   label: string;
   description?: string;
-  type: "text" | "number" | "calendar" | "enum" | "location";
+  type: "text" | "number" | "calendar" | "enum" | "location" | "messaging_platform";
   options?: string[];
   rowId: string;
 }
@@ -32,6 +33,13 @@ export const LocationValueSchema = z.object({
 });
 
 export type LocationValue = z.infer<typeof LocationValueSchema>;
+
+export const MessagingPlatformValueSchema = z.object({
+  is_imessage_persona: z.boolean(),
+  is_telegram_persona: z.boolean()
+});
+
+export type MessagingPlatformValue = z.infer<typeof MessagingPlatformValueSchema>;
 
 const generateBaseSchemaShape = (fields: FieldSchema[]) => {
   const shape: Record<string, z.ZodTypeAny> = {};
@@ -55,6 +63,9 @@ const generateBaseSchemaShape = (fields: FieldSchema[]) => {
         break;
       case "location":
         fieldSchema = LocationValueSchema;
+        break;
+      case "messaging_platform":
+        fieldSchema = MessagingPlatformValueSchema;
         break;
       default:
         fieldSchema = z.any().refine(val => val !== undefined && val !== null, { message: 'This field is required' });
@@ -94,9 +105,23 @@ const generateTransformedSchema = (fields: FieldSchema[]) => {
                 }
                 delete transformedData[fieldName];
             }
+            if (field.type === 'messaging_platform') {
+                const platformData = value as MessagingPlatformValue | undefined;
+                if (platformData) {
+                    transformedData['is_imessage_persona'] = platformData.is_imessage_persona;
+                    transformedData['is_telegram_persona'] = platformData.is_telegram_persona;
+                }
+                delete transformedData[fieldName];
+            }
         });
-        const { sender_address, telegram_username, ...attributes } = {...transformedData, ...locationAttrs};
-        return {attributes, sender_address: sender_address ?? null, telegram_username: telegram_username ?? null};
+        const { sender_address, telegram_username, is_imessage_persona, is_telegram_persona, ...attributes } = {...transformedData, ...locationAttrs};
+        return {
+            attributes,
+            sender_address: sender_address ?? null,
+            telegram_username: telegram_username ?? null,
+            is_imessage_persona: is_imessage_persona ?? false,
+            is_telegram_persona: is_telegram_persona ?? false
+        };
     });
 };
 
@@ -106,6 +131,8 @@ export interface GenericFormProps {
     attributes?: Record<string, any>;
     sender_address?: string | null;
     telegram_username?: string | null;
+    is_imessage_persona?: boolean;
+    is_telegram_persona?: boolean;
   };
   fields: FieldSchema[];
   saveAction: (payload: {
@@ -113,6 +140,8 @@ export interface GenericFormProps {
     attributes: Record<string, any>;
     sender_address?: string | null;
     telegram_username?: string | null;
+    is_imessage_persona?: boolean;
+    is_telegram_persona?: boolean;
   }) => Promise<any>;
   destructiveButton?: React.ReactNode;
   formTitle: string;
@@ -150,6 +179,12 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
                  const existingLocation = attrs["location"] ? { name: attrs["location"], lat: attrs["latitude"], lon: attrs["longitude"], timezone: attrs["timezone"] } : undefined;
                  value = existingLocation ?? (isNewRecord ? undefined : { name: '', lat: 0, lon: 0, timezone: '' });
                  break;
+            case "messaging_platform":
+                value = {
+                    is_imessage_persona: startingValues?.is_imessage_persona ?? false,
+                    is_telegram_persona: startingValues?.is_telegram_persona ?? false
+                };
+                break;
             default:
                  value = value ?? (isNewRecord ? undefined : "");
         }
@@ -226,6 +261,8 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
         );
       case "location":
         return <LocationField value={ctrl.value} onChange={ctrl.onChange} />;
+      case "messaging_platform":
+        return <MessagingPlatformField value={ctrl.value} onChange={ctrl.onChange} />;
       default:
         return <Input {...ctrl} value={safeValue} />;
     }

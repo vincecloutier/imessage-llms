@@ -12,16 +12,17 @@ import { SidebarGroupAction, SidebarMenuAction } from '@/components/ui/sidebar';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 const personaFields: FieldSchema[] = [
-  { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a1', type: 'text' },
-  { name: 'occupation', label: 'Occupation', description: 'What do they do for a living?', rowId: 'a1', type: 'text' },
-  { name: 'birthday', label: 'Birthday', description: 'What is their birthday?', rowId: 'a2', type: 'calendar' },
-  { name: 'location', label: 'Location', description: 'Where do they live?', rowId: 'a2', type: 'text' },
-  { name: 'relationship', label: 'Relationship', description: 'Who are they to you?', rowId: 'a2', type: 'enum', options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
-  { name: 'ethnicity', label: 'Ethnicity', description: 'What is their ethnicity?', rowId: 'b1', type: 'enum', options: ['Caucasian', 'African American', 'Asian', 'Hispanic', 'Indian', 'Middle Eastern', 'Native American', 'Other'] },
-  { name: 'gender', label: 'Gender', description: 'What is their gender?', rowId: 'b1', type: 'enum', options: ['Male', 'Female', 'Other'] },
-  { name: 'hair_length', label: 'Hair Length', description: 'What length is their hair?', rowId: 'b2', type: 'enum', options: ['Bald', 'Short', 'Medium', 'Long'] },
-  { name: 'hair_color', label: 'Hair Color', description: 'What color is their hair?', rowId: 'b2', type: 'enum', options: ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White'] },
-  { name: 'eye_color', label: 'Eye Color', description: 'What color are their eyes?', rowId: 'b2', type: 'enum', options: ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Violet', 'Other'] },
+  { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a', type: 'text' },
+  { name: 'occupation', label: 'Occupation', description: 'What do they do for a living?', rowId: 'a', type: 'text' },
+  { name: 'birthday', label: 'Birthday', description: 'What is their birthday?', rowId: 'b', type: 'calendar' },
+  { name: 'location', label: 'Location', description: 'Where do they live?', rowId: 'b', type: 'text' },
+  { name: 'relationship', label: 'Relationship', description: 'Who are they to you?', rowId: 'b', type: 'enum', options: ['Friend', 'Girlfriend', 'Boyfriend', 'Wife', 'Husband', 'Colleague'] },
+  { name: 'ethnicity', label: 'Ethnicity', description: 'What is their ethnicity?', rowId: 'c', type: 'enum', options: ['Caucasian', 'African American', 'Asian', 'Hispanic', 'Indian', 'Middle Eastern', 'Native American', 'Other'] },
+  { name: 'gender', label: 'Gender', description: 'What is their gender?', rowId: 'c', type: 'enum', options: ['Male', 'Female', 'Other'] },
+  { name: 'hair_length', label: 'Hair Length', description: 'What length is their hair?', rowId: 'd', type: 'enum', options: ['Bald', 'Short', 'Medium', 'Long'] },
+  { name: 'hair_color', label: 'Hair Color', description: 'What color is their hair?', rowId: 'd', type: 'enum', options: ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White'] },
+  { name: 'eye_color', label: 'Eye Color', description: 'What color are their eyes?', rowId: 'd', type: 'enum', options: ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Violet', 'Other'] },
+  { name: 'messaging_platform', label: 'Messaging Platforms', description: 'What platforms can this persona use to message you?', rowId: 'e', type: 'messaging_platform' },
 ];
 
 export function PersonaForm({persona, freshProfile = false}: {persona: Persona | null, freshProfile?: boolean}) {
@@ -55,7 +56,7 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
           formTitle="Create New Persona"
           formDescription="Define the details for a new persona."
           fields={personaFields}
-          startingValues={{attributes: {}, sender_address: null}}
+          startingValues={{attributes: {}, is_imessage_persona: freshProfile, is_telegram_persona: freshProfile}}
           saveAction={savePersona}
           open={editingPersonaId === 'new' || freshProfile}
           onOpenChange={handlePersonaOpenChange}

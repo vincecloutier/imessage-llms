@@ -26,9 +26,19 @@ export async function saveProfile(payload: SaveEntityPayload) {
 
 export async function savePersona(payload: SaveEntityPayload) {
   const { supabase, user } = await getSupabaseUser();
+  console.log('payload', payload);
+  // if this persona is being set as a platform persona, unset any existing platform personas (except for the current persona)
+  if (payload.is_imessage_persona) {
+    await supabase.from('personas').update({is_imessage_persona: false}).eq('user_id', user.id)
+  }
+  
+  if (payload.is_telegram_persona) {
+    await supabase.from('personas').update({is_telegram_persona: false}).eq('user_id', user.id)
+  }
+
   const query = !!payload.id
-    ? supabase.from('personas').update({ attributes: payload.attributes, sender_address: payload.sender_address }).eq('id', payload.id).eq('user_id', user.id)
-    : supabase.from('personas').insert({ user_id: user.id, attributes: payload.attributes, sender_address: payload.sender_address });
+    ? supabase.from('personas').update({attributes: payload.attributes, is_imessage_persona: payload.is_imessage_persona, is_telegram_persona: payload.is_telegram_persona}).eq('id', payload.id).eq('user_id', user.id)
+    : supabase.from('personas').insert({user_id: user.id, attributes: payload.attributes, is_imessage_persona: payload.is_imessage_persona, is_telegram_persona: payload.is_telegram_persona});    
   const { data, error } = await query.select().single();
   if (error) throw new Error(error.message);
   return data;

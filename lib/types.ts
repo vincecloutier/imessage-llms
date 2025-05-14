@@ -5,12 +5,13 @@ export type Profile = {
     attributes: Record<string, unknown>;
     sender_address: string;
     telegram_username: string;
-  }
+}
   
 export type Persona = {
     id: string;
     attributes: Record<string, unknown>;
-    sender_address: string;
+    is_imessage_persona: boolean;
+    is_telegram_persona: boolean;
 }
 
 export type Message = {
@@ -25,4 +26,6 @@ export type SaveEntityPayload = {
     attributes: Record<string, any>;
     sender_address?: string | null;
     telegram_username?: string | null;
+    is_imessage_persona?: boolean;
+    is_telegram_persona?: boolean;
 }

@@ -12,7 +12,7 @@ export default async function Home() {
   if (!user) return notFound();
 
   // create dummy persona
-  const persona = {id: 'new', attributes: {name: 'April (Unsaved Persona)'}, sender_address: ''}
+  const persona = {id: 'new', attributes: {name: 'April (Unsaved Persona)'}, is_imessage_persona: false, is_telegram_persona: false}
 
   return <Chat user={user} persona={persona} profile={null} initialMessages={[]}/>
 }
