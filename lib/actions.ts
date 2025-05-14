@@ -26,7 +26,6 @@ export async function saveProfile(payload: SaveEntityPayload) {
 
 export async function savePersona(payload: SaveEntityPayload) {
   const { supabase, user } = await getSupabaseUser();
-  console.log('payload', payload);
   // if this persona is being set as a platform persona, unset any existing platform personas (except for the current persona)
   if (payload.is_imessage_persona) {
     await supabase.from('personas').update({is_imessage_persona: false}).eq('user_id', user.id)
