@@ -44,7 +44,7 @@ export const getCachedPersonas = cache(async (userId: string): Promise<Persona[]
     if (!userId) return [];
     console.log(`Attempting to fetch personas for user ${userId}...`);
     const supabase = await createClient();
-    const { data: personas, error } = await supabase.from('personas').select('*').eq('user_id', userId);
+    const { data: personas, error } = await supabase.from('personas').select('*').eq('user_id', userId).order('attributes->name');    
     if (error) {console.error('Error fetching personas:', error); return [];}
     console.log("Personas fetched successfully:", personas);
     return personas || [];
