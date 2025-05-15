@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { ArchiveX, Command, File, Inbox, Send, Trash2, Contact, BookOpen, LifeBuoy, Link } from "lucide-react"
+import { Command, Inbox, Send, Contact, BookOpen, LifeBuoy } from "lucide-react"
 
-import { NavUser } from "@/components/custom/nav-user"
 import { Label } from "@/components/ui/label"
 import {
   Sidebar,
@@ -179,26 +178,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* This is the second sidebar */}
       {/* We disable collapsible and let it fill remaining space */}
       <Sidebar collapsible="none" className="hidden flex-1 md:flex">
-        <SidebarHeader className="gap-3.5 border-b p-4">
+        <SidebarHeader className="gap-5 border-b py-3 px-4">
           <div className="flex w-full items-center justify-between">
             <div className="text-foreground text-base font-medium">
               {activeItem?.title}
             </div>
             <Label className="flex items-center gap-2 text-sm">
-              <span>Unreads</span>
+              <span>Unread</span>
               <Switch className="shadow-none" />
             </Label>
           </div>
-          <SidebarInput placeholder="Type to search..." />
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup className="px-0">
+          <SidebarGroup className="p-0">
             <SidebarGroupContent>
               {mails.map((mail) => (
                 <a
                   href="#"
                   key={mail.email}
-                  className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0"
+                  className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap"
                 >
                   <div className="flex w-full items-center gap-2">
                     <span>{mail.name}</span>{" "}
@@ -213,6 +211,46 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
+    </Sidebar>
+  )
+}
+
+// This is sample data.
+const data2 = {
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
+  calendars: [
+    {
+      name: "My Calendars",
+      items: ["Personal", "Work", "Family"],
+    },
+    {
+      name: "Favorites",
+      items: ["Holidays", "Birthdays"],
+    },
+    {
+      name: "Other",
+      items: ["Travel", "Reminders", "Deadlines"],
+    },
+  ],
+}
+
+export function AppSidebarRight({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  return (
+    <Sidebar
+      collapsible="none"
+      className="sticky hidden lg:flex top-0 h-svh border-l w-[calc(var(--sidebar-width-icon)+1px)]! "
+      {...props}
+    >
+      <SidebarHeader className="h-16 border-b border-sidebar-border">
+      </SidebarHeader>
+      <SidebarContent>
+      </SidebarContent>
     </Sidebar>
   )
 }
