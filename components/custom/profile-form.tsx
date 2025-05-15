@@ -1,6 +1,6 @@
 'use client';
 
-import { UserRound } from "lucide-react";
+import { ChevronsUpDown, UserRound } from "lucide-react";
 import { useState, useMemo } from "react"; 
 import { useRouter } from "next/navigation";
 
@@ -9,6 +9,7 @@ import { Profile, User } from "@/lib/types";
 import { signOut } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import GenericForm, { FieldSchema } from "@/components/custom/generic-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const profileFields: FieldSchema[] = [ 
     { name: 'name', label: 'Name*', rowId: 'a1', type: 'text' },
@@ -32,7 +33,15 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
   
     return (
       <>
-        {profile && (<Button variant="ghost" className="size-7" onClick={() => setOpen(true)}><UserRound size={4}/></Button>)}
+        {profile && (
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setOpen(true)}>
+              <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarImage src={profile.attributes.avatar as string} alt={profile.attributes.name as string} />
+              <AvatarFallback className="rounded-lg">{profile.attributes.name?.toString().charAt(0)|| '?'}</AvatarFallback>
+            </Avatar>
+          </div>
+        )}
+          
         <GenericForm
           formTitle={"Profile"}
           formDescription="Your profile is used to personalize your personas."
