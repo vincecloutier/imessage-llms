@@ -23,29 +23,10 @@ const commonStyles = {
   mailTeaser: "line-clamp-2 w-[260px] text-xs whitespace-break-spaces"
 }
 
-// This is sample data
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Conversations",
-      url: "#",
-      icon: Inbox,
-      isActive: true,
-    },
-    {
-      title: "Contacts",
-      url: "#",
-      icon: Contact,
-      isActive: false,
-    },
-  ],
-}
-
+const navMain = [
+    {title: "Inbox", url: "#", icon: Inbox, isActive: true},
+    {title: "Contacts", url: "#", icon: Contact, isActive: false},
+]
 const items = [
   { title: "Support", url: "mailto:support@aprilintelligence.com", icon: LifeBuoy },
   { title: "Feedback", url: "mailto:info@aprilintelligence.com", icon: Send },
@@ -78,7 +59,7 @@ const MenuItem = ({ item, isActive, onClick, asChild = false }: { item: { title:
 )
 
 export function AppSidebar({personas, chats, ...props }: {personas: React.ReactNode, chats: React.ReactNode}) {
-  const [activeItem, setActiveItem] = React.useState<NavItem>(data.navMain[0])
+  const [activeItem, setActiveItem] = React.useState<NavItem>(navMain[0])
   const { setOpen } = useSidebar()
 
   const handleItemClick = (item: NavItem) => {
@@ -107,7 +88,7 @@ export function AppSidebar({personas, chats, ...props }: {personas: React.ReactN
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {data.navMain.map((item) => (
+                {navMain.map((item) => (
                   <MenuItem
                     key={item.title}
                     item={item}
