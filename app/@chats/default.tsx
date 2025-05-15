@@ -42,13 +42,13 @@ export default async function DefaultPersonas() {
     <SidebarGroup className="p-0">
       <SidebarGroupContent>
         {conversations.map((conversation) => (
-            <a href="#" key={conversation.id} className={commonStyles.mailItem}>
+            <Link href={`/chat/${conversation.id}`} key={conversation.id} className={commonStyles.mailItem}>
             <div className="flex w-full items-center gap-2">
               <span>{conversation.name}</span>{" "}
               <span className="ml-auto text-xs">{new Date(conversation.lastMessageTime).toLocaleDateString()}</span>
             </div>
             <span className={commonStyles.mailTeaser}> {conversation.lastMessage}</span>
-          </a>
+          </Link>
         ))}
       </SidebarGroupContent>
     </SidebarGroup>
