@@ -26,24 +26,24 @@ export default async function DefaultPersonas() {
 
   return (
     <Sidebar collapsible="none" className="hidden flex-1 md:flex">
-    <SidebarHeader className="gap-5 border-b py-3 px-4">
-    <div className="flex w-full items-center justify-between">
-      <div className="text-foreground text-base font-medium">
-        Contacts
+      <SidebarHeader className="gap-5 border-b py-3 px-4">
+      <div className="flex w-full items-center justify-between">
+        <div className="text-foreground text-base font-medium">
+          Contacts
+        </div>
+        <Label className="flex items-center gap-2 text-sm">
+          <span>Add Contact</span>
+          <PersonaForm persona={null}/>
+        </Label>
       </div>
-      <Label className="flex items-center gap-2 text-sm">
-        <span>Add Contact</span>
-        <PersonaForm persona={null}/>
-      </Label>
-    </div>
-  </SidebarHeader>
-  <SidebarContent>
-    <SidebarGroup className="p-0">
-      <SidebarGroupContent>
-        {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
-      </SidebarGroupContent>
-    </SidebarGroup>
-  </SidebarContent>
+    </SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup className="p-0">
+        <SidebarGroupContent>
+          {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
   </Sidebar>
   );
 }
