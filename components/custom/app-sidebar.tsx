@@ -72,16 +72,19 @@ export function AppSidebar({personas, chats, ...props }: {personas: React.ReactN
       <Sidebar collapsible="none" className={`${commonStyles.sidebarWidth} border-r`}>
         <SidebarHeader>
           <SidebarMenu>
-            <MenuItem 
-              item={{
-                title: "April Intelligence",
-                icon: Command,
-                url: "#",
-              }}
-              isActive={false}
-              onClick={() => {}}
-              asChild
-            />
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
+                <a href="#">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    <Command className="size-4" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">April Intelligence</span>
+                    <span className="truncate text-xs">v1.0.0</span>
+                  </div>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
