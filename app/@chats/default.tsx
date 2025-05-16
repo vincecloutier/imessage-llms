@@ -26,33 +26,33 @@ export default async function DefaultPersonas() {
   const conversations = await getCachedConversations(user.id);
 
   return (
-    <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+  <Sidebar collapsible="none" className="hidden flex-1 md:flex">
     <SidebarHeader className="gap-5 border-b py-3 px-4">
-    <div className="flex w-full items-center justify-between">
-      <div className="text-foreground text-base font-medium">
-        Inbox
+      <div className="flex w-full items-center justify-between">
+        <div className="text-foreground text-base font-medium">
+          Inbox
+        </div>
+        <Label className="flex items-center gap-2 text-sm">
+          <span>Unread</span>
+          <Switch className="shadow-none" />
+        </Label>
       </div>
-      <Label className="flex items-center gap-2 text-sm">
-        <span>Unread</span>
-        <Switch className="shadow-none" />
-      </Label>
-    </div>
-  </SidebarHeader>
-  <SidebarContent>
-    <SidebarGroup className="p-0">
-      <SidebarGroupContent>
-        {conversations.map((conversation) => (
-            <Link href={`/chat/${conversation.id}`} key={conversation.id} className={commonStyles.mailItem}>
-            <div className="flex w-full items-center gap-2">
-              <span>{conversation.name}</span>{" "}
-              <span className="ml-auto text-xs">{new Date(conversation.lastMessageTime).toLocaleDateString()}</span>
-            </div>
-            <span className={commonStyles.mailTeaser}> {conversation.lastMessage}</span>
-          </Link>
-        ))}
-      </SidebarGroupContent>
-    </SidebarGroup>
-  </SidebarContent>
+    </SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup className="p-0">
+        <SidebarGroupContent>
+          {conversations.map((conversation) => (
+              <Link href={`/chat/${conversation.id}`} key={conversation.id} className={commonStyles.mailItem}>
+              <div className="flex w-full items-center gap-2">
+                <span>{conversation.name}</span>{" "}
+                <span className="ml-auto text-xs">{new Date(conversation.lastMessageTime).toLocaleDateString()}</span>
+              </div>
+              <span className={commonStyles.mailTeaser}> {conversation.lastMessage}</span>
+            </Link>
+          ))}
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
   </Sidebar>
   );
 }
