@@ -8,9 +8,8 @@ import { Persona } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { deletePersona, savePersona } from '@/lib/actions';
 import GenericForm, { FieldSchema } from '@/components/custom/generic-form';
-import { SidebarGroupAction, SidebarMenuAction } from '@/components/ui/sidebar';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { Label } from '@radix-ui/react-label';
+import { Label } from '@/components/ui/label';
 
 const personaFields: FieldSchema[] = [
   { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a', type: 'text' },
@@ -61,7 +60,10 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
   } else {  
     return (
       <>
-        <Plus className="w-4 h-4"  onClick={() => {setEditingPersonaId('new');}}/> <span className="sr-only">Add Persona</span>
+        <Label onClick={() => {setEditingPersonaId('new'); }} className="cursor-pointer">
+          <span>Add Contact</span>
+          <Plus className="w-4 h-4" />
+        </Label>
         <GenericForm
           formTitle="Add New Contact"
           formDescription="Define the details for a new contact."

@@ -31,10 +31,7 @@ export default async function DefaultPersonas() {
         <div className="text-foreground text-base font-medium">
           Contacts
         </div>
-        <Label className="flex items-center gap-2 text-sm">
-          <span>Add Contact</span>
-          <PersonaForm persona={null}/>
-        </Label>
+        <PersonaForm persona={null}/>
       </div>
     </SidebarHeader>
     <SidebarContent>
