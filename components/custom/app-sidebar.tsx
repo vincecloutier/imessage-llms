@@ -110,7 +110,7 @@ export function AppSidebar({personas, chats, ...props }: {personas: React.ReactN
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      {activeItem.title === "Conversations" && chats}
+      {activeItem.title === "Inbox" && chats}
       {activeItem.title === "Contacts" && personas}
     </Sidebar>
   )

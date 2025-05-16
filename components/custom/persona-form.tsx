@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, Plus, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { Persona } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { deletePersona, savePersona } from '@/lib/actions';
 import GenericForm, { FieldSchema } from '@/components/custom/generic-form';
 import { SidebarGroupAction, SidebarMenuAction } from '@/components/ui/sidebar';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { Label } from '@radix-ui/react-label';
 
 const personaFields: FieldSchema[] = [
   { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a', type: 'text' },
@@ -22,21 +23,32 @@ const personaFields: FieldSchema[] = [
   { name: 'hair_length', label: 'Hair Length', description: 'What length is their hair?', rowId: 'd', type: 'enum', options: ['Bald', 'Short', 'Medium', 'Long'] },
   { name: 'hair_color', label: 'Hair Color', description: 'What color is their hair?', rowId: 'd', type: 'enum', options: ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White'] },
   { name: 'eye_color', label: 'Eye Color', description: 'What color are their eyes?', rowId: 'd', type: 'enum', options: ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Violet', 'Other'] },
-  { name: 'messaging_platform', label: 'Messaging Platforms', description: 'What platforms can this persona use to message you?', rowId: 'e', type: 'messaging_platform' },
+  { name: 'messaging_platform', label: 'Messaging Platforms', description: 'What platforms can they use to message you?', rowId: 'e', type: 'messaging_platform' },
 ];
+
+
+const commonStyles = {
+  sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
+  menuButton: "px-2.5 md:px-2",
+  mailItem: "hover:bg-sidebar-accent cursor-pointer hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap",
+  mailTeaser: "line-clamp-2 w-[260px] text-xs whitespace-break-spaces"
+}
 
 export function PersonaForm({persona, freshProfile = false}: {persona: Persona | null, freshProfile?: boolean}) {
   const [editingPersonaId, setEditingPersonaId] = useState<string | null>(null);
   const handlePersonaOpenChange = (isOpen: boolean) => {if (!isOpen) setEditingPersonaId(null)};
   if (persona) {
-    return (  
+    return (
       <>
-        <SidebarMenuAction onClick={() => setEditingPersonaId(persona.id)}>
-          <MoreHorizontal/> <span className="sr-only">More</span>
-        </SidebarMenuAction>
+        <div className={commonStyles.mailItem} onClick={() => setEditingPersonaId(persona.id)}>
+            <div className="flex w-full items-center gap-2">
+              <span>{(persona.attributes.name || 'Unnamed Persona').toString()}</span>{" "}
+           <span className="ml-auto text-xs text-underline"> <MoreHorizontal className="w-4 h-4" /> </span>
+            </div>
+        </div>
         <GenericForm
-          formTitle="Edit Persona"
-          formDescription="Update the details for this persona."
+          formTitle="Edit Contact"
+          formDescription="Update the details for this contact."
           fields={personaFields}
           startingValues={persona}
           saveAction={savePersona}
@@ -49,12 +61,10 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
   } else {  
     return (
       <>
-        <SidebarGroupAction onClick={() => {setEditingPersonaId('new');}}>
-          <Plus/> <span className="sr-only">Add Persona</span>
-        </SidebarGroupAction>
+        <Plus className="w-4 h-4"  onClick={() => {setEditingPersonaId('new');}}/> <span className="sr-only">Add Persona</span>
         <GenericForm
-          formTitle="Create New Persona"
-          formDescription="Define the details for a new persona."
+          formTitle="Add New Contact"
+          formDescription="Define the details for a new contact."
           fields={personaFields}
           startingValues={{attributes: {}, is_imessage_persona: freshProfile, is_telegram_persona: freshProfile}}
           saveAction={savePersona}
@@ -66,7 +76,6 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
     )
   }
 }
-
 
 export function PersonaDestructiveButton({ personaId, setEditingPersonaId }: { personaId: string, setEditingPersonaId: (id: string | null) => void }) {
     const [isOpen, setIsOpen] = useState(false);

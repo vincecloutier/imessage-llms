@@ -1,10 +1,12 @@
 import Link from 'next/link';
 
-import { UserRound} from 'lucide-react';
+import { Plus, UserRound} from 'lucide-react';
 import { PersonaForm } from '@/components/custom/persona-form';
 import { ProfileForm } from '@/components/custom/profile-form';
 import { getCachedUser,getCachedPersonas, getCachedUserProfile } from '@/lib/supabase/server';
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 export default async function DefaultPersonas() {
   const user = await getCachedUser();
@@ -23,25 +25,25 @@ export default async function DefaultPersonas() {
   if (personas.length === 0) return <PersonaForm persona={null} freshProfile={true}/>;
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Personas</SidebarGroupLabel>
-      <SidebarMenu>
-        <PersonaForm persona={null} />
-        {personas.map((persona) => {
-          return (
-            <SidebarMenuItem key={persona.id}>
-              <SidebarMenuButton asChild>
-                <Link href={`/chat/${persona.id}`}>
-                  <UserRound />
-                  <span>{(persona.attributes.name || 'Unnamed Persona').toString()}</span>
-                </Link>
-              </SidebarMenuButton>
-              <PersonaForm persona={persona} />
-            </SidebarMenuItem>
-          );
-        })}
-      </SidebarMenu>
+    <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+    <SidebarHeader className="gap-5 border-b py-3 px-4">
+    <div className="flex w-full items-center justify-between">
+      <div className="text-foreground text-base font-medium">
+        Contacts
+      </div>
+      <Label className="flex items-center gap-2 text-sm">
+        <span>Add Contact</span>
+        <PersonaForm persona={null}/>
+      </Label>
+    </div>
+  </SidebarHeader>
+  <SidebarContent>
+    <SidebarGroup className="p-0">
+      <SidebarGroupContent>
+        {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
+      </SidebarGroupContent>
     </SidebarGroup>
+  </SidebarContent>
+  </Sidebar>
   );
 }
-
