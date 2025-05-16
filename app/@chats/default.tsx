@@ -32,9 +32,9 @@ export default async function DefaultPersonas() {
         <div className="text-foreground text-base font-medium">
           Inbox
         </div>
-        <Label className="flex items-center gap-2 text-sm">
+        <Label className="flex items-center gap-2 text-sm cursor-pointer">
           <span>Unread</span>
-          <Switch className="shadow-none" />
+          <Switch className="shadow-none cursor-pointer" />
         </Label>
       </div>
     </SidebarHeader>
