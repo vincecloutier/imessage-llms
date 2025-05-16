@@ -5,7 +5,7 @@ import { Toaster } from 'sonner';
 import './globals.css';
 import { ThemeProvider } from '@/components/custom/theme-provider';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
-import { AppSidebar, AppSidebarRight } from '@/components/custom/app-sidebar';
+import { AppSidebar } from '@/components/custom/app-sidebar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
