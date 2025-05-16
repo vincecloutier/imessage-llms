@@ -41,15 +41,25 @@ export default async function DefaultPersonas() {
     <SidebarContent>
       <SidebarGroup className="p-0">
         <SidebarGroupContent>
-          {conversations.map((conversation) => (
+          {conversations.map((conversation) => {
+            const messageDate = new Date(conversation.lastMessageTime);
+            const today = new Date();
+            const isToday = messageDate.getFullYear() === today.getFullYear() &&
+                            messageDate.getMonth() === today.getMonth() &&
+                            messageDate.getDate() === today.getDate();
+            const displayDate = isToday
+              ? messageDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+              : messageDate.toLocaleDateString();
+            return (
               <Link href={`/chat/${conversation.id}`} key={conversation.id} className={commonStyles.mailItem}>
               <div className="flex w-full items-center gap-2">
                 <span>{conversation.name}</span>{" "}
-                <span className="ml-auto text-xs">{new Date(conversation.lastMessageTime).toLocaleDateString()}</span>
+                <span className="ml-auto text-xs">{displayDate}</span>
               </div>
               <span className={commonStyles.mailTeaser}> {conversation.lastMessage}</span>
             </Link>
-          ))}
+            );
+          })}
         </SidebarGroupContent>
       </SidebarGroup>
     </SidebarContent>
