@@ -1,11 +1,9 @@
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { Toaster } from 'sonner';
 
 import './globals.css';
 import { ThemeProvider } from '@/components/custom/theme-provider';
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/custom/app-sidebar';
+import { SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
