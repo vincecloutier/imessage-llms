@@ -29,3 +29,11 @@ export type SaveEntityPayload = {
     is_imessage_persona?: boolean;
     is_telegram_persona?: boolean;
 }
+
+export type Conversation = {
+    id: string;
+    name: string;
+    lastMessage: string;
+    lastMessageTime: string;
+    is_unread: boolean;
+}

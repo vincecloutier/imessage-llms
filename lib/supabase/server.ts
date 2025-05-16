@@ -2,16 +2,7 @@ import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 
-import { Persona } from '@/lib/types';
-
-// Add this type before the getCachedConversations function
-export type Conversation = {
-    id: string;
-    name: string;
-    lastMessage: string;
-    lastMessageTime: string;
-    role: string;
-}
+import { Persona, Conversation } from '@/lib/types';
 
 export const createClient = async () => {
   const cookieStore = await cookies();
@@ -110,7 +101,7 @@ export const getCachedConversations = cache(async (userId: string) => {
                 name: message.personas?.attributes?.name || 'Unknown',
                 lastMessage: message.content,
                 lastMessageTime: message.created_at,
-                role: message.role
+                is_unread: false
             } as Conversation;
         }
         return acc;
