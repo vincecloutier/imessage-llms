@@ -80,7 +80,7 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
   );
 };
 
-const ContentPanel = ({ title, actions, children }: { title: string; actions?: React.ReactNode; children: React.ReactNode }) => {
+const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string; actions?: React.ReactNode; isLoggedIn: boolean; children: React.ReactNode }) => {
   return (
     <Sidebar collapsible="none" className="hidden flex-1 md:flex">
       <SidebarHeader className="gap-5 border-b py-3 px-4">
@@ -88,13 +88,13 @@ const ContentPanel = ({ title, actions, children }: { title: string; actions?: R
           <div className="text-foreground text-base font-medium">
             {title}
           </div>
-          {actions}
+          {isLoggedIn && actions}
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
-            {children}
+            {isLoggedIn ? children : <div className="p-4">Login to view this content!</div>}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
@@ -102,8 +102,9 @@ const ContentPanel = ({ title, actions, children }: { title: string; actions?: R
   );
 };
 
-export function AppSidebar({personas, chats, ...props }: {personas: Persona[], chats: Conversation[]}) {
+export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: Persona[], chats: Conversation[], isLoggedIn: boolean}) {
   const [activeItem, setActiveItem] = React.useState<NavItem>(navMain[0])
+  const [showUnreadOnly, setShowUnreadOnly] = React.useState(false);
   const { setOpen } = useSidebar()
 
   const handleItemClick = (item: NavItem) => {
@@ -111,6 +112,8 @@ export function AppSidebar({personas, chats, ...props }: {personas: Persona[], c
     setOpen(true)
   }
 
+  const filteredChats = showUnreadOnly ? chats.filter(chat => chat.is_unread) : chats;
+  
   return (
     <Sidebar collapsible="icon" className="overflow-hidden *:data-[sidebar=sidebar]:flex-row border-t border-b border-l" {...props}>
       <Sidebar collapsible="none" className={`${commonStyles.sidebarWidth} border-r`}>
@@ -163,11 +166,12 @@ export function AppSidebar({personas, chats, ...props }: {personas: Persona[], c
         actions={
           <Label className="flex items-center gap-2 text-sm cursor-pointer">
             <span>Unread</span>
-            <Switch className="shadow-none cursor-pointer" />
+            <Switch className="shadow-none cursor-pointer" checked={showUnreadOnly} onCheckedChange={setShowUnreadOnly} />
           </Label>
         }
+        isLoggedIn={isLoggedIn}
       >
-        {chats.map((chat) => {
+        {filteredChats.map((chat) => {
           const messageDate = new Date(chat.lastMessageTime);
           const isToday = messageDate.toDateString() === new Date().toDateString();
           const displayDate = isToday
@@ -189,6 +193,7 @@ export function AppSidebar({personas, chats, ...props }: {personas: Persona[], c
         <ContentPanel
           title="Contacts"
           actions={<PersonaForm persona={null}/>}
+          isLoggedIn={isLoggedIn}
         >
           {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
         </ContentPanel>
