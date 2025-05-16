@@ -25,13 +25,13 @@ export default async function RootLayout({children, personas, chats}: {children:
       </head>
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <Toaster position="top-center" richColors/>
+        <Toaster position="top-center" richColors/>
           <SidebarProvider style={{"--sidebar-width": "350px"} as React.CSSProperties}>
-      <AppSidebar personas={personas} chats={chats} />
-      <SidebarInset>
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+            <AppSidebar personas={personas} chats={chats} />
+            <SidebarInset>
+              {children}
+            </SidebarInset>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>
