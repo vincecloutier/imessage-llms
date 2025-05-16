@@ -1,3 +1,4 @@
+/* UI TOOLS: https://tweakcn.com/editor/theme, https://ui-x.junwen-k.dev/docs/, https://www.kibo-ui.com/, https://www.launchuicomponents.com/, https://21st.dev/ */
 @import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));
