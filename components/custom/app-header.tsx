@@ -22,7 +22,6 @@ import { useRouter } from "next/navigation";
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   const { theme, setTheme } = useTheme()
   return (
-    // if you do absolute, the header will allow the chat to scroll behind it
     <header className="bg-sidebar sticky top-0 flex shrink-0 items-center gap-2 border-b border-t border-r p-2 justify-between">
         <div className="flex items-center gap-2">
         <SidebarTrigger/>
