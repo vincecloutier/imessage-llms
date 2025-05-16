@@ -53,10 +53,10 @@ export default async function DefaultPersonas() {
             return (
               <Link href={`/chat/${conversation.id}`} key={conversation.id} className={commonStyles.mailItem}>
               <div className="flex w-full items-center gap-2">
-                <span>{conversation.name}</span>{" "}
+                <span>{conversation.name}</span>
                 <span className="ml-auto text-xs">{displayDate}</span>
               </div>
-              <span className={commonStyles.mailTeaser}> {conversation.lastMessage}</span>
+              <span className={commonStyles.mailTeaser}>{conversation.lastMessage.trim()}</span>
             </Link>
             );
           })}
