@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 // disable auto-zoom on mobile Safari
 export const viewport = { maximumScale: 1 };
 
-export default async function RootLayout({children, personas, chats}: {children: React.ReactNode, personas: React.ReactNode, chats: React.ReactNode}) {
+export default async function RootLayout({children, sidebar}: {children: React.ReactNode, sidebar: React.ReactNode}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -27,7 +27,7 @@ export default async function RootLayout({children, personas, chats}: {children:
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <Toaster position="top-center" richColors/>
           <SidebarProvider style={{"--sidebar-width": "350px"} as React.CSSProperties}>
-            <AppSidebar personas={personas} chats={chats} />
+            {sidebar}
             <SidebarInset>
               {children}
             </SidebarInset>

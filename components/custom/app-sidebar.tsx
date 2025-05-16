@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from 'next/link';
 import { Command, Inbox, Send, Contact, BookOpen, LifeBuoy } from "lucide-react"
 
 import {
@@ -14,6 +15,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Persona, Conversation } from '@/lib/types';
+import { PersonaForm } from "./persona-form";
 
 // Common styles
 const commonStyles = {
@@ -41,24 +47,62 @@ type NavItem = {
 }
 
 // sidebar item component
-const MenuItem = ({ item, isActive, onClick, asChild = false }: { item: { title: string; icon: React.ElementType; url: string }; isActive: boolean; onClick: () => void; asChild: boolean }) => (
-  <SidebarMenuItem key={item.title}>
-    <SidebarMenuButton
-      tooltip={{children: item.title, hidden: false}}
-      onClick={onClick}
-      isActive={isActive}
-      asChild={asChild}
-      className={commonStyles.menuButton}
-    >
-    <a href={item.url}> 
-      <item.icon /> 
-      <span>{item.title}</span>
-    </a>
-    </SidebarMenuButton>
-  </SidebarMenuItem>
-)
+const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: React.ElementType; url: string }; isActive: boolean; onClick: () => void; }) => {
+  const isNextLink = item.url.startsWith("/");
+  const isExternalNewTab = item.url.startsWith("http"); // mailto links handle themselves, http/https will be new tab
 
-export function AppSidebar({personas, chats, ...props }: {personas: React.ReactNode, chats: React.ReactNode}) {
+  const linkContent = (<> <item.icon /> <span>{item.title}</span> </>)
+
+  return (
+    <SidebarMenuItem key={item.title}>
+      <SidebarMenuButton
+        tooltip={{ children: item.title, hidden: false }}
+        onClick={onClick} // Handles internal state like active item
+        isActive={isActive}
+        asChild={true} // SidebarMenuButton will use its child as the component
+        className={commonStyles.menuButton}
+      >
+        {isNextLink ? (
+          <Link href={item.url}>
+            {linkContent}
+          </Link>
+        ) : (
+          <a
+            href={item.url}
+            target={isExternalNewTab ? "_blank" : undefined}
+            rel={isExternalNewTab ? "noopener noreferrer" : undefined}
+          >
+            {linkContent}
+          </a>
+        )}
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};
+
+const ContentPanel = ({ title, actions, children }: { title: string; actions?: React.ReactNode; children: React.ReactNode }) => {
+  return (
+    <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+      <SidebarHeader className="gap-5 border-b py-3 px-4">
+        <div className="flex w-full items-center justify-between">
+          <div className="text-foreground text-base font-medium">
+            {title}
+          </div>
+          {actions}
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup className="p-0">
+          <SidebarGroupContent>
+            {children}
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+};
+
+export function AppSidebar({personas, chats, ...props }: {personas: Persona[], chats: Conversation[]}) {
   const [activeItem, setActiveItem] = React.useState<NavItem>(navMain[0])
   const { setOpen } = useSidebar()
 
@@ -74,7 +118,7 @@ export function AppSidebar({personas, chats, ...props }: {personas: React.ReactN
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
-                <a href="#">
+                <Link href="/">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                     <Command className="size-4" />
                   </div>
@@ -82,7 +126,7 @@ export function AppSidebar({personas, chats, ...props }: {personas: React.ReactN
                     <span className="truncate font-semibold">April Intelligence</span>
                     <span className="truncate text-xs">v1.0.0</span>
                   </div>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -97,24 +141,58 @@ export function AppSidebar({personas, chats, ...props }: {personas: React.ReactN
                     item={item}
                     isActive={activeItem?.title === item.title}
                     onClick={() => handleItemClick(item)}
-                    asChild
                   />
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-
           <SidebarGroup className="mt-auto">
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {items.map((item) => (<MenuItem key={item.title} item={item} isActive={false} onClick={() => {}} asChild />))}
+                {items.map((item) => (<MenuItem key={item.title} item={item} isActive={false} onClick={() => {}} />))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      {activeItem.title === "Inbox" && chats}
-      {activeItem.title === "Contacts" && personas}
+
+
+    {activeItem.title === "Inbox" && (
+      <ContentPanel
+        title="Inbox"
+        actions={
+          <Label className="flex items-center gap-2 text-sm cursor-pointer">
+            <span>Unread</span>
+            <Switch className="shadow-none cursor-pointer" />
+          </Label>
+        }
+      >
+        {chats.map((chat) => {
+          const messageDate = new Date(chat.lastMessageTime);
+          const isToday = messageDate.toDateString() === new Date().toDateString();
+          const displayDate = isToday
+            ? messageDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            : messageDate.toLocaleDateString();
+          return (
+            <Link href={`/chat/${chat.id}`} key={chat.id} className={commonStyles.mailItem}>
+              <div className="flex w-full items-center gap-2">
+                <span>{chat.name}</span>
+                <span className="ml-auto text-xs">{displayDate}</span>
+              </div>
+              <span className={commonStyles.mailTeaser}>{chat.lastMessage.trim()}</span>
+            </Link>
+          );
+        })}
+      </ContentPanel>
+      )}
+      {activeItem.title === "Contacts" && (
+        <ContentPanel
+          title="Contacts"
+          actions={<PersonaForm persona={null}/>}
+        >
+          {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
+        </ContentPanel>
+      )}
     </Sidebar>
   )
 }
