@@ -176,9 +176,10 @@ const CredenzaTitle = ({ className, children, ...props }: CredenzaProps) => {
 };
 
 const CredenzaBody = ({ className, children, ...props }: CredenzaProps) => {
-  // This component doesn't need isDesktop or preventClose from context for its own logic
+  const { isDesktop } = useCredenzaContext();
+  const bodyClasses = !isDesktop ? "flex-1 overflow-y-auto" : "";
   return (
-    <div className={cn("px-4 md:px-0", className)} {...props}>
+    <div className={cn("px-4 md:px-0", bodyClasses, className)} {...props}>
       {children}
     </div>
   );

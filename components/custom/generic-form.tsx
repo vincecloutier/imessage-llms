@@ -14,7 +14,7 @@ import { LocationField } from "@/components/ui/location-input";
 import { MessagingPlatformField } from "@/components/ui/messaging-platform-field";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Credenza, CredenzaContent, CredenzaHeader, CredenzaTitle, CredenzaDescription, CredenzaFooter, CredenzaBody } from "@/components/ui/credenza";
 
 export interface FieldSchema {
   name: string;
@@ -279,49 +279,49 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
 
   const dialogWidthClass = (fields.length <= 5) ? "sm:max-w-md" : "sm:max-w-[60%] md:max-w-[50%] lg:max-w-[40%]";
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent
-        className={cn("max-h-[90vh] overflow-y-auto", dialogWidthClass)}
+    <Credenza open={open} onOpenChange={handleOpenChange} preventClose={forceAnswer}>
+      <CredenzaContent
+        className={cn("max-h-[90vh]", dialogWidthClass)}
         showCloseButton={!forceAnswer}
-        onEscapeKeyDown={(e) => { if (forceAnswer) e.preventDefault(); }}
-        onPointerDownOutside={(e) => { if (forceAnswer) e.preventDefault(); }}
       >
-        <DialogHeader>
-          <DialogTitle>{formTitle}</DialogTitle>
-          {formDescription && (<DialogDescription>{formDescription}</DialogDescription>)}
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4">
-             {Object.entries(rowGroups).map(([rowId, groupedFields]) => (
-               <div key={rowId} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
-                  {groupedFields.map((field) => (
-                    <FormField
-                      key={field.name}
-                      control={form.control}
-                      name={field.name as keyof FormInputValues}
-                      render={({ field: ctrl }) => (
-                        <FormItem style={{ gridColumn: 'span 1'}}>
-                          <FormLabel>{field.label}</FormLabel>
-                          <FormControl>
-                             {renderFormField(field, ctrl)}
-                          </FormControl>
-                          {field.description && (<FormDescription>{field.description}</FormDescription>)}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-              ))}
-          </form>
-        </Form>
-        <DialogFooter>
+        <CredenzaHeader>
+          <CredenzaTitle>{formTitle}</CredenzaTitle>
+          {formDescription && (<CredenzaDescription>{formDescription}</CredenzaDescription>)}
+        </CredenzaHeader>
+        <CredenzaBody>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} id="generic-dialog-form" className="space-y-4">
+               {Object.entries(rowGroups).map(([rowId, groupedFields]) => (
+                 <div key={rowId} style={{display: 'grid', gridTemplateColumns: `repeat(${groupedFields.length}, minmax(0, 1fr))`, gap: '1rem'}}>
+                    {groupedFields.map((field) => (
+                      <FormField
+                        key={field.name}
+                        control={form.control}
+                        name={field.name as keyof FormInputValues}
+                        render={({ field: ctrl }) => (
+                          <FormItem style={{ gridColumn: 'span 1'}}>
+                            <FormLabel>{field.label}</FormLabel>
+                            <FormControl>
+                               {renderFormField(field, ctrl)}
+                            </FormControl>
+                            {field.description && (<FormDescription>{field.description}</FormDescription>)}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ))}
+                  </div>
+                ))}
+            </form>
+          </Form>
+        </CredenzaBody>
+        <CredenzaFooter>
              <div className={`flex w-full gap-4 ${destructiveButton ? 'justify-between' : 'justify-end'}`}>
                 {destructiveButton}
                 <Button type="submit" form="generic-dialog-form" disabled={!isDirty || isSaving || !isValid}> {isSaving ? 'Saving...' : 'Save'}</Button>
             </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CredenzaFooter>
+      </CredenzaContent>
+    </Credenza>
   );
 }

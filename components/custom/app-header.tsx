@@ -15,9 +15,11 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ProfileForm } from "@/components/custom/profile-form";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Credenza, CredenzaContent, CredenzaDescription, CredenzaFooter, CredenzaHeader, CredenzaTitle, CredenzaTrigger } from "@/components/ui/credenza"
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
 import { useRouter } from "next/navigation";
+import { Dialog } from "@radix-ui/react-dialog"
+import { DialogFooter } from "../ui/dialog"
 
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   const { theme, setTheme } = useTheme()
@@ -95,21 +97,21 @@ export function SignInDialog() {
   }
   
   return (
-    <Dialog open={open} onOpenChange={setOpen}> 
-      <DialogTrigger asChild> 
+    <Credenza open={open} onOpenChange={setOpen}> 
+      <CredenzaTrigger asChild> 
         <Button className="h-7">Connect</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Connect</DialogTitle>
-          <DialogDescription>
+      </CredenzaTrigger>
+      <CredenzaContent className="sm:max-w-[425px]">
+        <CredenzaHeader>
+          <CredenzaTitle>Connect</CredenzaTitle>
+          <CredenzaDescription>
             {showOTP ? "Enter the verification code sent to your email." : "Enter your email below to receive a verification code."}
-          </DialogDescription>
-        </DialogHeader>
+          </CredenzaDescription>
+        </CredenzaHeader>
         {!showOTP ? (
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <Input id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@mail.com" required type="email"/>
-            <DialogFooter>
+            <CredenzaFooter>
               <div className="flex justify-between w-full">
                 <div className="flex items-center space-x-2">
                   <Checkbox id="remember" checked={rememberEmail} onCheckedChange={(checked) => setRememberEmail(checked === true)}/>
@@ -119,7 +121,7 @@ export function SignInDialog() {
                 </div>
                 <Button type="submit">Send Code</Button>
               </div>
-            </DialogFooter>
+            </CredenzaFooter>
           </form>
         ) : (
           <form onSubmit={handleOTPSubmit} className="space-y-4">
@@ -135,15 +137,15 @@ export function SignInDialog() {
                 </InputOTPGroup>
               </InputOTP>
             </div>
-            <DialogFooter>
+            <CredenzaFooter>
               <div className="flex justify-between w-full">
                 <Button type="button" variant="ghost" onClick={() => setShowOTP(false)}>Back</Button>
                 <Button type="submit">Verify</Button>
               </div>
-            </DialogFooter>
+            </CredenzaFooter>
           </form>
         )}
-      </DialogContent>
-    </Dialog>
+      </CredenzaContent>
+    </Credenza>
   );
 }
