@@ -56,24 +56,14 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
     <SidebarMenuItem key={item.title}>
       <SidebarMenuButton
         tooltip={{ children: item.title, hidden: false }}
-        onClick={onClick} // Handles internal state like active item
+        onClick={onClick}
         isActive={isActive}
-        asChild={true} // SidebarMenuButton will use its child as the component
+        asChild={true}
         className={commonStyles.menuButton}
       >
-        {isNextLink ? (
-          <Link href={item.url}>
-            {linkContent}
-          </Link>
-        ) : (
-          <a
-            href={item.url}
-            target={isExternalNewTab ? "_blank" : undefined}
-            rel={isExternalNewTab ? "noopener noreferrer" : undefined}
-          >
-            {linkContent}
-          </a>
-        )}
+        {isNextLink 
+        ? (<Link href={item.url}>{linkContent}</Link>) 
+        : (<a href={item.url} target={isExternalNewTab ? "_blank" : undefined} rel={isExternalNewTab ? "noopener noreferrer" : undefined}>{linkContent}</a>)}
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
