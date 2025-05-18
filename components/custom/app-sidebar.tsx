@@ -21,7 +21,6 @@ import { Switch } from '@/components/ui/switch';
 import { Persona, Conversation } from '@/lib/types';
 import { PersonaForm } from "./persona-form";
 
-// Common styles
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
   menuButton: "px-2.5 md:px-2",
@@ -112,7 +111,17 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
     setOpen(true)
   }
 
-  const filteredChats = showUnreadOnly ? chats.filter(chat => chat.is_unread) : chats;
+  // ensure one entry per persona
+  const combinedChats = personas.map(persona => {
+    const existingChat = chats.find(chat => chat.id === persona.id);
+    if (existingChat) {
+      return existingChat;
+    } else {
+      return {id: persona.id, name: persona.attributes.name, lastMessage: "Send a message to start a conversation", lastMessageTime: null, is_unread: false};
+    }
+  });
+
+  const filteredChatsToDisplay = showUnreadOnly ? combinedChats.filter(chat => chat.is_unread) : combinedChats;
   
   return (
     <Sidebar collapsible="icon" className="overflow-hidden *:data-[sidebar=sidebar]:flex-row border-t border-b border-l" {...props}>
@@ -171,17 +180,26 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
         }
         isLoggedIn={isLoggedIn}
       >
-        {filteredChats.map((chat) => {
-          const messageDate = new Date(chat.lastMessageTime);
-          const isToday = messageDate.toDateString() === new Date().toDateString();
-          const displayDate = isToday
-            ? messageDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-            : messageDate.toLocaleDateString();
+        {isLoggedIn && filteredChatsToDisplay.length === 0 && !showUnreadOnly && (
+          <div className="p-4 text-sm text-muted-foreground">No messages in your inbox. Create a contact to start chatting.</div>
+        )}
+        {isLoggedIn && filteredChatsToDisplay.length === 0 && showUnreadOnly && (
+          <div className="p-4 text-sm text-muted-foreground">No unread messages.</div>
+        )}
+        {filteredChatsToDisplay.map((chat) => {
+          let displayDateOrStatus = "New";
+          if (chat.lastMessageTime) {
+            const messageDate = new Date(chat.lastMessageTime);
+            const isToday = messageDate.toDateString() === new Date().toDateString();
+            displayDateOrStatus = isToday
+              ? messageDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+              : messageDate.toLocaleDateString();
+          }
           return (
             <Link href={`/chat/${chat.id}`} key={chat.id} className={commonStyles.mailItem}>
               <div className="flex w-full items-center gap-2">
-                <span>{chat.name}</span>
-                <span className="ml-auto text-xs">{displayDate}</span>
+                <span>{chat.name as string}</span>
+                <span className="ml-auto text-xs">{displayDateOrStatus}</span>
               </div>
               <span className={commonStyles.mailTeaser}>{chat.lastMessage.trim()}</span>
             </Link>
