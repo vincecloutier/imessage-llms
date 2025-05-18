@@ -20,6 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Persona, Conversation } from '@/lib/types';
 import { PersonaForm } from "./persona-form";
+import { cn } from "@/lib/utils";
 
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
@@ -47,16 +48,25 @@ type NavItem = {
 
 // sidebar item component
 const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: React.ElementType; url: string }; isActive: boolean; onClick: () => void; }) => {
+  const { isMobile, setOpenMobile } = useSidebar();
   const isNextLink = item.url.startsWith("/");
-  const isExternalNewTab = item.url.startsWith("http"); // mailto links handle themselves, http/https will be new tab
+  const isExternalNewTab = item.url.startsWith("http");
+  const isHashLink = item.url === "#";
 
   const linkContent = (<> <item.icon /> <span>{item.title}</span> </>)
+
+  const handlePress = () => {
+    onClick();
+    if (isMobile && !isHashLink) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <SidebarMenuItem key={item.title}>
       <SidebarMenuButton
         tooltip={{ children: item.title, hidden: false }}
-        onClick={onClick}
+        onClick={handlePress}
         isActive={isActive}
         asChild={true}
         className={commonStyles.menuButton}
@@ -70,8 +80,9 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
 };
 
 const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string; actions?: React.ReactNode; isLoggedIn: boolean; children: React.ReactNode }) => {
+  const { isMobile } = useSidebar();
   return (
-    <Sidebar collapsible="none" className="flex-1">
+    <Sidebar collapsible="none" className={cn("flex-1", isMobile && "w-full")}>
       <SidebarHeader className="gap-5 border-b py-3 px-4">
         <div className="flex w-full items-center justify-between">
           <div className="text-foreground text-base font-medium">
@@ -187,7 +198,12 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
               : messageDate.toLocaleDateString();
           }
           return (
-            <Link href={`/chat/${chat.id}`} key={chat.id} className={commonStyles.mailItem}>
+            <Link 
+              href={`/chat/${chat.id}`} 
+              key={chat.id} 
+              className={commonStyles.mailItem}
+              onClick={() => {if (isMobile) {setOpenMobile(false);}}}
+            >
               <div className="flex w-full items-center gap-2">
                 <span>{chat.name as string}</span>
                 <span className="ml-auto text-xs">{displayDateOrStatus}</span>
