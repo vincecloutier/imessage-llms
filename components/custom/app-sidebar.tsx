@@ -180,9 +180,6 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
         }
         isLoggedIn={isLoggedIn}
       >
-        {isLoggedIn && filteredChatsToDisplay.length === 0 && !showUnreadOnly && (
-          <div className="p-4 text-sm text-muted-foreground">No messages in your inbox. Create a contact to start chatting.</div>
-        )}
         {isLoggedIn && filteredChatsToDisplay.length === 0 && showUnreadOnly && (
           <div className="p-4 text-sm text-muted-foreground">No unread messages.</div>
         )}
