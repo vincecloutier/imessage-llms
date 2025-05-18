@@ -33,7 +33,7 @@ const commonStyles = {
   mailTeaser: "line-clamp-2 w-[260px] text-xs whitespace-break-spaces"
 }
 
-export function PersonaForm({persona, freshProfile = false}: {persona: Persona | null, freshProfile?: boolean}) {
+export function PersonaForm({persona, showButton = true, freshProfile = false}: {persona: Persona | null, showButton?: boolean, freshProfile?: boolean}) {
   const [editingPersonaId, setEditingPersonaId] = useState<string | null>(null);
   const handlePersonaOpenChange = (isOpen: boolean) => {if (!isOpen) setEditingPersonaId(null)};
   if (persona) {
@@ -42,8 +42,8 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
         <div className={commonStyles.mailItem} onClick={() => setEditingPersonaId(persona.id)}>
             <div className="flex w-full items-center gap-2">
               <span>{(persona.attributes.name || 'Unnamed Persona').toString()}</span>{" "}
-           <span className="ml-auto text-xs text-underline"> <MoreHorizontal className="w-4 h-4" /> </span>
-            </div>
+              <span className="ml-auto text-xs text-underline"> <MoreHorizontal className="w-4 h-4" /> </span>
+          </div>
         </div>
         <GenericForm
           formTitle="Edit Contact"
@@ -60,10 +60,12 @@ export function PersonaForm({persona, freshProfile = false}: {persona: Persona |
   } else {  
     return (
       <>
-        <Label onClick={() => {setEditingPersonaId('new'); }} className="cursor-pointer">
-          <span>Add Contact</span>
-          <Plus className="w-4 h-4" />
-        </Label>
+        {showButton && (
+          <Label onClick={() => {setEditingPersonaId('new'); }} className="cursor-pointer">
+            <span>Add Contact</span>
+            <Plus className="w-4 h-4" />
+          </Label>
+        )}
         <GenericForm
           formTitle="Add New Contact"
           formDescription="Define the details for a new contact."
