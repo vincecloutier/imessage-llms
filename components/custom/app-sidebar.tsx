@@ -71,7 +71,7 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
 
 const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string; actions?: React.ReactNode; isLoggedIn: boolean; children: React.ReactNode }) => {
   return (
-    <Sidebar collapsible="none" className="hidden flex-1 md:flex">
+    <Sidebar collapsible="none" className="flex-1">
       <SidebarHeader className="gap-5 border-b py-3 px-4">
         <div className="flex w-full items-center justify-between">
           <div className="text-foreground text-base font-medium">
@@ -94,11 +94,15 @@ const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string;
 export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: Persona[], chats: Conversation[], isLoggedIn: boolean}) {
   const [activeItem, setActiveItem] = React.useState<NavItem>(navMain[0])
   const [showUnreadOnly, setShowUnreadOnly] = React.useState(false);
-  const { setOpen } = useSidebar()
+  const { setOpen, isMobile, setOpenMobile } = useSidebar()
 
   const handleItemClick = (item: NavItem) => {
     setActiveItem(item)
-    setOpen(true)
+    if (isMobile) {
+      setOpenMobile(true);
+    } else {
+      setOpen(true);
+    }
   }
 
   // ensure one entry per persona
@@ -114,7 +118,8 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
   const filteredChatsToDisplay = showUnreadOnly ? combinedChats.filter(chat => chat.is_unread) : combinedChats;
   
   return (
-    <Sidebar collapsible="icon" className="overflow-hidden *:data-[sidebar=sidebar]:flex-row border-t border-b border-l" {...props}>
+  <Sidebar collapsible="icon" className="overflow-hidden border-t border-b border-l data-[state=open]:w-auto" {...props}>
+    <div className="flex flex-row h-full w-full">
       <Sidebar collapsible="none" className={`${commonStyles.sidebarWidth} border-r`}>
         <SidebarHeader>
           <SidebarMenu>
@@ -135,7 +140,7 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupContent className="px-1.5 md:px-0">
+            <SidebarGroupContent>
               <SidebarMenu>
                 {navMain.map((item) => (
                   <MenuItem
@@ -149,7 +154,7 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup className="mt-auto">
-            <SidebarGroupContent className="px-1.5 md:px-0">
+            <SidebarGroupContent>
               <SidebarMenu>
                 {items.map((item) => (<MenuItem key={item.title} item={item} isActive={false} onClick={() => {}} />))}
               </SidebarMenu>
@@ -157,7 +162,6 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-
 
     {activeItem.title === "Inbox" && (
       <ContentPanel
@@ -193,16 +197,17 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
           );
         })}
       </ContentPanel>
-      )}
-      {activeItem.title === "Contacts" && (
-        <ContentPanel
-          title="Contacts"
-          actions={<PersonaForm persona={null}/>}
-          isLoggedIn={isLoggedIn}
-        >
-          {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
-        </ContentPanel>
-      )}
-    </Sidebar>
+    )}
+    {activeItem.title === "Contacts" && (
+      <ContentPanel
+        title="Contacts"
+        actions={<PersonaForm persona={null}/>}
+        isLoggedIn={isLoggedIn}
+      >
+        {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
+      </ContentPanel>
+    )}
+  </div>
+</Sidebar>
   )
 }
