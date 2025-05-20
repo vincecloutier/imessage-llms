@@ -19,6 +19,7 @@ export type Message = {
     content: string;
     file_path?: string | null;
     attachmentFile?: File | null;
+    created_at: string;
 }
 
 export type SaveEntityPayload = {
