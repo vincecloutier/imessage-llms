@@ -18,17 +18,17 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbS
 import { Credenza, CredenzaContent, CredenzaDescription, CredenzaFooter, CredenzaHeader, CredenzaTitle, CredenzaTrigger } from "@/components/ui/credenza"
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
 import { useRouter } from "next/navigation";
-import { Dialog } from "@radix-ui/react-dialog"
-import { DialogFooter } from "../ui/dialog"
 
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   const { theme, setTheme } = useTheme()
   return (
     <header className="bg-sidebar sticky top-0 flex shrink-0 items-center gap-2 border-b border-t border-r p-2 justify-between">
         <div className="flex items-center gap-2">
-        <SidebarTrigger/>
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-        <Breadcrumb>
+          <div className="md:hidden flex items-center gap-2">
+            <SidebarTrigger/>
+            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+          </div>
+        <Breadcrumb className="md:ml-2">
             <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">Chat</BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
