@@ -79,7 +79,7 @@ export const TypingMessage = ({name}: {name: string}) => {
       </div>
       <div className="flex flex-col gap-1 max-w-[80%]">
         <div className="flex-1">
-          <div className="bg-secondary text-secondary-foreground rounded-2xl rounded-bl-none px-4 py-2">
+          <div className="bg-muted text-secondary-foreground rounded-2xl rounded-bl-none px-4 py-2">
             <div className="flex gap-1">
               <span className="animate-smooth-bounce">●</span>
               <span className="animate-smooth-bounce" style={{ animationDelay: '0.2s' }}>●</span>
