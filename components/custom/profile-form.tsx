@@ -35,7 +35,7 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
       <>
         {profile && (
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setOpen(true)}>
-              <Avatar className="h-8 w-8 rounded-lg">
+            <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage src={profile.attributes.avatar as string} alt={profile.attributes.name as string} />
               <AvatarFallback className="rounded-lg">{profile.attributes.name?.toString().charAt(0)|| '?'}</AvatarFallback>
             </Avatar>
