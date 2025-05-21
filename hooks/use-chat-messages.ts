@@ -24,7 +24,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
       try {
         const response = await fetch(API_URL, {method: 'POST', credentials: 'include', body: formData});
         const result = await response.json();
-        setMessages([{role: 'assistant', content: result.message.content}]);
+        setMessages([{role: 'assistant', content: result.message.content, created_at: new Date().toISOString()}]);
       } catch (err: any) {
         console.error("Initial prompt error:", err);
         toast.error(`Failed to connect to April.`, {description: 'Please contact support if the issue persists.'});
@@ -38,7 +38,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
   const sendMessage = async (content: string, attachmentFile: File | null, setAttachmentFile: (file: File | null) => void) => {
     setIsResponding(true);
     const trimmedContent = content.trim();
-    const userMessage: Message = { role: 'user', content: trimmedContent };
+    const userMessage: Message = { role: 'user', content: trimmedContent, created_at: new Date().toISOString() };
     if (attachmentFile) {
       userMessage.attachmentFile = attachmentFile;
     }
@@ -58,7 +58,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
     try {
       const response = await fetch(API_URL, {method: 'POST', credentials: 'include', body: formData});
       const result = await response.json();
-      setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content}]);
+      setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content, created_at: new Date().toISOString()}]);
     } catch (err: any) {
       console.error("Send message error:", err);
       toast.error(`Failed to connect to April.`, {description: 'Please contact support if the issue persists.'});
