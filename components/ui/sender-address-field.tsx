@@ -9,45 +9,24 @@ import {
   ControlGroup,
   ControlGroupItem,
 } from "@/components/ui/control-group";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "./input";
+import { PhoneInput } from "@/components/ui/phone-input";
 
 export function SenderAddressField({value, onChange}: {value: string | null, onChange: (value: string | null) => void}) {
   const [isEmail, setIsEmail] = useState(value?.includes('@') ?? false);
-  const [inputValue, setInputValue] = useState(value ?? '');
-  const [emailValue, setEmailValue] = useState('');
-  const [phoneValue, setPhoneValue] = useState('');
-
-  useEffect(() => {
-    if (value) {
-      const isEmailValue = value.includes('@');
-      setIsEmail(isEmailValue);
-      setInputValue(value);
-      if (isEmailValue) {
-        setEmailValue(value);
-      } else {
-        setPhoneValue(value);
-      }
-    }
-  }, [value]);
+  const [emailValue, setEmailValue] = useState(value?.includes('@') ? value : '');
+  const [phoneValue, setPhoneValue] = useState(!value?.includes('@') ? value : '');
 
   const handleTypeChange = (newType: string) => {
     const newIsEmail = newType === 'email';
     setIsEmail(newIsEmail);
-    setInputValue(newIsEmail ? emailValue : phoneValue);
-    const currentValue = newIsEmail ? emailValue : phoneValue;
-    if (currentValue) {
-      onChange(currentValue);
-    } else {
-      onChange(null);
-    }
+    // When switching types, use the stored value for that type
+    onChange(newIsEmail ? emailValue || null : phoneValue || null);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    
+  const handleInputChange = (newValue: string) => {
     if (isEmail) {
-      setInputValue(newValue);
       setEmailValue(newValue);
       if (newValue.includes('@') && newValue.includes('.')) {
         onChange(newValue);
@@ -55,16 +34,8 @@ export function SenderAddressField({value, onChange}: {value: string | null, onC
         onChange(null);
       }
     } else {
-      const sanitizedValue = newValue.replace(/[^0-9+]/g, '');
-      const finalValue = sanitizedValue.startsWith('+') ? sanitizedValue : '+' + sanitizedValue;
-      setInputValue(finalValue);
-      setPhoneValue(finalValue);
-
-      if (finalValue.length > 1) {
-        onChange(finalValue);
-      } else {
-        onChange(null);
-      }
+      setPhoneValue(newValue);
+      onChange(newValue || null);
     }
   };
 
@@ -80,18 +51,28 @@ export function SenderAddressField({value, onChange}: {value: string | null, onC
           </SelectTrigger>
         </ControlGroupItem>
         <SelectContent align="end">
-          <SelectItem value="email">Email</SelectItem>
           <SelectItem value="phone">Phone</SelectItem>
+          <SelectItem value="email">Email</SelectItem>
         </SelectContent>
       </Select>
       <ControlGroupItem>
-        <Input
-          type={isEmail ? "email" : "tel"}
-          placeholder={""}
-          value={inputValue}
-          onChange={handleInputChange}
-          pattern={isEmail ? undefined : "^\\+[0-9]+$"}
-        />
+        {isEmail ? (
+          <Input
+            type="email"
+            placeholder=""
+            value={emailValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+          />
+        ) : (
+          <PhoneInput
+            international
+            countryCallingCodeEditable={true}
+            defaultCountry="US"
+            value={phoneValue || ''}
+            onChange={(newValue) => handleInputChange(newValue)}
+            className="w-full"
+          />
+        )}
       </ControlGroupItem>
     </ControlGroup>
   );
