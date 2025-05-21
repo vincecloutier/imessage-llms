@@ -50,7 +50,7 @@ export function SenderAddressField({value, onChange}: {value: string | null, onC
             <SelectValue placeholder="Email or Phone" />
           </SelectTrigger>
         </ControlGroupItem>
-        <SelectContent align="end">
+        <SelectContent >
           <SelectItem value="phone">Phone</SelectItem>
           <SelectItem value="email">Email</SelectItem>
         </SelectContent>
