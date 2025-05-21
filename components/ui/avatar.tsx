@@ -36,8 +36,18 @@ function AvatarImage({
 
 function AvatarFallback({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+  // Function to get initials from a full name
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+    }
+    return name[0]?.toUpperCase() || '';
+  };
+
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
@@ -46,7 +56,9 @@ function AvatarFallback({
         className
       )}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? getInitials(children) : children}
+    </AvatarPrimitive.Fallback>
   )
 }
 
