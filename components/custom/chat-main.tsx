@@ -49,6 +49,15 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
     return () => {resizeObserver.unobserve(inputElement);};
   }, []);
 
+  // Function to determine if we should show a date separator
+  const shouldShowDateSeparator = (message: Message, index: number) => {
+    if (index === 0) return true;
+    const prevMessage = messages[index - 1];
+    const currentDate = new Date(message.created_at || Date.now());
+    const prevDate = new Date(prevMessage.created_at || Date.now());
+    return currentDate.toDateString() !== prevDate.toDateString();
+  };
+
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden transition-colors duration-200 ease-in-out" {...handlers}>
       <AppHeader user={user} persona={persona} profile={profile}/>
@@ -65,15 +74,22 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
         )}
       </AnimatePresence>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 pt-4 min-h-0" style={{ paddingBottom: `${inputAreaHeight}px` }}>
-        <div className="flex flex-col gap-4">
-            {messages.map((message, index) => (<DisplayMessage key={index} message={message}/>))}
-            {isResponding && <TypingMessage />}
-            <div ref={messagesEndRef} />
+      <div className="flex-1 overflow-y-auto scrollbar-hide min-h-0 pt-4" style={{ paddingBottom: `${inputAreaHeight}px` }}>
+        <div className="flex flex-col gap-2">
+          {messages.map((message, index) => (
+            <DisplayMessage 
+              name={(message.role === 'user' ? profile?.attributes?.name || 'User' : persona.attributes?.name || 'Assistant') as string}
+              key={index} 
+              message={message} 
+              showDateSeparator={shouldShowDateSeparator(message, index)}
+            />
+          ))}
+          {isResponding && <TypingMessage name={(persona.attributes?.name || 'Assistant') as string} />}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      <div ref={inputContainerRef} className="absolute bottom-4 left-0 right-0 px-4 z-5 pointer-events-none">
+      <div ref={inputContainerRef} className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
            <ChatInput
             input={input}
             setInput={setInput}
