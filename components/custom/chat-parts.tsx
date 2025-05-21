@@ -51,7 +51,7 @@ export const DisplayMessage = ({name, message, showDateSeparator}: {name: string
             {message.content && (
               <div className={cx(
                 "text-sm inline-block relative group",
-                isUser ? "bg-primary text-primary-foreground rounded-2xl rounded-br-none px-4 py-2" : "bg-secondary text-secondary-foreground rounded-2xl rounded-bl-none px-4 py-2"
+                isUser ? "bg-primary text-primary-foreground rounded-2xl rounded-br-none px-4 py-2" : "bg-muted text-secondary-foreground rounded-2xl rounded-bl-none px-4 py-2"
               )}>
                 <div className="text-left">
                   {message.content}
