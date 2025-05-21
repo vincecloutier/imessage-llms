@@ -15,12 +15,13 @@ import { MessagingPlatformField } from "@/components/ui/messaging-platform-field
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 import { Credenza, CredenzaContent, CredenzaHeader, CredenzaTitle, CredenzaDescription, CredenzaFooter, CredenzaBody } from "@/components/ui/credenza";
+import { SenderAddressField } from "@/components/ui/sender-address-field";
 
 export interface FieldSchema {
   name: string;
   label: string;
   description?: string;
-  type: "text" | "number" | "calendar" | "enum" | "location" | "messaging_platform";
+  type: "text" | "number" | "calendar" | "enum" | "location" | "messaging_platform" | "sender_address";
   options?: string[];
   rowId: string;
 }
@@ -67,18 +68,30 @@ const generateBaseSchemaShape = (fields: FieldSchema[]) => {
       case "messaging_platform":
         fieldSchema = MessagingPlatformValueSchema;
         break;
+      case "sender_address":  
+      fieldSchema = z.preprocess(
+        (val) => (val === "" ? null : val),
+        z.string()
+          .refine(
+            (val) => {
+              if (!val) return true; // Allow null/empty
+              if (val.includes('@')) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+              } else {
+                return /^\+[0-9]+$/.test(val);
+              }
+            },
+            { message: "Invalid email or phone number format. Phone numbers must start with + and contain only digits." }
+          )
+          .nullable()
+          .optional()
+      );
+            break;
       default:
         fieldSchema = z.any().refine(val => val !== undefined && val !== null, { message: 'This field is required' });
     }
     shape[field.name] = fieldSchema;
   });
-  shape["sender_address"] = z.preprocess(
-    (val) => (val === "" ? null : val),
-    z.string().email({ message: "Invalid email or phone number format for sender address"})
-      .or(z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format for sender address"}))
-      .nullable()
-      .optional()
-  );
   shape["telegram_username"] = z.string().refine(val => val === null || val === undefined || !val.includes("@"), {
     message: "Please enter your username without the '@'.",
   }).nullable().optional();
@@ -263,6 +276,8 @@ export default function GenericForm({startingValues, fields, saveAction, destruc
         return <LocationField value={ctrl.value} onChange={ctrl.onChange} />;
       case "messaging_platform":
         return <MessagingPlatformField value={ctrl.value} onChange={ctrl.onChange} />;
+      case "sender_address":
+        return <SenderAddressField value={ctrl.value} onChange={ctrl.onChange} />;
       default:
         return <Input {...ctrl} value={safeValue} />;
     }

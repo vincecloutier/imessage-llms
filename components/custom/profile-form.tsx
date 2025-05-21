@@ -15,7 +15,7 @@ const profileFields: FieldSchema[] = [
     { name: 'name', label: 'Name*', rowId: 'a1', type: 'text' },
     { name: 'birthday', label: 'Birthday*', rowId: 'a2', type: 'calendar' },
     { name: 'location', label: 'Location*', rowId: 'a3', type: 'location' },
-    { name: 'sender_address', label: 'iMessage Address (Optional)', description: 'The phone number or email address you use with iMessages.', rowId: 'a4', type: 'phone' },
+    { name: 'sender_address', label: 'iMessage Address (Optional)', description: 'The phone number or email address you use with iMessages.', rowId: 'a4', type: 'sender_address' },
     { name: 'telegram_username', label: 'Telegram Username (Optional)', description: 'The username you use with Telegram (without the @).', rowId: 'a5', type: 'text' },
   ]
 
