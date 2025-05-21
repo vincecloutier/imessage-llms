@@ -14,13 +14,13 @@ export function ImagePreview({ source, onDelete, alt = "Preview image" }: {sourc
   const handlePreviewClick = () => {if (resolvedUrl && !error && !isLoading) setIsModalOpen(true);};
   const renderPreviewContent = () => {
     if (resolvedUrl) return <Image src={resolvedUrl} alt={alt} fill sizes="(max-width: 128px) 100vw, 128px" priority className="object-cover" onClick={handlePreviewClick}/>;
-    return <div className="w-full h-full animate-pulse rounded-md bg-muted" />;
+    return <div className="w-full h-full animate-pulse rounded-lg bg-muted" />;
   }
 
   return (
     <>
       <div className="relative inline-block group size-32">
-        <div className="border rounded-2xl overflow-hidden relative size-full">
+        <div className="border rounded-lg overflow-hidden relative size-full">
           <div className={`size-full ${resolvedUrl && !error && !isLoading ? 'cursor-pointer' : ''}`}>
              {renderPreviewContent()}
           </div>
