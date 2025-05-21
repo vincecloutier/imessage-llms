@@ -89,7 +89,7 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
         </div>
       </div>
 
-      <div ref={inputContainerRef} className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none">
+      <div ref={inputContainerRef} className="absolute bottom-0 left-0 right-0">
            <ChatInput
             input={input}
             setInput={setInput}

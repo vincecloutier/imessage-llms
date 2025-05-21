@@ -115,7 +115,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
   }, [input, isResponding, handleSubmit, textareaRef]);
 
   return (
-    <div className="pointer-events-auto">
+    <div className="relative">
       {attachmentFile && (
         <div className="px-2">
           <ImagePreview source={attachmentFile} onDelete={handleFileRemoved} alt={attachmentFile.name || "Selected image"} />
