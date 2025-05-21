@@ -15,18 +15,32 @@ import { Input } from "./input";
 export function SenderAddressField({value, onChange}: {value: string | null, onChange: (value: string | null) => void}) {
   const [isEmail, setIsEmail] = useState(value?.includes('@') ?? false);
   const [inputValue, setInputValue] = useState(value ?? '');
+  const [emailValue, setEmailValue] = useState('');
+  const [phoneValue, setPhoneValue] = useState('');
 
   useEffect(() => {
     if (value) {
-      setIsEmail(value.includes('@'));
+      const isEmailValue = value.includes('@');
+      setIsEmail(isEmailValue);
       setInputValue(value);
+      if (isEmailValue) {
+        setEmailValue(value);
+      } else {
+        setPhoneValue(value);
+      }
     }
   }, [value]);
 
   const handleTypeChange = (newType: string) => {
-    setIsEmail(newType === 'email');
-    setInputValue('');
-    onChange(null);
+    const newIsEmail = newType === 'email';
+    setIsEmail(newIsEmail);
+    setInputValue(newIsEmail ? emailValue : phoneValue);
+    const currentValue = newIsEmail ? emailValue : phoneValue;
+    if (currentValue) {
+      onChange(currentValue);
+    } else {
+      onChange(null);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,20 +48,19 @@ export function SenderAddressField({value, onChange}: {value: string | null, onC
     
     if (isEmail) {
       setInputValue(newValue);
-      // Email validation
+      setEmailValue(newValue);
       if (newValue.includes('@') && newValue.includes('.')) {
         onChange(newValue);
       } else {
         onChange(null);
       }
     } else {
-      // Phone validation - only allow numbers and +
       const sanitizedValue = newValue.replace(/[^0-9+]/g, '');
-      // Ensure it starts with +
       const finalValue = sanitizedValue.startsWith('+') ? sanitizedValue : '+' + sanitizedValue;
       setInputValue(finalValue);
+      setPhoneValue(finalValue);
 
-      if (finalValue.length > 1) { // More than just the + symbol
+      if (finalValue.length > 1) {
         onChange(finalValue);
       } else {
         onChange(null);
@@ -62,7 +75,7 @@ export function SenderAddressField({value, onChange}: {value: string | null, onC
         onValueChange={handleTypeChange}
       >
         <ControlGroupItem>
-          <SelectTrigger className="w-fit">
+          <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Email or Phone" />
           </SelectTrigger>
         </ControlGroupItem>
@@ -72,12 +85,13 @@ export function SenderAddressField({value, onChange}: {value: string | null, onC
         </SelectContent>
       </Select>
       <ControlGroupItem>
-        <Input              type={isEmail ? "email" : "tel"}
-              placeholder={isEmail ? "Enter email" : "Enter phone number"}
-              value={inputValue}
-              onChange={handleInputChange}
-              pattern={isEmail ? undefined : "^\\+[0-9]+$"}
-            />
+        <Input
+          type={isEmail ? "email" : "tel"}
+          placeholder={""}
+          value={inputValue}
+          onChange={handleInputChange}
+          pattern={isEmail ? undefined : "^\\+[0-9]+$"}
+        />
       </ControlGroupItem>
     </ControlGroup>
   );
