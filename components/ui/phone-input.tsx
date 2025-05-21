@@ -112,7 +112,7 @@ const CountrySelect = ({
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
         <Command>
-          <CommandInput
+          {/* <CommandInput
             value={searchValue}
             onValueChange={(value) => {
               setSearchValue(value);
@@ -128,7 +128,7 @@ const CountrySelect = ({
               }, 0);
             }}
             placeholder="Search country..."
-          />
+          /> */}
           <CommandList>
             <ScrollArea ref={scrollAreaRef} className="h-72">
               <CommandEmpty>No country found.</CommandEmpty>
