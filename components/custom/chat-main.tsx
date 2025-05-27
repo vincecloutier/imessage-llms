@@ -32,6 +32,15 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
   // custom hook for handling keyboard focus
   useKeyboardFocus(textareaRef);
 
+  // mark conversation as read whenever messages change
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(`read-${persona.id}`, new Date().toISOString());
+      window.dispatchEvent(new CustomEvent('chat-read', { detail: { personaId: persona.id } }));
+    } catch (_) {}
+  }, [persona.id, messages.length]);
+
   // auto-scroll to bottom when messages change OR input area height changes
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });}, [messages, inputAreaHeight]);
   

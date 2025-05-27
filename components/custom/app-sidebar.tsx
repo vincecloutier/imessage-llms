@@ -107,7 +107,33 @@ const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string;
 export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: Persona[], chats: Conversation[], isLoggedIn: boolean}) {
   const [activeItem, setActiveItem] = React.useState<NavItem>(navMain[0])
   const [showUnreadOnly, setShowUnreadOnly] = React.useState(false);
+  const [chatStates, setChatStates] = React.useState<Conversation[]>(chats);
   const { setOpen, isMobile, setOpenMobile } = useSidebar()
+
+  // compute unread status based on localStorage
+  React.useEffect(() => {
+    const compute = () => {
+      const updated = chats.map(chat => {
+        try {
+          const readAt = localStorage.getItem(`read-${chat.id}`);
+          const lastRead = readAt ? new Date(readAt).getTime() : 0;
+          const lastMsg = chat.lastMessageTime ? new Date(chat.lastMessageTime).getTime() : 0;
+          return { ...chat, is_unread: lastMsg > lastRead } as Conversation;
+        } catch {
+          return { ...chat };
+        }
+      });
+      setChatStates(updated);
+    };
+
+    compute();
+    window.addEventListener('chat-read', compute);
+    window.addEventListener('storage', compute);
+    return () => {
+      window.removeEventListener('chat-read', compute);
+      window.removeEventListener('storage', compute);
+    };
+  }, [chats]);
 
   const handleItemClick = (item: NavItem) => {
     setActiveItem(item)
@@ -120,7 +146,7 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
 
   // ensure one entry per persona
   const combinedChats = personas.map(persona => {
-    const existingChat = chats.find(chat => chat.id === persona.id);
+    const existingChat = chatStates.find(chat => chat.id === persona.id);
     if (existingChat) {
       return existingChat;
     } else {
@@ -201,7 +227,10 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
               onClick={() => {if (isMobile) {setOpenMobile(false);}}}
             >
               <div className="flex w-full items-center gap-2">
-                <span>{chat.name as string}</span>
+                <span className="flex items-center gap-2">
+                  {chat.name as string}
+                  {chat.is_unread && <span className="block h-2 w-2 rounded-full bg-primary" />}
+                </span>
                 <span className="ml-auto text-xs">{displayDateOrStatus}</span>
               </div>
               <span className={commonStyles.mailTeaser}>{chat.lastMessage.trim()}</span>
@@ -216,7 +245,16 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
         actions={<PersonaForm persona={null}/>}
         isLoggedIn={isLoggedIn}
       >
-        {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} />))}
+        {personas.map((persona) => {
+          try {
+            localStorage.setItem(`read-${persona.id}`, new Date().toISOString());
+            window.dispatchEvent(new CustomEvent('chat-read', { detail: { personaId: persona.id } }));
+          } catch (error) {
+            console.error('Failed to update chat read status:', error);
+            // Handle the error appropriately
+          }
+          return (<PersonaForm key={persona.id} persona={persona} />);
+        })}
       </ContentPanel>
     )}
   </div>
