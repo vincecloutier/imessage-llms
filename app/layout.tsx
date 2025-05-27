@@ -24,7 +24,10 @@ export default async function RootLayout({children, sidebar}: {children: React.R
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <Toaster position="top-center" richColors/>
-          <SidebarProvider style={{"--sidebar-width": "350px"} as React.CSSProperties}>
+          <SidebarProvider style={{
+            "--sidebar-width": "min(350px, 100vw)",
+            "--sidebar-width-mobile": "100vw"
+          } as React.CSSProperties}>
             {sidebar}
             <SidebarInset>
               {children}

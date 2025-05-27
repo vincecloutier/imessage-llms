@@ -25,8 +25,8 @@ import { PersonaForm } from "./persona-form";
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
   menuButton: "px-2.5 md:px-2",
-  mailItem: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap",
-  mailTeaser: "line-clamp-2 w-[260px] text-xs whitespace-break-spaces"
+  mailItem: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col gap-2 border-b p-4 text-sm",
+  mailTeaser: "line-clamp-2 w-full text-xs whitespace-break-spaces"
 }
 
 const navMain = [
@@ -50,7 +50,7 @@ type NavItem = {
 const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: React.ElementType; url: string }; isActive: boolean; onClick: () => void; }) => {
   const { isMobile, setOpenMobile } = useSidebar();
   const isNextLink = item.url.startsWith("/");
-  const isExternalNewTab = item.url.startsWith("http"); // mailto links handle themselves, http/https will be new tab
+  const isExternalNewTab = item.url.startsWith("http");
   const isHashLink = item.url === "#";
 
   const handlePress = () => {
@@ -61,23 +61,17 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
   };
 
   const linkContent = (
-    <>
-      <item.icon className={cn("shrink-0", isMobile ? "size-5" : "size-4")} />
-      <span className={cn(isMobile ? "text-xs" : "sr-only")}>{item.title}</span>
-    </>
+    <item.icon className="size-5 shrink-0" />
   );
 
   return (
     <SidebarMenuItem key={item.title}>
       <SidebarMenuButton
-        tooltip={{ children: item.title, hidden: isMobile ? true : false }}
+        tooltip={{ children: item.title, hidden: false }}
         onClick={handlePress}
         isActive={isActive}
         asChild={true}
-        className={cn(
-          commonStyles.menuButton,
-          isMobile ? "px-2.5 py-2 flex items-center justify-start text-xs" : commonStyles.menuButton
-      )}
+        className="p-2 flex items-center justify-center"
       >
         {isNextLink 
         ? (<Link href={item.url}>{linkContent}</Link>) 
@@ -90,7 +84,7 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
 const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string; actions?: React.ReactNode; isLoggedIn: boolean; children: React.ReactNode }) => {
   const { isMobile } = useSidebar();
   return (
-    <Sidebar collapsible="none" className={cn("w-80", isMobile && "w-full")}>
+    <Sidebar collapsible="none" className={cn("w-80 md:w-80", isMobile && "w-full")}>
       <SidebarHeader className="gap-5 border-b py-3 px-4">
         <div className="flex w-full items-center justify-between">
           <div className="text-foreground text-base font-medium">
@@ -143,17 +137,11 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
-                <Link href="/">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <Command className="size-4" />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">April Intelligence</span>
-                    <span className="truncate text-xs">v1.0.0</span>
-                  </div>
-                </Link>
-              </SidebarMenuButton>
+              <Link href="/">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Command className="size-4" />
+                </div>
+              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
