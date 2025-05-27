@@ -36,7 +36,7 @@ export const DisplayMessage = ({name, message, showDateSeparator}: {name: string
         {!isUser && (
           <div className="flex-shrink-0 mr-2 self-end -mb-4">
             <Avatar className="h-8 w-8 rounded-lg">
-              <AvatarImage src={avatarUrl} alt={name} />
+              {/* <AvatarImage src={avatarUrl} alt={name} /> */}
               <AvatarFallback className={cx("rounded-lg bg-muted")}>{name}</AvatarFallback>
             </Avatar>
           </div>
@@ -73,7 +73,7 @@ export const TypingMessage = ({name}: {name: string}) => {
     <div className="px-4 py-2 flex justify-start" data-role="assistant">
       <div className="flex-shrink-0 mr-2 self-end -mb-4">
         <Avatar className="h-8 w-8 rounded-lg">
-          <AvatarImage src="/assistant-avatar.png" alt="Assistant" />
+          {/* <AvatarImage src="/assistant-avatar.png" alt="Assistant" /> */}
           <AvatarFallback className="rounded-lg bg-muted">{name}</AvatarFallback>
         </Avatar>
       </div>
