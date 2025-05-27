@@ -245,16 +245,7 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
         actions={<PersonaForm persona={null}/>}
         isLoggedIn={isLoggedIn}
       >
-        {personas.map((persona) => {
-          try {
-            localStorage.setItem(`read-${persona.id}`, new Date().toISOString());
-            window.dispatchEvent(new CustomEvent('chat-read', { detail: { personaId: persona.id } }));
-          } catch (error) {
-            console.error('Failed to update chat read status:', error);
-            // Handle the error appropriately
-          }
-          return (<PersonaForm key={persona.id} persona={persona} />);
-        })}
+      {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} /> ))}
       </ContentPanel>
     )}
   </div>
