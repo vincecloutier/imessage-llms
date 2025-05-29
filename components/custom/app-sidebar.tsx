@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from 'next/link';
-import { Command, Inbox, Send, Contact, BookOpen, LifeBuoy } from "lucide-react"
+import { Inbox, Send, Contact, BookOpen, LifeBuoy } from "lucide-react"
 
 import {
   Sidebar,
@@ -21,6 +21,7 @@ import { Switch } from '@/components/ui/switch';
 import { Persona, Conversation } from '@/lib/types';
 import { cn } from "@/lib/utils";
 import { PersonaForm } from "./persona-form";
+import Image from "next/image";
 
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
@@ -65,7 +66,7 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
   );
 
   return (
-    <SidebarMenuItem key={item.title}>
+    <SidebarMenuItem key={item.title} className="text-muted-foreground hover:text-foreground">
       <SidebarMenuButton
         tooltip={{ children: item.title, hidden: false }}
         onClick={handlePress}
@@ -164,9 +165,7 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
           <SidebarMenu>
             <SidebarMenuItem>
               <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Command className="size-4" />
-                </div>
+                <Image src="/logo.svg" alt="April Intelligence" width={32} height={32} />
               </Link>
             </SidebarMenuItem>
           </SidebarMenu>
