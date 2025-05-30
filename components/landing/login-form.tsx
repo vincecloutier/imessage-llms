@@ -1,0 +1,169 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { ArrowRight, Loader2 } from "lucide-react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { signIn, verifyOTP } from "@/lib/supabase/client"
+
+export function LoginForm() {
+  const router = useRouter()
+  const [step, setStep] = useState<"email" | "otp">("email")
+  const [email, setEmail] = useState("")
+  const [otp, setOtp] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    try {
+      await signIn(email)
+      toast.success("OTP sent successfully.", {
+        description: "Please check your email for the verification code.",
+      })
+      setStep("otp")
+    } catch (error: any) {
+      toast.error("OTP could not be sent.", {
+        description: `${error.message}${error.message.endsWith(".") ? "" : "."}`,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    try {
+      await verifyOTP(email, otp)
+      toast.success("Successfully signed in!")
+      router.push("/chat/0") 
+      // router.refresh(); // Uncomment if you need to refresh server components on the target page
+    } catch (error: any) {
+      toast.error("Invalid OTP.", {
+        description: `${error.message}${error.message.endsWith(".") ? "" : "."}`,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendCode = async () => {
+    setIsLoading(true)
+    try {
+      await signIn(email) // Resend OTP to the same email
+      toast.success("OTP resent successfully.", {
+        description: "Please check your email for the new verification code.",
+      })
+    } catch (error: any) {
+      toast.error("Failed to resend OTP.", {
+        description: `${error.message}${error.message.endsWith(".") ? "" : "."}`,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="w-full max-w-md space-y-6 rounded-lg border bg-card p-6 shadow-sm">
+      {step === "email" ? (
+        <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold tracking-tight">Get started</h2>
+            <p className="text-sm text-muted-foreground">Enter your email to continue</p>
+          </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+                className="rounded-full"
+              />
+            </div>
+            <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sending code...
+                </>
+              ) : (
+                <>
+                  Continue
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <form onSubmit={handleOtpSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold tracking-tight">Verify your email</h2>
+            <p className="text-sm text-muted-foreground">
+              We sent a verification code to <span className="font-medium">{email}</span>
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={(value) => setOtp(value)}
+                disabled={isLoading}
+              >
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={0} className="h-12 w-12 text-center text-lg rounded-lg" />
+                  <InputOTPSlot index={1} className="h-12 w-12 text-center text-lg rounded-lg" />
+                  <InputOTPSlot index={2} className="h-12 w-12 text-center text-lg rounded-lg" />
+                  <InputOTPSlot index={3} className="h-12 w-12 text-center text-lg rounded-lg" />
+                  <InputOTPSlot index={4} className="h-12 w-12 text-center text-lg rounded-lg" />
+                  <InputOTPSlot index={5} className="h-12 w-12 text-center text-lg rounded-lg" />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+            <Button type="submit" className="w-full rounded-full" disabled={isLoading || otp.length < 6}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  Verify and continue
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
+            </Button>
+            <Button
+              variant="link"
+              type="button"
+              className="w-full"
+              onClick={() => {
+                setStep("email")
+                setOtp("") // Clear OTP when going back
+              }}
+              disabled={isLoading}
+            >
+              Back to email
+            </Button>
+          </div>
+          <div className="text-center text-sm text-muted-foreground">
+            Didn't receive a code?{" "}
+            <Button variant="link" className="p-0 h-auto" disabled={isLoading} onClick={handleResendCode}>
+              Resend code
+            </Button>
+          </div>
+        </form>
+      )}
+    </div>
+  )
+}

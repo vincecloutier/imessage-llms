@@ -9,7 +9,7 @@ export default async function DefaultPersonas() {
   
   const profile = await getCachedUserProfile(user.id);
   if (!profile) return <ProfileForm user={user} profile={null} />;
-
+  
   const personas = await getCachedPersonas(user.id);
   if (personas.length === 0) return <PersonaForm persona={null} showButton={false} freshProfile={true}/>;
 

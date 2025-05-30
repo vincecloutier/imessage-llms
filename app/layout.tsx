@@ -3,7 +3,6 @@ import { Toaster } from 'sonner';
 
 import './globals.css';
 import { ThemeProvider } from '@/components/custom/theme-provider';
-import { SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aprilintelligence.com'),
@@ -24,15 +23,7 @@ export default async function RootLayout({children, sidebar}: {children: React.R
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <Toaster position="top-center" richColors/>
-          <SidebarProvider style={{
-            "--sidebar-width": "min(350px, 100vw)",
-            "--sidebar-width-mobile": "100vw"
-          } as React.CSSProperties}>
-            {sidebar}
-            <SidebarInset>
-              {children}
-            </SidebarInset>
-          </SidebarProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>
