@@ -21,7 +21,7 @@ export default async function RootLayout({children, sidebar}: {children: React.R
         <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
       </head>
       <body className="antialiased">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
         <Toaster position="top-center" richColors/>
           {children}
         </ThemeProvider>

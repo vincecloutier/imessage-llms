@@ -43,7 +43,7 @@ export function LoginForm() {
       await verifyOTP(email, otp)
       toast.success("Successfully signed in!")
       router.push("/chat/0") 
-      // router.refresh(); // Uncomment if you need to refresh server components on the target page
+      router.refresh();
     } catch (error: any) {
       toast.error("Invalid OTP.", {
         description: `${error.message}${error.message.endsWith(".") ? "" : "."}`,
@@ -74,8 +74,8 @@ export function LoginForm() {
       {step === "email" ? (
         <form onSubmit={handleEmailSubmit} className="space-y-4">
           <div className="space-y-2">
-            <h2 className="text-xl font-semibold tracking-tight">Get started</h2>
-            <p className="text-sm text-muted-foreground">Enter your email to continue</p>
+            <h2 className="text-xl font-semibold tracking-tight">Connect with April</h2>
+            <p className="text-sm text-muted-foreground">Enter your email to continue.</p>
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -107,7 +107,7 @@ export function LoginForm() {
       ) : (
         <form onSubmit={handleOtpSubmit} className="space-y-4">
           <div className="space-y-2">
-            <h2 className="text-xl font-semibold tracking-tight">Verify your email</h2>
+            <h2 className="text-xl font-semibold tracking-tight">Enter your one time password.</h2>
             <p className="text-sm text-muted-foreground">
               We sent a verification code to <span className="font-medium">{email}</span>
             </p>
@@ -119,14 +119,15 @@ export function LoginForm() {
                 value={otp}
                 onChange={(value) => setOtp(value)}
                 disabled={isLoading}
+                containerClassName="gap-2"
               >
-                <InputOTPGroup className="gap-2">
-                  <InputOTPSlot index={0} className="h-12 w-12 text-center text-lg rounded-lg" />
-                  <InputOTPSlot index={1} className="h-12 w-12 text-center text-lg rounded-lg" />
-                  <InputOTPSlot index={2} className="h-12 w-12 text-center text-lg rounded-lg" />
-                  <InputOTPSlot index={3} className="h-12 w-12 text-center text-lg rounded-lg" />
-                  <InputOTPSlot index={4} className="h-12 w-12 text-center text-lg rounded-lg" />
-                  <InputOTPSlot index={5} className="h-12 w-12 text-center text-lg rounded-lg" />
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} className="h-12 w-12"/>
+                  <InputOTPSlot index={1} className="h-12 w-12"/>
+                  <InputOTPSlot index={2} className="h-12 w-12"/>
+                  <InputOTPSlot index={3} className="h-12 w-12"/>
+                  <InputOTPSlot index={4} className="h-12 w-12"/>
+                  <InputOTPSlot index={5} className="h-12 w-12"/>
                 </InputOTPGroup>
               </InputOTP>
             </div>

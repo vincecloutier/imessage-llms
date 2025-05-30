@@ -2,7 +2,7 @@ import { BookOpen, Code, Share2 } from "lucide-react"
 
 export function FeatureSection() {
   return (
-    <section className="py-16 container">
+    <section className="py-16 max-w-7xl mx-auto">
       <div className="text-center space-y-4 mb-12">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Meet Nexus</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
