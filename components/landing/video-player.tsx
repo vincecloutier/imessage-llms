@@ -14,21 +14,14 @@ export function VideoPlayer() {
   }, [])
 
   return (
-    <div className="relative w-full max-w-xl rounded-lg overflow-hidden shadow-xl border bg-card">
-      <div className="absolute top-0 left-0 right-0 h-8 bg-muted flex items-center px-3 gap-1.5">
-        <div className="w-3 h-3 rounded-full bg-primary" />
-        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-        <div className="w-3 h-3 rounded-full bg-green-500" />
-        <div className="ml-2 text-xs text-muted-foreground">Nexus AI Demo</div>
-      </div>
-      <div className="pt-8">
+    <div className="fixed inset-0 w-screen h-screen z-[-1]">
         <video
           ref={videoRef}
-          className="w-full aspect-video object-cover"
+          className="w-full h-full object-cover"
           loop
           muted
           playsInline
-          poster="/placeholder.svg?height=720&width=1280"
+          poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         >
           <source
             src="https://storage.googleapis.com/web-dev-assets/video-and-source-tags/chrome.mp4"
@@ -36,29 +29,6 @@ export function VideoPlayer() {
           />
           Your browser does not support the video tag.
         </video>
-      </div>
-      <div className="p-4 bg-card border-t">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-            <span className="text-sm font-medium">N</span>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm">
-              I can help you optimize your code for better performance. Here's an example of how to improve your current
-              implementation.
-            </p>
-            <pre className="mt-2 rounded-md bg-muted p-2 text-xs overflow-x-auto">
-              <code>{`function optimizeData(data) {
-  return data.filter(item => item.value > 0)
-    .map(item => ({
-      ...item,
-      score: item.value * 2
-    }));
-}`}</code>
-            </pre>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
