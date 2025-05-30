@@ -7,7 +7,7 @@ import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Persona } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { deletePersona, savePersona } from '@/lib/actions';
-import GenericForm, { FieldSchema } from '@/components/custom/generic-form';
+import GenericForm, { FieldSchema } from '@/components/custom/form-generic';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 

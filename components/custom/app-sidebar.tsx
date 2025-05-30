@@ -20,7 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Persona, Conversation } from '@/lib/types';
 import { cn } from "@/lib/utils";
-import { PersonaForm } from "./persona-form";
+import { PersonaForm } from "./form-persona";
 import Image from "next/image";
 
 const commonStyles = {
@@ -82,7 +82,7 @@ const MenuItem = ({ item, isActive, onClick }: { item: { title: string; icon: Re
   );
 };
 
-const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string; actions?: React.ReactNode; isLoggedIn: boolean; children: React.ReactNode }) => {
+const ContentPanel = ({ title, actions, children }: { title: string; actions?: React.ReactNode; children: React.ReactNode }) => {
   const { isMobile } = useSidebar();
   return (
     <Sidebar collapsible="none" className={cn("w-80 md:w-80", isMobile && "w-full")}>
@@ -91,13 +91,13 @@ const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string;
           <div className="text-foreground text-base font-medium">
             {title}
           </div>
-          {isLoggedIn && actions}
+          {actions}
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
-            {isLoggedIn ? children : <div className="p-4">Login to view this content!</div>}
+            {children}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
@@ -105,7 +105,7 @@ const ContentPanel = ({ title, actions, isLoggedIn, children }: { title: string;
   );
 };
 
-export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: Persona[], chats: Conversation[], isLoggedIn: boolean}) {
+export function AppSidebar({personas, chats, ...props }: {personas: Persona[], chats: Conversation[]}) {
   const [activeItem, setActiveItem] = React.useState<NavItem>(navMain[0])
   const [showUnreadOnly, setShowUnreadOnly] = React.useState(false);
   const [chatStates, setChatStates] = React.useState<Conversation[]>(chats);
@@ -204,9 +204,8 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
             <Switch className="shadow-none cursor-pointer" checked={showUnreadOnly} onCheckedChange={setShowUnreadOnly} />
           </Label>
         }
-        isLoggedIn={isLoggedIn}
       >
-        {isLoggedIn && filteredChatsToDisplay.length === 0 && showUnreadOnly && (
+        {filteredChatsToDisplay.length === 0 && showUnreadOnly && (
           <div className="p-4 text-sm text-muted-foreground">No unread messages.</div>
         )}
         {filteredChatsToDisplay.map((chat) => {
@@ -242,7 +241,6 @@ export function AppSidebar({personas, chats, isLoggedIn, ...props }: {personas: 
       <ContentPanel
         title="Contacts"
         actions={<PersonaForm persona={null}/>}
-        isLoggedIn={isLoggedIn}
       >
       {personas.map((persona) => (<PersonaForm key={persona.id} persona={persona} /> ))}
       </ContentPanel>

@@ -8,7 +8,7 @@ import { saveProfile } from "@/lib/actions";
 import { Profile, User } from "@/lib/types";
 import { signOut } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import GenericForm, { FieldSchema } from "@/components/custom/generic-form";
+import GenericForm, { FieldSchema } from "@/components/custom/form-generic";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const profileFields: FieldSchema[] = [ 
