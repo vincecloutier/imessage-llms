@@ -48,38 +48,51 @@ export default function Home() {
             <div className="w-full">
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
-                  <AccordionTrigger>What is Nexus and how does it work?</AccordionTrigger>
+                  <AccordionTrigger>What is April and how does it work?</AccordionTrigger>
                   <AccordionContent>
-                    Nexus is a next-generation AI assistant built to be safe, accurate, and secure to help you do your
-                    best work. It uses advanced machine learning to understand your needs and provide helpful responses.
+                    April is a platform that allows you to create and interact with virtual contacts. You can chat with these AI-powered contacts, whether they represent a version of yourself, a friend, or a fictional character.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-2">
-                  <AccordionTrigger>What should I use Nexus for?</AccordionTrigger>
+                  <AccordionTrigger>How do I create and customize a virtual contact?</AccordionTrigger>
                   <AccordionContent>
-                    Nexus can help with writing, research, coding, data analysis, creative work, and much more. It's
-                    designed to be a versatile assistant for all your productivity needs.
+                    You can create new contacts within the April platform. Customization options allow you to define their personality and physical appearance.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-3">
-                  <AccordionTrigger>How much does it cost to use?</AccordionTrigger>
+                  <AccordionTrigger>Is April available on iOS and Android?</AccordionTrigger>
                   <AccordionContent>
-                    Nexus offers a free tier with basic functionality, a Pro tier at $17/month for everyday productivity,
-                    and a Max tier starting at $100/month for advanced features and higher usage limits.
+                    You can message your contacts via iMessage, Telegram, or directly within our web application.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-4">
-                  <AccordionTrigger>Is my data secure?</AccordionTrigger>
+                  <AccordionTrigger>How much does April cost?</AccordionTrigger>
                   <AccordionContent>
-                    Yes, we take data security very seriously. Nexus is built with privacy-first principles, and we never
-                    use your data to train our models without your explicit consent.
+                    We offer a free tier with basic usage limits for getting started. Our Pro tier is $15/month for higher limits, and the Max tier, starting at $100/month, provides unlimited usage and early access to new features.
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-5">
-                  <AccordionTrigger>Can I use Nexus with my team?</AccordionTrigger>
+                  <AccordionTrigger>Does April learn from my conversations?</AccordionTrigger>
                   <AccordionContent>
-                    We offer team and enterprise plans with collaborative features, shared workspaces, and admin controls.
-                    Contact our sales team for more information.
+                    Your contacts will each learn from your communications just like a regular person would.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-6">
+                  <AccordionTrigger>Is my data secure with April?</AccordionTrigger>
+                  <AccordionContent>
+                    Yes, data security is a top priority. Your information is stored securely and is never sold to third parties. You can find more details in our Privacy Policy.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-7">
+                  <AccordionTrigger>How can I get customer support?</AccordionTrigger>
+                  <AccordionContent>
+                    Customer support is available via email. Please reach out to us at <a href="mailto:support@aprilintelligence.com">support@aprilintelligence.com</a>, and we typically respond within 24 hours.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-8">
+                  <AccordionTrigger>What is April Images and how does it work?</AccordionTrigger>
+                  <AccordionContent>
+                    April Images (images.aprilintelligence.com) allows you to edit any image you'd like with class-leading accuracy. It uses the same technology as April to make your edits.
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
