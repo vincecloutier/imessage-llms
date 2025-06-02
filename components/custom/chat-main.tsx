@@ -68,7 +68,7 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
   };
 
   return (
-    <div className="absolute inset-0 flex flex-col overflow-hidden transition-colors duration-200 ease-in-out" {...handlers}>
+    <div className="absolute inset-0 flex flex-col overflow-hidden transition-colors duration-200 ease-in-out md:border-t" {...handlers}>
       <AppHeader user={user} persona={persona} profile={profile}/>
       <AnimatePresence>
         {isDraggingOver && (

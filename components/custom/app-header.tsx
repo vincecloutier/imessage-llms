@@ -18,35 +18,13 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbS
 import { Credenza, CredenzaContent, CredenzaDescription, CredenzaFooter, CredenzaHeader, CredenzaTitle, CredenzaTrigger } from "@/components/ui/credenza"
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/custom/theme-provider";
 
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
-  const { theme, setTheme } = useTheme()
   return (
-    <header className="bg-sidebar sticky top-0 flex shrink-0 items-center gap-2 border-b border-t border-r p-2 justify-between">
-        <div className="flex items-center gap-2">
-          <div className="md:hidden flex items-center gap-2">
+    <header className="bg-transparent fixed top-0 w-full z-50 flex shrink-0 items-center gap-2 px-4 py-2 justify-between">
+        <div className="md:hidden flex items-center gap-2">
             <SidebarTrigger/>
-            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          </div>
-        <Breadcrumb className="md:ml-2">
-            <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">Chat</BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                    <BreadcrumbPage>{(persona.attributes.name || 'April (Unsaved Persona)').toString()}</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-        </div>
-        <div className="flex items-center gap-2"> 
-          <Button variant="ghost" className="size-7" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-              <Sun size={4} className="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon size={4} className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-          </Button>
-          <Separator orientation="vertical" className="data-[orientation=vertical]:h-4 mr-2" />
-          {user.is_anonymous && <SignInDialog/>}
-          {!user.is_anonymous && <ProfileForm user={user} profile={profile}/>}
         </div>
     </header>
   );

@@ -5,7 +5,7 @@ import { getCachedUser,getCachedPersonas, getCachedUserProfile, getCachedConvers
 
 export default async function DefaultPersonas() {
   const user = await getCachedUser();
-  if (!user || user.is_anonymous) return <AppSidebar personas={[]} chats={[]} />
+  if (!user || user.is_anonymous) return null;
   
   const profile = await getCachedUserProfile(user.id);
   if (!profile) return <ProfileForm user={user} profile={null} />;
@@ -15,5 +15,5 @@ export default async function DefaultPersonas() {
 
   const conversations = await getCachedConversations(user.id);
 
-  return <AppSidebar personas={personas} chats={conversations} />
+  return <AppSidebar personas={personas} chats={conversations} user={user} profile={profile} />
 }

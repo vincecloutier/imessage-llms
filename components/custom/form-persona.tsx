@@ -33,6 +33,48 @@ const commonStyles = {
   mailTeaser: "line-clamp-2 w-[260px] text-xs whitespace-break-spaces"
 }
 
+// Helper function to generate a color from a string (personaId)
+const generateColorFromId = (id: string): string => {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  const r = (hash & 0xFF0000) >> 16;
+  const g = (hash & 0x00FF00) >> 8;
+  const b = hash & 0x0000FF;
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
+interface PersonaAvatarProps {
+  personaId: string;
+  personaName?: string | null; // Optional: to display the first letter
+}
+
+const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ personaId, personaName }) => {
+  const backgroundColor = generateColorFromId(personaId);
+  const initial = personaName ? personaName.charAt(0).toUpperCase() : '?';
+
+  return (
+    <div
+      style={{
+        backgroundColor,
+        width: '24px', // Adjust size as needed
+        height: '24px',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white', // Or a contrasting color based on background
+        fontWeight: 'bold',
+        fontSize: '12px', // Adjust size as needed
+      }}
+    >
+      {initial}
+    </div>
+  );
+};
+
 export function PersonaForm({persona, showButton = true, freshProfile = false}: {persona: Persona | null, showButton?: boolean, freshProfile?: boolean}) {
   const [editingPersonaId, setEditingPersonaId] = useState<string | null>(null);
   const handlePersonaOpenChange = (isOpen: boolean) => {if (!isOpen) setEditingPersonaId(null)};
@@ -41,6 +83,7 @@ export function PersonaForm({persona, showButton = true, freshProfile = false}: 
       <>
         <div className={commonStyles.mailItem} onClick={() => setEditingPersonaId(persona.id)}>
             <div className="flex w-full items-center gap-2">
+              <PersonaAvatar personaId={persona.id} personaName={persona.attributes.name as string} />
               <span>{(persona.attributes.name || 'Unnamed Persona').toString()}</span>{" "}
               <span className="ml-auto text-xs text-underline"> <MoreHorizontal className="w-4 h-4" /> </span>
           </div>
