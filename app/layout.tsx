@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 // disable auto-zoom on mobile Safari
 export const viewport = { maximumScale: 1 };
 
-export default async function RootLayout({children, sidebar}: {children: React.ReactNode, sidebar: React.ReactNode}) {
+export default async function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" suppressHydrationWarning>
       {/* <head>
