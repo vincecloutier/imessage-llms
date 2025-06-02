@@ -10,6 +10,7 @@ import { deletePersona, savePersona } from '@/lib/actions';
 import GenericForm, { FieldSchema } from '@/components/custom/form-generic';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 
 const personaFields: FieldSchema[] = [
   { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a', type: 'text' },
@@ -34,43 +35,49 @@ const commonStyles = {
 }
 
 // Helper function to generate a color from a string (personaId)
-const generateColorFromId = (id: string): string => {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    hash = id.charCodeAt(i) + ((hash << 5) - hash);
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  const r = (hash & 0xFF0000) >> 16;
-  const g = (hash & 0x00FF00) >> 8;
-  const b = hash & 0x0000FF;
-  return `rgb(${r}, ${g}, ${b})`;
+// 6 Default Colors
+const defaultColors = [
+  ['#FF5733', '#FF33A1'], // Red and Pink
+  ['#33FF57', '#00FF00'], // Green and Lime
+  ['#3357FF', '#0000FF'], // Blue and Green
+  ['#FF33A1', '#FF5733'], // Pink and Red
+  ['#FFD700', '#3357FF'], // Gold and Blue
+  ['#00FF00', '#33FF57'], // Lime and Green
+  ['#FF5733', '#FF33A1'], // Red and Pink
+];
+const generateGradientFromId = (id: string): string => {
+  const colorIndex = Math.abs(parseInt(id.slice(-1)) % defaultColors.length);
+  return `linear-gradient(135deg, ${defaultColors[colorIndex]} 0%, ${defaultColors[(colorIndex + 1) % defaultColors.length]} 100%)`;
 };
 
 interface PersonaAvatarProps {
   personaId: string;
   personaName?: string | null; // Optional: to display the first letter
+  onClick?: () => void;
 }
 
-const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ personaId, personaName }) => {
-  const backgroundColor = generateColorFromId(personaId);
-  const initial = personaName ? personaName.charAt(0).toUpperCase() : '?';
-
+const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ personaId, personaName, onClick }) => {
+  const backgroundColor = generateGradientFromId(personaId);
+  const parts = personaName?.split(' ');
+  const initials = parts && parts.length >= 2 ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase() : '?';
   return (
     <div
       style={{
-        backgroundColor,
-        width: '24px', // Adjust size as needed
-        height: '24px',
+        background: backgroundColor,
+        width: '40px',
+        height: '40px',
         borderRadius: '50%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white', // Or a contrasting color based on background
+        color: 'white',
         fontWeight: 'bold',
-        fontSize: '12px', // Adjust size as needed
+        fontSize: '12px',
+        cursor: 'pointer',
       }}
+      onClick={onClick}
     >
-      {initial}
+      {initials}
     </div>
   );
 };
@@ -81,13 +88,7 @@ export function PersonaForm({persona, showButton = true, freshProfile = false}: 
   if (persona) {
     return (
       <>
-        <div className={commonStyles.mailItem} onClick={() => setEditingPersonaId(persona.id)}>
-            <div className="flex w-full items-center gap-2">
-              <PersonaAvatar personaId={persona.id} personaName={persona.attributes.name as string} />
-              <span>{(persona.attributes.name || 'Unnamed Persona').toString()}</span>{" "}
-              <span className="ml-auto text-xs text-underline"> <MoreHorizontal className="w-4 h-4" /> </span>
-          </div>
-        </div>
+        <PersonaAvatar personaId={persona.id} personaName={persona.attributes.name as string} onClick={() => setEditingPersonaId(persona.id)} />
         <GenericForm
           formTitle="Edit Contact"
           formDescription="Update the details for this contact."

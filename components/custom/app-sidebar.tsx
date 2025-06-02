@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { PersonaForm } from "./form-persona";
 import { Button } from "../ui/button";
 import { ProfileForm } from "./form-profile";
-import { ThemeToggleSidebar } from "./theme-provider";
+import { ThemeToggle } from "./theme-provider";
 
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
@@ -94,26 +94,44 @@ export function AppSidebar({personas, chats, user, profile, ...props }: {persona
                 ? messageDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
                 : messageDate.toLocaleDateString();
             }
+            const currentPersona = personas.find(p => p.id === chat.id);
+
             return (
-              <Link
-                href={`/chat/${chat.id}`}
-                key={chat.id}
-                className={cn(commonStyles.mailItem)}
-                onClick={() => {if (isMobile) {setOpenMobile(false);}}}
-              >
-                <div className="flex w-full items-center gap-2">
-                  <span className="flex items-center gap-2">
-                    {chat.name as string}
-                    {chat.is_unread && <span className="block h-2 w-2 rounded-full bg-primary" />}
-                  </span>
-                  <span className="ml-auto text-xs">{displayDateOrStatus}</span>
-                </div>
-                <span className={commonStyles.mailTeaser}>{chat.lastMessage.trim()}</span>
-              </Link>
+              <div key={chat.id} className="flex items-stretch justify-start">
+                <Link
+                  href={`/chat/${chat.id}`}
+                  key={chat.id}
+                  className={cn(commonStyles.mailItem, "flex-grow")}
+                  onClick={() => {if (isMobile) {setOpenMobile(false);}}}
+                >
+                  <div className="flex items-start gap-3">
+                    {currentPersona && (
+                      <div
+                        className="flex-shrink-0"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <PersonaForm persona={currentPersona} />
+                      </div>
+                    )}
+                    <div className="flex flex-col w-full">
+                      <div className="flex w-full items-center justify-between gap-2">
+                        <span className="flex items-center gap-2 font-medium">
+                          {chat.name as string}
+                          {chat.is_unread && <span className="block h-2 w-2 rounded-full bg-primary" />}
+                        </span>
+                        <span className="ml-auto text-xs text-muted-foreground">{displayDateOrStatus}</span>
+                      </div>
+                      <span className={cn(commonStyles.mailTeaser, "w-full mt-1")}>{chat.lastMessage.trim()}</span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             );
           })}
         </div>
-        <div className="border-b px-4"> <ThemeToggleSidebar /> </div>
       </SidebarContent>
       <SidebarFooter className="p-0 border-t">
         <ProfileForm profile={profile} user={user} />
