@@ -97,18 +97,6 @@ export const TypingMessage = ({name}: {name: string}) => {
 export function ChatInput({input, setInput, isResponding, handleSubmit, attachmentFile, handleFileAdded, handleFileRemoved, textareaRef}:{input: string, setInput: (value: string) => void, isResponding: boolean, handleSubmit: () => void, attachmentFile: File | null, handleFileAdded: (file: File) => boolean, handleFileRemoved: () => void, textareaRef: React.RefObject<HTMLTextAreaElement>}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const adjustHeight = useCallback(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      const scrollHeight = textareaRef.current.scrollHeight;
-      const maxHeight = 200;
-      textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
-      textareaRef.current.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden';
-    }
-  }, [textareaRef]);
-
-  useEffect(() => {adjustHeight();}, [input, adjustHeight]);
-
   const submit = useCallback(() => {
     handleSubmit();
     if (textareaRef.current) textareaRef.current.focus();
@@ -122,7 +110,7 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
         </div>
       )}
       <div className="border-t border-b border-r bg-sidebar border-input overflow-hidden">
-        <div className="flex items-center w-full px-4 py-2">
+        <div className="flex items-center w-full px-4 h-12">
           <button onClick={() => fileInputRef.current?.click()} className="shrink-0 text-muted-foreground hover:text-foreground mr-2">
             <Paperclip size={18}/>
           </button>
@@ -139,11 +127,10 @@ export function ChatInput({input, setInput, isResponding, handleSubmit, attachme
             ref={textareaRef}
             value={input}
             onChange={(event) => {setInput(event.target.value.replace(/\n/g, ''));}} // remove newlines
-            maxLength={250}
+            maxLength={150}
             className={cx(
-              'grow resize-none scrollbar-hide border-none focus:ring-0 focus:outline-hidden py-1 bg-sidebar',
-              'leading-tight text-sm md:text-base',
-              'min-h-[24px] max-h-[120px]'
+              'grow resize-none scrollbar-hide border-none focus:ring-0 focus:outline-hidden bg-sidebar',
+              'leading-tight text-md',
             )}
             rows={1}
             onKeyDown={(event) => {

@@ -20,9 +20,9 @@ import {
 import { Persona, Conversation, User, Profile } from '@/lib/types';
 import { cn } from "@/lib/utils";
 import { PersonaForm } from "./form-persona";
-import { ThemeToggle } from "./theme-provider";
 import { Button } from "../ui/button";
 import { ProfileForm } from "./form-profile";
+import { NavUser } from "./nav-user";
 
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
@@ -30,7 +30,6 @@ const commonStyles = {
   mailItem: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col gap-2 border-b p-4 text-sm",
   mailTeaser: "line-clamp-2 w-full text-xs whitespace-break-spaces"
 }
-
 
 export function AppSidebar({personas, chats, user, profile, ...props }: {personas: Persona[], chats: Conversation[], user: User, profile: Profile}) {
   const [chatStates, setChatStates] = React.useState<Conversation[]>(chats);
@@ -116,10 +115,11 @@ export function AppSidebar({personas, chats, user, profile, ...props }: {persona
         </div>
       </SidebarContent>
       <SidebarFooter className="p-0 border-t">
-        <div className="flex items-center justify-between p-2">
-          <ProfileForm user={user} profile={profile}/>
-          <ThemeToggle/>
-        </div>
+          <NavUser user={{
+              name: profile.attributes.name as string,
+              email: user.email as string,
+              avatar: user.user_metadata.avatar_url as string,
+        }} />
       </SidebarFooter>
     </Sidebar>
   )
