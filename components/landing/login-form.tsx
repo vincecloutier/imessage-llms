@@ -2,14 +2,15 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRight, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp"
 import { signIn, verifyOTP } from "@/lib/supabase/client"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export function LoginForm() {
   const router = useRouter()
@@ -17,11 +18,25 @@ export function LoginForm() {
   const [email, setEmail] = useState("")
   const [otp, setOtp] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [rememberEmail, setRememberEmail] = useState(false)
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail")
+    if (savedEmail) {
+      setEmail(savedEmail)
+      setRememberEmail(true)
+    }
+  }, [])
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     try {
+      if (rememberEmail) {
+        localStorage.setItem("rememberedEmail", email)
+      } else {
+        localStorage.removeItem("rememberedEmail")
+      }
       await signIn(email)
       toast.success("OTP sent successfully.", {
         description: "Please check your email for the verification code.",
@@ -89,7 +104,14 @@ export function LoginForm() {
                 className="rounded-full"
               />
             </div>
-            <Button type="submit" className="w-full rounded-full" disabled={isLoading}>
+            <div className="flex justify-between w-full">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="remember" checked={rememberEmail} onCheckedChange={(checked) => setRememberEmail(checked === true)} disabled={isLoading} />
+                  <label htmlFor="remember" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Remember Me?
+                  </label>
+                </div>
+                <Button type="submit" className="rounded-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -102,6 +124,7 @@ export function LoginForm() {
                 </>
               )}
             </Button>
+              </div>
           </div>
         </form>
       ) : (
@@ -131,31 +154,33 @@ export function LoginForm() {
                 </InputOTPGroup>
               </InputOTP>
             </div>
-            <Button type="submit" className="w-full rounded-full" disabled={isLoading || otp.length < 6}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                <>
-                  Verify and continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
-            <Button
-              variant="link"
-              type="button"
-              className="w-full"
-              onClick={() => {
-                setStep("email")
-                setOtp("") // Clear OTP when going back
-              }}
-              disabled={isLoading}
-            >
-              Back to email
-            </Button>
+            <div className="flex items-center justify-between w-full">
+              <Button
+                variant="link"
+                type="button"
+                className="w-auto"
+                onClick={() => {
+                  setStep("email")
+                  setOtp("") // Clear OTP when going back
+                }}
+                disabled={isLoading}
+              >
+                Back 
+              </Button>
+              <Button type="submit" className="w-auto rounded-full" disabled={isLoading || otp.length < 6}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    Verify
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
           <div className="text-center text-sm text-muted-foreground">
             Didn't receive a code?{" "}
