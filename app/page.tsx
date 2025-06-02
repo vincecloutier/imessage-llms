@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 import { LoginForm } from "@/components/landing/login-form"
 import { VideoPlayer } from "@/components/landing/video-player"
@@ -5,6 +6,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ArrowDown } from "lucide-react"
 
 export default function Home() {
+  const handleScrollToFaq = () => {
+    const faqSection = document.getElementById("faq-section");
+    if (faqSection) {
+      faqSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <main className="flex-1">
@@ -16,13 +24,13 @@ export default function Home() {
             <p className="text-lg sm:text-xl text-muted-foreground text-center">The world's most human-like AI.</p>
             <LoginForm />
             <div className="absolute bottom-8 justify-center">
-              <Link
-                href="#faq-section"
-                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              <button
+                onClick={handleScrollToFaq}
+                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-md text-white bg-foreground hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
                 Learn More
                 <ArrowDown className="ml-2 h-4 w-4" />
-              </Link>
+              </button>
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-center">
