@@ -12,9 +12,7 @@ export default function Home() {
         <section className=" grid items-center gap-6 pb-8 pt-6 md:py-10 lg:grid-cols-2">
           <div className="flex flex-col gap-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Have you met
-              <br />
-              <span className="text-primary">April?</span>
+              Have you met April?
             </h1>
             <p className="text-xl text-muted-foreground">Fun, safe, and secure.</p>
             <LoginForm />
@@ -28,10 +26,7 @@ export default function Home() {
         <section id="pricing" className="">
           <div className=" space-y-8">
             <div className="text-center space-y-4">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Explore plans</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Choose the plan that works best for you and your team.
-              </p>
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Explore Plans</h2>
             </div>
                 <PricingCards />
           </div>
@@ -83,31 +78,21 @@ export default function Home() {
       <footer className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center space-y-4">
-            <ul className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 text-sm">
+            <ul className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 text-xs text-muted-foreground">
               <li>
-                <Link href="https://acolyteintelligence.com" className="text-muted-foreground hover:text-foreground">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-muted-foreground hover:text-foreground">
+                <Link href="https://legal.aprilintelligence.com/privacy" className="text-muted-foreground hover:text-foreground">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-muted-foreground hover:text-foreground">
-                  Terms of Service
+                <Link href="https://legal.aprilintelligence.com/terms" className="text-muted-foreground hover:text-foreground">
+                  Terms and Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-muted-foreground hover:text-foreground">
-                  Cookie Policy
-                </Link>
+                © {new Date().getFullYear()} April Intelligence.
               </li>
             </ul>
-            <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} April Intelligence.
-            </p>
           </div>
         </div>
       </footer>
