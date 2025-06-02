@@ -1,40 +1,37 @@
 import Link from "next/link"
 import { LoginForm } from "@/components/landing/login-form"
 import { VideoPlayer } from "@/components/landing/video-player"
-import { PricingCards } from "@/components/landing/pricing-cards"
-import { FeatureSection } from "@/components/landing/feature-section"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { ArrowDown } from "lucide-react"
 
 export default function Home() {
   return (
     <div className="max-w-7xl mx-auto">
       <main className="flex-1">
-        <section className=" grid items-center gap-6 pb-8 pt-6 md:py-10 lg:grid-cols-2">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Have you met April?
+        <section className="min-h-screen flex flex-col lg:grid lg:grid-cols-2 items-center gap-6 pb-8 pt-6 md:py-10">
+          <div className="flex flex-col items-center gap-4 px-4 sm:px-0">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center">
+              Have you <br/> met April?
             </h1>
-            <p className="text-xl text-muted-foreground">Fun, safe, and secure.</p>
+            <p className="text-lg sm:text-xl text-muted-foreground text-center">The world's most human-like AI.</p>
             <LoginForm />
+            <div className="absolute bottom-8 justify-center">
+              <Link
+                href="#faq-section"
+                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              >
+                Learn More
+                <ArrowDown className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
           </div>
           <div className="hidden lg:flex items-center justify-center">
             <VideoPlayer />
           </div>
         </section>
-
-        <FeatureSection />
-        <section id="pricing" className="">
-          <div className=" space-y-8">
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Explore Plans</h2>
-            </div>
-                <PricingCards />
-          </div>
-        </section>
-        <section id="faq" className="py-16 ">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-3xl font-bold tracking-tight text-center sm:text-4xl">Not convinced?</h2>
-            <h3 className="text-xl text-muted-foreground tracking-tight text-center sm:text-2xl"> Here's everything you might want to know.</h3>
+        <section id="faq-section" className="min-h-screen flex flex-col lg:grid lg:grid-cols-2 items-center gap-6 pb-8 pt-6 md:py-10">
+            <h2 className="text-2xl font-bold tracking-tight text-center sm:text-3xl md:text-4xl">Not convinced?</h2>
+            <h3 className="text-lg sm:text-xl text-muted-foreground tracking-tight text-center md:text-2xl"> Here's everything you might want to know.</h3>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
                 <AccordionTrigger>What is Nexus and how does it work?</AccordionTrigger>
@@ -72,12 +69,11 @@ export default function Home() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          </div>
-        </section>
+          </section>
       </main>
       <footer className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-col items-center">
             <ul className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 text-xs text-muted-foreground">
               <li>
                 <Link href="https://legal.aprilintelligence.com/privacy" className="text-muted-foreground hover:text-foreground">
