@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { PersonaForm } from "./form-persona";
 import { Button } from "../ui/button";
 import { ProfileForm } from "./form-profile";
-import { NavUser } from "./nav-user";
+import { ThemeToggleSidebar } from "./theme-provider";
 
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
@@ -113,13 +113,10 @@ export function AppSidebar({personas, chats, user, profile, ...props }: {persona
             );
           })}
         </div>
+        <div className="border-b px-4"> <ThemeToggleSidebar /> </div>
       </SidebarContent>
       <SidebarFooter className="p-0 border-t">
-          <NavUser user={{
-              name: profile.attributes.name as string,
-              email: user.email as string,
-              avatar: user.user_metadata.avatar_url as string,
-        }} />
+        <ProfileForm profile={profile} user={user} />
       </SidebarFooter>
     </Sidebar>
   )

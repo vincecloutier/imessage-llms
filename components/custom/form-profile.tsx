@@ -34,11 +34,18 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
     return (
       <>
         {profile && (
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setOpen(true)}>
-            <UserRound className="w-4 h-4" />
+          <div className="flex items-center gap-3 cursor-pointer hover:bg-muted px-4 h-12" onClick={() => setOpen(true)}>
+            <Avatar className="h-8 w-8 rounded-lg bg-gradient-to-br from-fuchsia-500 via-purple-600 to-indigo-700 shadow-[inset_0_1px_2px_0_rgba(255,255,255,0.3)] text-white overflow-hidden">
+              <AvatarFallback className="rounded-lg bg-transparent">{profile.attributes?.name as string}</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">{profile.attributes?.name as string}</span>
+              <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+            </div>
+            <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
           </div>
         )}
-          
+        
         <GenericForm
           formTitle={"Profile"}
           formDescription="Your profile is used to personalize your personas."
