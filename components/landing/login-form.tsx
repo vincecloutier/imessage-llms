@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp"
 import { signIn, verifyOTP } from "@/lib/supabase/client"
-import { Checkbox } from "@/components/ui/checkbox"
 
 export function LoginForm() {
   const router = useRouter()
@@ -18,13 +17,11 @@ export function LoginForm() {
   const [email, setEmail] = useState("")
   const [otp, setOtp] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [rememberEmail, setRememberEmail] = useState(false)
 
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail")
     if (savedEmail) {
       setEmail(savedEmail)
-      setRememberEmail(true)
     }
   }, [])
 
@@ -32,11 +29,7 @@ export function LoginForm() {
     e.preventDefault()
     setIsLoading(true)
     try {
-      if (rememberEmail) {
-        localStorage.setItem("rememberedEmail", email)
-      } else {
-        localStorage.removeItem("rememberedEmail")
-      }
+      localStorage.setItem("rememberedEmail", email)
       await signIn(email)
       toast.success("OTP sent successfully.", {
         description: "Please check your email for the verification code.",
@@ -96,26 +89,17 @@ export function LoginForm() {
             <div className="space-y-2">
               <Input
                 type="email"
-                placeholder="Enter your email"
+                placeholder="example@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className="rounded-full"
               />
             </div>
-            <div className="flex justify-between w-full gap-12">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="remember" checked={rememberEmail} onCheckedChange={(checked) => setRememberEmail(checked === true)} disabled={isLoading} />
-                <label htmlFor="remember" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Remember Me?
-                </label>
-              </div>
-              <Button type="submit" className="rounded-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Sending code..." : "Continue"}
                 {isLoading ? <Loader2 className="animate-spin" /> : <ArrowRight />}
-              </Button>
-            </div>
+            </Button>
           </div>
         </form>
       ) : (
@@ -158,7 +142,7 @@ export function LoginForm() {
               >
                 Back 
               </Button>
-              <Button type="submit" className="w-auto rounded-full" disabled={isLoading || otp.length < 6}>
+              <Button type="submit" className="w-auto" disabled={isLoading || otp.length < 6}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
