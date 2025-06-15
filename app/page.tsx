@@ -4,6 +4,7 @@ import { LoginForm } from "@/components/landing/login-form"
 import { VideoPlayer } from "@/components/landing/video-player"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { ArrowDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   const handleScrollToFaq = () => {
@@ -24,13 +25,9 @@ export default function Home() {
             <p className="text-lg sm:text-xl text-muted-foreground text-center">The world's most human-like AI.</p>
             <LoginForm />
             <div className="absolute bottom-8 justify-center">
-              <button
-                onClick={handleScrollToFaq}
-                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-md text-white bg-foreground hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-              >
-                Learn More
-                <ArrowDown className="ml-2 h-4 w-4" />
-              </button>
+              <Button variant="outline" onClick={handleScrollToFaq} className="rounded-full">
+                Learn More <ArrowDown/>
+              </Button>
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-center">

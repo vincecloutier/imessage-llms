@@ -112,11 +112,8 @@ export function LoginForm() {
                 </label>
               </div>
               <Button type="submit" className="rounded-full" disabled={isLoading}>
-              {isLoading ? (
-                <> <Loader2 className="mr-2 size-4 animate-spin" /> Sending code... </>
-              ) : (
-                <> Continue <ArrowRight className="ml-2 size-4" /> </>
-              )}
+                {isLoading ? "Sending code..." : "Continue"}
+                {isLoading ? <Loader2 className="animate-spin" /> : <ArrowRight />}
               </Button>
             </div>
           </div>
