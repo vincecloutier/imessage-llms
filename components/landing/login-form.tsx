@@ -104,27 +104,21 @@ export function LoginForm() {
                 className="rounded-full"
               />
             </div>
-            <div className="flex justify-between w-full">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" checked={rememberEmail} onCheckedChange={(checked) => setRememberEmail(checked === true)} disabled={isLoading} />
-                  <label htmlFor="remember" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Remember Me?
-                  </label>
-                </div>
-                <Button type="submit" className="rounded-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending code...
-                </>
-              ) : (
-                <>
-                  Continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
+            <div className="flex justify-between w-full gap-12">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="remember" checked={rememberEmail} onCheckedChange={(checked) => setRememberEmail(checked === true)} disabled={isLoading} />
+                <label htmlFor="remember" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Remember Me?
+                </label>
               </div>
+              <Button type="submit" className="rounded-full" disabled={isLoading}>
+              {isLoading ? (
+                <> <Loader2 className="mr-2 size-4 animate-spin" /> Sending code... </>
+              ) : (
+                <> Continue <ArrowRight className="ml-2 size-4" /> </>
+              )}
+              </Button>
+            </div>
           </div>
         </form>
       ) : (
