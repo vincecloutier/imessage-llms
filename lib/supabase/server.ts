@@ -72,7 +72,7 @@ export const getCachedConversations = cache(async (userId: string) => {
     if (!userId) return [];
     const supabase = await createClient();
     
-    // This query uses a window function to get the latest message for each persona
+    // this query uses a window function to get the latest message for each persona
     const { data: conversations, error } = await supabase
         .from('messages')
         .select(`
@@ -92,7 +92,7 @@ export const getCachedConversations = cache(async (userId: string) => {
         return [];
     }
 
-    // Group messages by persona_id and get the latest message for each
+    // group messages by persona_id and get the latest message for each
     const latestMessages = conversations.reduce((acc, message) => {
         const personaId = message.persona_id;
         if (!acc[personaId]) {
