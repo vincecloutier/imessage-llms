@@ -26,16 +26,8 @@ const personaFields: FieldSchema[] = [
   { name: 'messaging_platform', label: 'Messaging Platforms', description: 'What platforms can they use to message you?', rowId: 'e', type: 'messaging_platform' },
 ];
 
-
-const commonStyles = {
-  sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
-  menuButton: "px-2.5 md:px-2",
-  mailItem: "hover:bg-sidebar-accent cursor-pointer hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap",
-  mailTeaser: "line-clamp-2 w-[260px] text-xs whitespace-break-spaces"
-}
-
-// Helper function to generate a color from a string (personaId)
-// 6 Default Colors
+// helper function to generate a color from a string (personaId)
+// 6 default colors
 const defaultColors = [
   ['#FF5733', '#FF33A1'], // Red and Pink
   ['#33FF57', '#00FF00'], // Green and Lime
@@ -60,6 +52,7 @@ const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ personaId, personaName, o
   const backgroundColor = generateGradientFromId(personaId);
   const parts = personaName?.split(' ');
   const initials = parts && parts.length >= 2 ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase() : '?';
+  const [isHovered, setIsHovered] = useState(false);
   return (
     <div
       style={{
@@ -76,8 +69,10 @@ const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ personaId, personaName, o
         cursor: 'pointer',
       }}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {initials}
+      {isHovered ? 'Edit' : initials}
     </div>
   );
 };
