@@ -29,17 +29,15 @@ const personaFields: FieldSchema[] = [
 // helper function to generate a color from a string (personaId)
 // 6 default colors
 const defaultColors = [
-  ['#FF5733', '#FF33A1'], // Red and Pink
-  ['#33FF57', '#00FF00'], // Green and Lime
-  ['#3357FF', '#0000FF'], // Blue and Green
-  ['#FF33A1', '#FF5733'], // Pink and Red
-  ['#FFD700', '#3357FF'], // Gold and Blue
-  ['#00FF00', '#33FF57'], // Lime and Green
-  ['#FF5733', '#FF33A1'], // Red and Pink
+  '#FF00FF', // Magenta
+  '#0000FF', // Blue
+  '#00FFFF', // Turquoise
+  '#FFA500', // Orange
+  '#FF0000', // Red
 ];
 const generateGradientFromId = (id: string): string => {
   const colorIndex = Math.abs(parseInt(id.slice(-1)) % defaultColors.length);
-  return `linear-gradient(135deg, ${defaultColors[colorIndex]} 0%, ${defaultColors[(colorIndex + 1) % defaultColors.length]} 100%)`;
+  return defaultColors[colorIndex];
 };
 
 interface PersonaAvatarProps {
@@ -67,15 +65,15 @@ export const PersonaAvatar = ({ personaId, personaName, onClick }: PersonaAvatar
     <div
       style={{
         background: backgroundColor,
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
+        width: '36px',
+        height: '36px',
+        borderRadius: '25%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
         fontWeight: 'bold',
-        fontSize: '12px',
+        fontSize: '14px',
         cursor: onClick ? 'pointer' : 'default',
       }}
       onClick={onClick}
