@@ -48,11 +48,21 @@ interface PersonaAvatarProps {
   onClick?: () => void;
 }
 
-const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ personaId, personaName, onClick }) => {
+export const PersonaAvatar = ({ personaId, personaName, onClick }: PersonaAvatarProps) => {
   const backgroundColor = generateGradientFromId(personaId);
   const parts = personaName?.split(' ');
   const initials = parts && parts.length >= 2 ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase() : '?';
   const [isHovered, setIsHovered] = useState(false);
+  function handleHover() {
+    if (onClick) {
+      setIsHovered(true);
+    }
+  }
+  function handleLeave() {
+    if (onClick) {
+      setIsHovered(false);
+    }
+  }
   return (
     <div
       style={{
@@ -66,15 +76,15 @@ const PersonaAvatar: React.FC<PersonaAvatarProps> = ({ personaId, personaName, o
         color: 'white',
         fontWeight: 'bold',
         fontSize: '12px',
-        cursor: 'pointer',
+        cursor: onClick ? 'pointer' : 'default',
       }}
       onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleHover}
+      onMouseLeave={handleLeave}
     >
-      {isHovered ? 'Edit' : initials}
-    </div>
-  );
+        {isHovered ? 'Edit' : initials}
+      </div>
+    );
 };
 
 export function PersonaForm({persona, showButton = true, freshProfile = false}: {persona: Persona | null, showButton?: boolean, freshProfile?: boolean}) {

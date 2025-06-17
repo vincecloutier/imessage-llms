@@ -87,13 +87,13 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
         <div className="flex flex-col gap-2">
           {messages.map((message, index) => (
             <DisplayMessage 
-              name={(message.role === 'user' ? profile?.attributes?.name || 'User' : persona.attributes?.name || 'Assistant') as string}
-              key={index} 
+              persona={persona}
+              key={index}
               message={message} 
               showDateSeparator={shouldShowDateSeparator(message, index)}
             />
           ))}
-          {isResponding && <TypingMessage name={(persona.attributes?.name || 'Assistant') as string} />}
+          {isResponding && <TypingMessage persona={persona} />}
           <div ref={messagesEndRef} />
         </div>
       </div>

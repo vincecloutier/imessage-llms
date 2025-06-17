@@ -5,13 +5,14 @@ import { Paperclip, ArrowUp } from 'lucide-react';
 import React, { useRef, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 
-import { Message } from '@/lib/types';
+import { Message, Persona } from '@/lib/types';
 import { ImagePreview } from '@/components/custom/chat-preview';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { PersonaAvatar } from '@/components/custom/form-persona';
 
 const DateSeparator = ({ date }: { date: Date }) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 my-3">
       <div className="h-px flex-1 bg-border ml-4.5" />
       <span className="text-xs text-muted-foreground">
         {format(date, 'MMMM d, yyyy')}
@@ -21,24 +22,17 @@ const DateSeparator = ({ date }: { date: Date }) => {
   );
 };
 
-export const DisplayMessage = ({name, message, showDateSeparator}: {name: string, message: Message, showDateSeparator?: boolean}) => {
+export const DisplayMessage = ({persona, message, showDateSeparator}: {persona: Persona, message: Message, showDateSeparator?: boolean}) => {
   const messageDate = new Date(message.created_at || Date.now());
-  const avatarUrl = message.role === 'user' ? '/user-avatar.png' : '/assistant-avatar.png';
   const isUser = message.role === 'user';
 
   return (
     <>
       {showDateSeparator && <DateSeparator date={messageDate} />}
-      <div className={cx(
-        "px-4 py-2",
-        isUser ? "flex justify-end" : "flex justify-start"
-      )} data-role={message.role}>
+      <div className={cx("px-4 my-3", isUser ? "flex justify-end" : "flex justify-start")} data-role={message.role}>
         {!isUser && (
           <div className="flex-shrink-0 mr-2 self-end -mb-4">
-            <Avatar className="h-8 w-8 rounded-lg">
-              {/* <AvatarImage src={avatarUrl} alt={name} /> */}
-              <AvatarFallback className={cx("rounded-lg bg-muted")}>{name}</AvatarFallback>
-            </Avatar>
+            <PersonaAvatar personaId={persona.id} personaName={persona.attributes.name as string} />
           </div>
         )}
         <div className={cx("flex flex-col gap-1 max-w-[80%]", isUser && "items-end")}>
@@ -68,14 +62,11 @@ export const DisplayMessage = ({name, message, showDateSeparator}: {name: string
   );
 };
 
-export const TypingMessage = ({name}: {name: string}) => {
+export const TypingMessage = ({persona}: {persona: Persona}) => {
   return (
-    <div className="px-4 py-2 flex justify-start" data-role="assistant">
+    <div className="px-4 my-3 flex justify-start" data-role="assistant">
       <div className="flex-shrink-0 mr-2 self-end -mb-4">
-        <Avatar className="h-8 w-8 rounded-lg">
-          {/* <AvatarImage src="/assistant-avatar.png" alt="Assistant" /> */}
-          <AvatarFallback className="rounded-lg bg-muted">{name}</AvatarFallback>
-        </Avatar>
+        <PersonaAvatar personaId={persona.id} personaName={persona.attributes.name as string} />
       </div>
       <div className="flex flex-col gap-1 max-w-[80%]">
         <div className="flex-1">
