@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pen, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { Persona } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { deletePersona, savePersona } from '@/lib/actions';
 import GenericForm, { FieldSchema } from '@/components/custom/form-generic';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const personaFields: FieldSchema[] = [
   { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a', type: 'text' },
@@ -26,63 +26,57 @@ const personaFields: FieldSchema[] = [
   { name: 'messaging_platform', label: 'Messaging Platforms', description: 'What platforms can they use to message you?', rowId: 'e', type: 'messaging_platform' },
 ];
 
-// helper function to generate a color from a string (personaId)
-// 6 default colors
+// Replace the defaultColors array with Tailwind color classes
 const defaultColors = [
-  '#FF00FF', // Magenta
-  '#0000FF', // Blue
-  '#00FFFF', // Turquoise
-  '#FFA500', // Orange
-  '#FF0000', // Red
+  'bg-indigo-600',  // Indigo
+  'bg-blue-600',    // Blue
+  'bg-cyan-600',    // Cyan
+  'bg-orange-600',  // Orange
+  'bg-red-600',     // Red
+  'bg-purple-600',  // Purple
+  'bg-pink-600',    // Pink
+  'bg-emerald-600', // Emerald
 ];
-const generateGradientFromId = (id: string): string => {
+
+const generateColorFromId = (id: string): string => {
   const colorIndex = Math.abs(parseInt(id.slice(-1)) % defaultColors.length);
   return defaultColors[colorIndex];
 };
 
 interface PersonaAvatarProps {
   personaId: string;
-  personaName?: string | null; // Optional: to display the first letter
+  personaName?: string | null;
   onClick?: () => void;
 }
 
 export const PersonaAvatar = ({ personaId, personaName, onClick }: PersonaAvatarProps) => {
-  const backgroundColor = generateGradientFromId(personaId);
-  const parts = personaName?.split(' ');
-  const initials = parts && parts.length >= 2 ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase() : '?';
+  const colorClass = generateColorFromId(personaId);
   const [isHovered, setIsHovered] = useState(false);
+
   function handleHover() {
     if (onClick) {
       setIsHovered(true);
     }
   }
+
   function handleLeave() {
     if (onClick) {
       setIsHovered(false);
     }
   }
+  
   return (
-    <div
-      style={{
-        background: backgroundColor,
-        width: '36px',
-        height: '36px',
-        borderRadius: '25%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: '14px',
-        cursor: onClick ? 'pointer' : 'default',
-      }}
+    <Avatar 
+      className={`size-8 rounded-lg ${colorClass} text-white overflow-hidden ${onClick ? 'cursor-pointer' : ''}`}
       onClick={onClick}
       onMouseEnter={handleHover}
       onMouseLeave={handleLeave}
     >
-        {isHovered ? 'Edit' : initials}
-      </div>
-    );
+      <AvatarFallback className="rounded-lg bg-transparent">
+        {isHovered ? <Pencil className="size-4" /> : personaName}
+      </AvatarFallback>
+    </Avatar>
+  );
 };
 
 export function PersonaForm({persona, showButton = true, freshProfile = false}: {persona: Persona | null, showButton?: boolean, freshProfile?: boolean}) {

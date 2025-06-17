@@ -35,7 +35,7 @@ export function ProfileForm({user, profile}: {user: User, profile: Profile | nul
       <>
         {profile && (
           <div className="flex items-center gap-3 cursor-pointer hover:bg-muted px-4 h-12" onClick={() => setOpen(true)}>
-            <Avatar className="h-8 w-8 rounded-lg bg-gradient-to-br from-fuchsia-500 via-purple-600 to-indigo-700 shadow-[inset_0_1px_2px_0_rgba(255,255,255,0.3)] text-white overflow-hidden">
+            <Avatar className="size-8 rounded-lg bg-indigo-600 text-white overflow-hidden">
               <AvatarFallback className="rounded-lg bg-transparent">{profile.attributes?.name as string}</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
