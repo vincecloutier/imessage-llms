@@ -1,7 +1,6 @@
 "use client"
 import Link from "next/link"
 import { LoginForm } from "@/components/landing/login-form"
-import { VideoPlayer } from "@/components/landing/video-player"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { ArrowDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -31,7 +30,6 @@ export default function Home() {
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-center">
-            <VideoPlayer />
           </div>
         </section>
         <section 
