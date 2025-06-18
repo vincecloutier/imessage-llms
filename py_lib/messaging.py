@@ -7,7 +7,7 @@ import os
 import json
 import uuid
 import requests
-from lib.dbp import get_server_address
+from py_lib.dbp import get_server_address
 
 class Messaging:
     def __init__(self):

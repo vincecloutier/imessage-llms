@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify
-from lib.dbp import get_profile, save_message, get_messages, get_persona
-from lib.llm import llm_call
-from lib.utils_general import sanitize_response
-import random
+from py_lib.dbp import get_profile, save_message, get_messages, get_persona
+from py_lib.llm import llm_call
+from py_lib.utils_general import sanitize_response
 from flask_cors import CORS
 from flask import Flask, request, jsonify
-from lib.messaging import Messaging, BlueBubbles, Telegram
+from py_lib.messaging import Messaging, BlueBubbles, Telegram
 
 BOTS: dict[str, Messaging] = {"imessage": BlueBubbles(), "telegram": Telegram()}
 

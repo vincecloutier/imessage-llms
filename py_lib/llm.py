@@ -10,9 +10,9 @@ import requests
 
 from openai import OpenAI
 
-from lib.prompts import SHORT_PROMPT, RESPONDING_PROMPT
-from lib.tools import search_internet, get_facts
-from lib.utils_general import handle_tool_call
+from py_lib.prompts import SHORT_PROMPT, RESPONDING_PROMPT
+from py_lib.tools import search_internet, get_facts
+from py_lib.utils_general import handle_tool_call
 
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPENROUTER_API_KEY"))
 

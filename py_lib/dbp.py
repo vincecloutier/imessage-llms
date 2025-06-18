@@ -8,7 +8,7 @@ import uuid
 import requests
 from supabase import create_client, Client
 
-from lib.utils_general import round_to_precision, is_within_wait
+from py_lib.utils_general import round_to_precision, is_within_wait
 
 supabase: Client = create_client(os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_SERVICE_ROLE_KEY"))
 _table_cache = {}
@@ -65,13 +65,13 @@ def save_message(user_id: str, persona_id: str, channel: str, role: str, content
     message = {"user_id": user_id, "persona_id": persona_id, "channel": channel, "role": role, "content": content}
     if attachment:
         message["file_path"] = upload_attachment(user_id, persona_id, attachment)
-        from lib.llm import get_attachment_description
+        from py_lib.llm import get_attachment_description
         message["file_description"] = get_attachment_description(attachment['bytes'], attachment['mime_type'])
     get_table(table_name).insert(message).execute()
     if role == "assistant" and persona_id != "new":
         unmemorized = get_messages(user_id, persona_id, channel, False)
         if len(unmemorized) >= CONTEXT_WINDOW:
-            from lib.memory import processor
+            from py_lib.memory import processor
             processor(user_id, persona_id, unmemorized)
             ids = [msg["id"] for msg in unmemorized]
             get_table(table_name).update({"memorized": True}).in_("id", ids).execute()

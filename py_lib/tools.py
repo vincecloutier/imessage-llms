@@ -2,8 +2,8 @@ import os
 from exa_py import Exa
 from typing import Annotated
 
-from lib.dbv import index_query
-from lib.utils_general import tool
+from py_lib.dbv import index_query
+from py_lib.utils_general import tool
 
 @tool
 def get_facts(
