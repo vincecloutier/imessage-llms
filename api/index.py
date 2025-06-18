@@ -1,9 +1,10 @@
+import logging
+
 from flask import Flask, request, jsonify
-from py_lib.dbp import get_profile, save_message, get_messages, get_persona
+from py_lib.dbp import get_profile, save_message, get_messages, get_persona, update_server_address
 from py_lib.llm import llm_call
 from py_lib.utils import sanitize_response
 from py_lib.messaging import Messaging, BlueBubbles, Telegram
-import logging
 
 BOTS: dict[str, Messaging] = {"imessage": BlueBubbles(), "telegram": Telegram()}
 
@@ -77,3 +78,12 @@ def responder():
 
     # for the web channel
     return jsonify({"status": 200, "message": {"role": "assistant", "content": response}})
+
+
+@app.route('/api/url_updater', methods=['GET', 'POST'])
+def url_updater():    
+    if server_url := request.json.get("data", ""):
+        update_server_address(server_url)
+        return jsonify({"status": 200})
+    
+    return jsonify({"status": 400})
