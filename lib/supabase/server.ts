@@ -54,20 +54,6 @@ export const getCachedUserProfile = cache(async (userId: string) => {
     return profile;
 });
 
-export const getCachedMessages = cache(async (userId: string) => {
-    if (!userId) return [];
-    const supabase = await createClient();
-    const { data: messages, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('channel', 'web')
-        .order('created_at', { ascending: false })
-        .limit(20);
-    if (error) {console.error('Error fetching messages:', error); return [];}
-    return messages || [];
-});
-
 export const getCachedConversations = cache(async (userId: string) => {
     if (!userId) return [];
     const supabase = await createClient();

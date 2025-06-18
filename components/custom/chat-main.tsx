@@ -10,7 +10,6 @@ import { Message, Persona, Profile, User } from '@/lib/types';
 import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 import { DisplayMessage, TypingMessage, ChatInput } from '@/components/custom/chat-parts';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { InfiniteList } from './infinite-list';
 
 const INITIAL_INPUT_AREA_HEIGHT = 70; // approximate initial height of the input area + bottom margin
 const BOTTOM_SPACING = 16; // additional space between last message and input area to bottom-4 (1rem)
@@ -88,16 +87,7 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
         )}
       </AnimatePresence>
 
-      <InfiniteList
-        tableName="messages"
-        columns="*" 
-        scrollDirection="up"
-        pageSize={20}
-        trailingQuery={(query) => query.eq('persona_id', persona.id).eq('channel', 'web').order('created_at', { ascending: false })}
-        renderItem={(message, index) => <DisplayMessage key={index} persona={persona} message={message} />}
-      />
-
-      {/* <div className="flex-1 overflow-y-auto scrollbar-hide min-h-0 pt-4" style={{ paddingBottom: `${inputAreaHeight}px` }}>
+      <div className="flex-1 overflow-y-auto scrollbar-hide min-h-0 pt-4" style={{ paddingBottom: `${inputAreaHeight}px` }}>
         <div className="flex flex-col gap-2">
           {messages.map((message, index) => (
             <DisplayMessage 
@@ -111,18 +101,18 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
           <div ref={messagesEndRef} />
         </div>
       </div>
- */}
+
       <div ref={inputContainerRef} className="absolute bottom-0 left-0 right-0">
-           <ChatInput
-            input={input}
-            setInput={setInput}
-            isResponding={isResponding}
-            handleSubmit={() => sendMessage(input, attachmentFile, setAttachmentFile)}
-            attachmentFile={attachmentFile}
-            handleFileAdded={handleFileAdded}
-            handleFileRemoved={handleFileRemoved}
-            textareaRef={textareaRef}
-          />
+        <ChatInput
+          input={input}
+          setInput={setInput}
+          isResponding={isResponding}
+          handleSubmit={() => sendMessage(input, attachmentFile, setAttachmentFile)}
+          attachmentFile={attachmentFile}
+          handleFileAdded={handleFileAdded}
+          handleFileRemoved={handleFileRemoved}
+          textareaRef={textareaRef}
+        />
       </div>
     </div>
   );

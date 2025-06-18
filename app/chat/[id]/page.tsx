@@ -28,7 +28,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     .eq('user_id', user.id)
     .eq('channel', 'web')
     .order('created_at', { ascending: false })
-    .limit(20);
+    .limit(500);
 
   return <Chat user={user} persona={persona} profile={profile} initialMessages={messages?.reverse() || []}/>
 }
