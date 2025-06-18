@@ -77,7 +77,7 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
       <AnimatePresence>
         {isDraggingOver && (
           <motion.div 
-            className="absolute top-16 inset-4 pointer-events-none z-10 flex flex-col items-center justify-center gap-1 rounded-xl bg-muted/90" 
+            className="absolute inset-4 top-4 bottom-16 pointer-events-none z-10 flex flex-col items-center justify-center gap-1 rounded-xl bg-muted/90" 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
