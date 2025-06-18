@@ -1,9 +1,15 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  experimental: {
-    ppr: true,
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  rewrites: async () => {
+    return [
+      {
+        source: '/api/:path*',
+        destination:
+          process.env.NODE_ENV === 'development'
+            ? 'http://127.0.0.1:8000/api/:path*'
+            : '/api/',
+      },
+    ]
   },
   images: {
     remotePatterns: [
@@ -19,6 +25,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-};
+}
 
-export default nextConfig;
+module.exports = nextConfig
