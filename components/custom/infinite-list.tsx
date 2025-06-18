@@ -89,7 +89,7 @@ export function InfiniteList<TableName extends SupabaseTableName>({
   }, [isFetching, hasMore, fetchNextPage])
 
   return (
-    <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto', className)}>
+    <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto scrollbar-hide', className)}>
       <div>
         {isSuccess && data.length === 0 && renderNoResults()}
 
