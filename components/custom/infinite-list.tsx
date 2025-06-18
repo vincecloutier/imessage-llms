@@ -1,4 +1,3 @@
-
 'use client'
 
 import { cn } from '@/lib/utils'
@@ -20,6 +19,7 @@ interface InfiniteListProps<TableName extends SupabaseTableName> {
   renderNoResults?: () => React.ReactNode
   renderEndMessage?: () => React.ReactNode
   renderSkeleton?: (count: number) => React.ReactNode
+  scrollDirection?: 'up' | 'down'
 }
 
 const DefaultNoResults = () => (
@@ -31,11 +31,12 @@ const DefaultEndMessage = () => (
 )
 
 const defaultSkeleton = (count: number) => (
-  <div className="flex flex-col gap-2 px-4">
-    {Array.from({ length: count }).map((_, index) => (
-      <div key={index} className="h-4 w-full bg-muted animate-pulse" />
-    ))}
-  </div>
+//   <div className="flex flex-col gap-2 px-4">
+//     {Array.from({ length: count }).map((_, index) => (
+//       <div key={index} className="h-4 w-full bg-muted animate-pulse" />
+//     ))}
+//   </div>
+    <div className="h-4 w-full bg-muted animate-pulse" />
 )
 
 export function InfiniteList<TableName extends SupabaseTableName>({
@@ -48,18 +49,25 @@ export function InfiniteList<TableName extends SupabaseTableName>({
   renderNoResults = DefaultNoResults,
   renderEndMessage = DefaultEndMessage,
   renderSkeleton = defaultSkeleton,
+  scrollDirection = 'down',
 }: InfiniteListProps<TableName>) {
-  const { data, isFetching, hasMore, fetchNextPage, isSuccess } = useInfiniteQuery({
+  const [data, setData] = React.useState<SupabaseTableData<TableName>[]>([])
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+  const previousScrollHeight = React.useRef<number>(0)
+
+  const { isFetching, hasMore, fetchNextPage, isSuccess } = useInfiniteQuery({
     tableName,
     columns,
     pageSize,
     trailingQuery,
+    scrollDirection,
+    onDataChange: (newData) => {
+      previousScrollHeight.current = scrollContainerRef.current?.scrollHeight || 0
+      setData(newData)
+    },
   })
 
   // Ref for the scrolling container
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null)
-
-  // Intersection observer logic - target the last rendered *item* or a dedicated sentinel
   const loadMoreSentinelRef = React.useRef<HTMLDivElement>(null)
   const observer = React.useRef<IntersectionObserver | null>(null)
 
@@ -88,16 +96,31 @@ export function InfiniteList<TableName extends SupabaseTableName>({
     }
   }, [isFetching, hasMore, fetchNextPage])
 
+  React.useLayoutEffect(() => {
+    if (scrollDirection === 'up' && isFetching) {
+      const scrollContainer = scrollContainerRef.current
+      if (scrollContainer) {
+        const newScrollHeight = scrollContainer.scrollHeight
+        const heightDifference = newScrollHeight - previousScrollHeight.current
+        if (heightDifference > 0) {
+          scrollContainer.scrollTop += heightDifference
+        }
+      }
+    }
+  }, [data, isFetching, scrollDirection])
+
   return (
     <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto scrollbar-hide', className)}>
       <div>
+        {scrollDirection === 'up' && hasMore && <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />}
+
         {isSuccess && data.length === 0 && renderNoResults()}
 
         {data.map((item, index) => renderItem(item, index))}
 
         {isFetching && renderSkeleton && renderSkeleton(pageSize)}
 
-        <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />
+        {scrollDirection === 'down' && hasMore && <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />}
 
         {!hasMore && data.length > 0 && renderEndMessage()}
       </div>

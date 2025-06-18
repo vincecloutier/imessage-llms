@@ -56,6 +56,10 @@ interface UseInfiniteQueryProps<T extends SupabaseTableName, Query extends strin
   pageSize?: number
   // A function that modifies the query. Can be used to sort, filter, etc. If .range is used, it will be overwritten.
   trailingQuery?: SupabaseQueryHandler<T>
+  // The direction of the scroll
+  scrollDirection?: 'up' | 'down'
+  // Callback when data changes
+  onDataChange?: (data: any[]) => void
 }
 
 interface StoreState<TData> {
@@ -73,7 +77,7 @@ type Listener = () => void
 function createStore<TData extends SupabaseTableData<T> & { id: number | string }, T extends SupabaseTableName>(
   props: UseInfiniteQueryProps<T>
 ) {
-  const { tableName, columns = '*', pageSize = 20, trailingQuery } = props
+  const { tableName, columns = '*', pageSize = 20, trailingQuery, scrollDirection = 'down', onDataChange } = props
 
   let state: StoreState<TData> = {
     data: [],
@@ -118,12 +122,18 @@ function createStore<TData extends SupabaseTableData<T> & { id: number | string 
         (item) => !state.data.find((old) => (old as any).id === (item as any).id)
       )
 
+      const updatedData =
+        scrollDirection === 'up'
+          ? [...deduplicatedData.slice().reverse(), ...state.data]
+          : [...state.data, ...deduplicatedData]
+
       setState({
-        data: [...state.data, ...deduplicatedData],
+        data: updatedData,
         count: count || 0,
         isSuccess: true,
         error: null,
       })
+      onDataChange?.(updatedData)
     }
     setState({ isFetching: false })
   }
@@ -179,7 +189,8 @@ function useInfiniteQuery<
       storeRef.current.getState().hasInitialFetch &&
       (props.tableName !== props.tableName ||
         props.columns !== props.columns ||
-        props.pageSize !== props.pageSize)
+        props.pageSize !== props.pageSize ||
+        props.scrollDirection !== props.scrollDirection)
     ) {
       storeRef.current = createStore<TData, T>(props)
     }
@@ -187,7 +198,7 @@ function useInfiniteQuery<
     if (!state.hasInitialFetch && typeof window !== 'undefined') {
       storeRef.current.initialize()
     }
-  }, [props.tableName, props.columns, props.pageSize, state.hasInitialFetch])
+  }, [props.tableName, props.columns, props.pageSize, props.scrollDirection, state.hasInitialFetch])
 
   return {
     data: state.data,

@@ -91,8 +91,9 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
       <InfiniteList
         tableName="messages"
         columns="*" 
+        scrollDirection="up"
         pageSize={20}
-        trailingQuery={(query) => query.eq('persona_id', persona.id).eq('channel', 'web')}
+        trailingQuery={(query) => query.eq('persona_id', persona.id).eq('channel', 'web').order('created_at', { ascending: false })}
         renderItem={(message, index) => <DisplayMessage key={index} persona={persona} message={message} />}
       />
 
