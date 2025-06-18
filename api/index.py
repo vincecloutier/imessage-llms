@@ -10,7 +10,7 @@ BOTS: dict[str, Messaging] = {"imessage": BlueBubbles(), "telegram": Telegram()}
 
 app = Flask(__name__)
 
-@app.route('/api/frontend')
+@app.route('/api/frontend', methods=['GET', 'POST'])
 def frontend():
     # parse request
     data = request.form
@@ -38,7 +38,7 @@ def frontend():
     return jsonify({"status": 200, "message": {"role": "assistant", "content": response}})
 
 
-@app.route('/api/responder')
+@app.route('/api/responder', methods=['GET', 'POST'])
 def responder():
     # get correct bot
     channel = request.args.get('channel')
