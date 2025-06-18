@@ -4,12 +4,12 @@ import {useRef, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useFileHandler } from '@/hooks/use-file-handler';
-import { AppHeader } from '@/components/custom/app-header';
 import { useFileInput } from '@/hooks/use-chat-file-input';
 import { useChatMessages } from '@/hooks/use-chat-messages';
 import { Message, Persona, Profile, User } from '@/lib/types';
 import { useKeyboardFocus } from '@/hooks/use-chat-keyboard-focus';
 import { DisplayMessage, TypingMessage, ChatInput } from '@/components/custom/chat-parts';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const INITIAL_INPUT_AREA_HEIGHT = 70; // approximate initial height of the input area + bottom margin
 const BOTTOM_SPACING = 16; // additional space between last message and input area to bottom-4 (1rem)
@@ -69,7 +69,11 @@ export function Chat({ user, persona, profile, initialMessages }: { user: User; 
 
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden transition-colors duration-200 ease-in-out md:border-t" {...handlers}>
-      <AppHeader user={user} persona={persona} profile={profile}/>
+      
+      <header className="bg-transparent fixed top-0 w-full z-50 flex shrink-0 items-center gap-2 px-4 py-2 justify-between">
+        <SidebarTrigger className="md:hidden" />
+      </header>
+
       <AnimatePresence>
         {isDraggingOver && (
           <motion.div 
