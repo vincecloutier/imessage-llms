@@ -1,13 +1,14 @@
 "use client"
-import type React from "react"
-import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowRight, Loader2 } from "lucide-react"
+
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import React, { useState, useEffect } from "react"
+
 import { Input } from "@/components/ui/input"
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, Loader2 } from "lucide-react"
 import { signIn, verifyOTP } from "@/lib/supabase/client"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 
 export default function Page() {
   const router = useRouter()

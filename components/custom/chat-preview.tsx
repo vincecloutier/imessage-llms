@@ -2,8 +2,8 @@
 
 import Image from "next/image"
 import { useState } from "react"
-import { X } from "lucide-react"
 
+import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useResolvedImageUrl } from "@/hooks/use-chat-resolved-image"
 

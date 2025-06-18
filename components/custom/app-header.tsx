@@ -1,24 +1,17 @@
 "use client"
 
 import { toast } from "sonner"
-import { useTheme } from "next-themes"
-import { Moon, Sun } from "lucide-react"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
-import React from "react"
 import { Input } from "@/components/ui/input"
-import { signIn, verifyOTP } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { User, Persona, Profile } from "@/lib/types";
-import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { ProfileForm } from "@/components/custom/form-profile";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { signIn, verifyOTP } from "@/lib/supabase/client";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Credenza, CredenzaContent, CredenzaDescription, CredenzaFooter, CredenzaHeader, CredenzaTitle, CredenzaTrigger } from "@/components/ui/credenza"
-import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
-import { useRouter } from "next/navigation";
-import { ThemeToggle } from "@/components/custom/theme-provider";
 
 export function AppHeader({user, persona, profile}: {user: User, persona: Persona, profile: Profile | null}) {
   return (

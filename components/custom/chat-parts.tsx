@@ -1,13 +1,12 @@
 'use client';
 
 import cx from 'classnames';
-import { Paperclip, ArrowUp } from 'lucide-react';
-import React, { useRef, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
+import React, { useRef, useCallback } from 'react';
 
 import { Message, Persona } from '@/lib/types';
+import { Paperclip, ArrowUp } from 'lucide-react';
 import { ImagePreview } from '@/components/custom/chat-preview';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PersonaAvatar } from '@/components/custom/form-persona';
 
 const DateSeparator = ({ date }: { date: Date }) => {

@@ -11,11 +11,11 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LocationField } from "@/components/ui/location-input";
+import { SenderAddressField } from "@/components/ui/sender-address-field";
 import { MessagingPlatformField } from "@/components/ui/messaging-platform-field";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 import { Credenza, CredenzaContent, CredenzaHeader, CredenzaTitle, CredenzaDescription, CredenzaFooter, CredenzaBody } from "@/components/ui/credenza";
-import { SenderAddressField } from "@/components/ui/sender-address-field";
 
 export interface FieldSchema {
   name: string;

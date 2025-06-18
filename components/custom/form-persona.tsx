@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, Pen, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { Persona } from '@/lib/types';
+import { Pencil, Plus } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { deletePersona, savePersona } from '@/lib/actions';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import GenericForm, { FieldSchema } from '@/components/custom/form-generic';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const personaFields: FieldSchema[] = [
   { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a', type: 'text' },

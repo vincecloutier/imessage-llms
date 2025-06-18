@@ -1,15 +1,15 @@
 'use client';
 
-import { ChevronsUpDown, UserRound } from "lucide-react";
 import { useState, useMemo } from "react"; 
 import { useRouter } from "next/navigation";
 
 import { saveProfile } from "@/lib/actions";
 import { Profile, User } from "@/lib/types";
+import { ChevronsUpDown } from "lucide-react";
 import { signOut } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import GenericForm, { FieldSchema } from "@/components/custom/form-generic";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const profileFields: FieldSchema[] = [ 
     { name: 'name', label: 'Name*', rowId: 'a1', type: 'text' },

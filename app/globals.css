@@ -1,15 +1,3 @@
-/* UI TOOLS: 
-v0.dev, 
-https://tweakcn.com/editor/theme, 
-https://ui-x.junwen-k.dev/docs/, 
-https://www.kibo-ui.com/, 
-https://www.launchuicomponents.com/, 
-https://21st.dev/, 
-https://kokonutui.com/docs/components/
-https://ant.design/
-https://once-ui.com/
-https://react-spectrum.adobe.com/react-aria/getting-started.html
-*/
 @import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));

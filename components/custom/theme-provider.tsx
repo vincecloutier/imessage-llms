@@ -1,11 +1,8 @@
 "use client"
  
 import * as React from "react"
+import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 import { useTheme, ThemeProvider as NextThemesProvider } from "next-themes"
-import { Button } from "@/components/ui/button"
-import { Sun, Moon } from "lucide-react"
-import { SidebarMenuButton, SidebarMenuItem} from "../ui/sidebar"
-import { ThemeSwitcher } from "../ui/theme-switcher"
 
 export function ThemeProvider({children, ...props}: React.ComponentProps<typeof NextThemesProvider>) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>

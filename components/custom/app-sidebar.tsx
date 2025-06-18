@@ -2,27 +2,13 @@
 
 import * as React from "react"
 import Link from 'next/link';
-import { Inbox, Send, Contact, BookOpen, LifeBuoy, LogOut } from "lucide-react"
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
-
-import { Persona, Conversation, User, Profile } from '@/lib/types';
 import { cn } from "@/lib/utils";
-import { PersonaForm } from "./form-persona";
-import { Button } from "../ui/button";
-import { ProfileForm } from "./form-profile";
-import { ThemeToggle } from "./theme-provider";
+import { PersonaForm } from "@/components/custom/form-persona";
+import { ProfileForm } from "@/components/custom/form-profile";
+import { ThemeToggle } from "@/components/custom/theme-provider";
+import { Persona, Conversation, User, Profile } from '@/lib/types';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from "@/components/ui/sidebar"
 
 const commonStyles = {
   sidebarWidth: "w-[calc(var(--sidebar-width-icon)+1px)]!",
