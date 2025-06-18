@@ -1,2 +1,8 @@
-flask
+pinecone
+supabase
+flask 
+requests
+openai
+exa-py
+pendulum
 flask-cors
