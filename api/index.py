@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify
 from py_lib.dbp import get_profile, save_message, get_messages, get_persona
 from py_lib.llm import llm_call
-from py_lib.utils_general import sanitize_response
-from flask_cors import CORS
-from flask import Flask, request, jsonify
+from py_lib.utils import sanitize_response
 from py_lib.messaging import Messaging, BlueBubbles, Telegram
+import logging
 
 BOTS: dict[str, Messaging] = {"imessage": BlueBubbles(), "telegram": Telegram()}
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 app = Flask(__name__)
 

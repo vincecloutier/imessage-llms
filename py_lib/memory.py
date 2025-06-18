@@ -6,7 +6,7 @@
 from py_lib.dbv import index_upsert, index_query
 from py_lib.llm import structured_call
 from py_lib.prompts import CHUNKING_SYSTEM, CHUNKING_PROMPT, MERGE_SYSTEM, MERGE_PROMPT
-from py_lib.utils_general import now
+from py_lib.utils import now
 
 THRESHOLD = 0.5
 
