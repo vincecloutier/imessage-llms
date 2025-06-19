@@ -72,7 +72,7 @@ export function AppSidebar({
     } else {
       return {
         id: persona.id,
-        name: persona.attributes.name,
+        name: persona.display_name,
         lastMessage: 'Send a message to start a conversation',
         lastMessageTime: null,
         is_unread: false,
@@ -86,7 +86,7 @@ export function AppSidebar({
         <div className="flex w-full items-center justify-between">
           <div className="text-foreground text-base font-medium">Contacts</div>
           <div className="pr-0">
-            <PersonaForm persona={null} />
+            <PersonaForm user={user} persona={null} />
           </div>
         </div>
       </SidebarHeader>
@@ -125,7 +125,7 @@ export function AppSidebar({
                           e.stopPropagation()
                         }}
                       >
-                        <PersonaForm persona={currentPersona} />
+                        <PersonaForm user={user} persona={currentPersona} />
                       </div>
                     )}
                     <div className="flex flex-col w-full">

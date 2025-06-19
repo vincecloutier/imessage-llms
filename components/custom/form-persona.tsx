@@ -1,15 +1,19 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { toast } from 'sonner'
+import { v4 as uuidv4 } from 'uuid'
 
-import { Persona } from '@/lib/types'
+import { Persona, User } from '@/lib/types'
 import { Pencil, Plus } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { deletePersona, savePersona } from '@/lib/actions'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import GenericForm, { FieldSchema } from '@/components/custom/form-generic'
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -21,38 +25,44 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog'
+import {
+  Credenza,
+  CredenzaContent,
+  CredenzaHeader,
+  CredenzaTitle,
+  CredenzaDescription,
+  CredenzaFooter,
+  CredenzaBody,
+} from '@/components/ui/credenza'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormDescription,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { MessagingPlatformField } from '@/components/ui/messaging-platform-field'
 
-const personaFields: FieldSchema[] = [
-  { name: 'name', label: 'Name', description: 'What is their name?', rowId: 'a', type: 'text' },
-  {
-    name: 'prompt',
-    label: 'Prompt',
-    description: 'What prompt should they use?',
-    rowId: 'b',
-    type: 'long_text',
-  },
-  {
-    name: 'model',
-    label: 'Model',
-    description: 'What model should they use?',
-    rowId: 'c',
-    type: 'text',
-  },
-  {
-    name: 'temperature',
-    label: 'Temperature',
-    description: 'What is the model temperature?',
-    rowId: 'c',
-    type: 'text',
-  },
-  {
-    name: 'messaging_platform',
-    label: 'Messaging Platforms',
-    description: 'What platforms can they use to message you?',
-    rowId: 'd',
-    type: 'messaging_platform',
-  },
-]
+const messagingPlatformValueSchema = z.object({
+  is_imessage_persona: z.boolean(),
+  is_telegram_persona: z.boolean(),
+})
+
+const personaFormSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  prompt: z.string().min(1, 'Prompt is required'),
+  model: z.string().min(1, 'Model is required'),
+  temperature: z.number().refine(val => !isNaN(val) && val >= 0 && val <= 2, {
+    message: "Temperature must be a number between 0 and 2",
+  }),
+  messaging_platform: messagingPlatformValueSchema,
+})
+
+type PersonaFormValues = z.infer<typeof personaFormSchema>
 
 // Replace the defaultColors array with Tailwind color classes
 const defaultColors = [
@@ -108,76 +118,210 @@ export const PersonaAvatar = ({ personaId, personaName, onClick }: PersonaAvatar
 }
 
 export function PersonaForm({
+  user,
   persona,
   showButton = true,
   freshProfile = false,
 }: {
+  user: User
   persona: Persona | null
   showButton?: boolean
   freshProfile?: boolean
 }) {
-  const [editingPersonaId, setEditingPersonaId] = useState<string | null>(null)
-  const handlePersonaOpenChange = (isOpen: boolean) => {
-    if (!isOpen) setEditingPersonaId(null)
-  }
-  const startingValues = useMemo(() => persona, [persona])
+  const [open, setOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const router = useRouter()
 
-  if (startingValues) {
-    return (
-      <>
-        <PersonaAvatar
-          personaId={startingValues.id}
-          personaName={startingValues.attributes.name as string}
-          onClick={() => setEditingPersonaId(startingValues.id)}
-        />
-        <GenericForm
-          formTitle="Edit Contact"
-          formDescription="Update the details for this contact."
-          fields={personaFields}
-          startingValues={startingValues}
-          saveAction={savePersona}
-          open={editingPersonaId === startingValues.id}
-          onOpenChange={handlePersonaOpenChange}
-          destructiveButton={
-            <PersonaDestructiveButton
-              personaId={startingValues.id}
-              setEditingPersonaId={setEditingPersonaId}
-            />
-          }
-        />
-      </>
-    )
-  } else {
-    return (
-      <>
-        {showButton && (
-          <Label
-            onClick={() => {
-              setEditingPersonaId('new')
-            }}
-            className="cursor-pointer"
-          >
-            <span>Add Contact</span>
-            <Plus className="w-4 h-4" />
-          </Label>
-        )}
-        <GenericForm
-          formTitle="Add New Contact"
-          formDescription="Define the details for a new contact."
-          fields={personaFields}
-          startingValues={{
-            attributes: {},
-            is_imessage_persona: freshProfile,
-            is_telegram_persona: freshProfile,
-          }}
-          saveAction={savePersona}
-          open={editingPersonaId === 'new' || freshProfile}
-          onOpenChange={handlePersonaOpenChange}
-          forceAnswer={freshProfile}
-        />
-      </>
+  const isEditing = !!persona
+
+  const defaultValues = useMemo(() => {
+    return {
+      name: persona?.display_name || '',
+      prompt: persona?.prompt || '',
+      model: persona?.model || '',
+      temperature: persona?.temperature || 0.7,
+      messaging_platform: {
+        is_imessage_persona: persona?.is_imessage_persona ?? freshProfile,
+        is_telegram_persona: persona?.is_telegram_persona ?? freshProfile,
+      },
+    }
+  }, [persona, freshProfile])
+
+  const form = useForm<PersonaFormValues>({
+    resolver: zodResolver(personaFormSchema),
+    defaultValues,
+    mode: 'onChange',
+  })
+
+  useEffect(() => {
+    if (open || freshProfile) {
+      form.reset(defaultValues)
+    }
+  }, [open, freshProfile, defaultValues, form])
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (freshProfile && !isOpen) {
+      return
+    }
+    setOpen(isOpen)
+  }
+
+  const onSubmit = async (data: PersonaFormValues) => {
+    setIsSaving(true)
+
+    await toast.promise(
+      savePersona({
+        id: persona?.id ?? uuidv4(),
+        user_id: user.id,
+        display_name: data.name,
+        prompt: data.prompt,
+        model: data.model,
+        temperature: data.temperature,
+        is_imessage_persona: data.messaging_platform.is_imessage_persona,
+        is_telegram_persona: data.messaging_platform.is_telegram_persona,
+      })
+        .then(result => {
+          handleOpenChange(false)
+          router.refresh()
+          return result
+        })
+        .catch(err => {
+          console.error(`Error saving persona:`, err)
+          throw err
+        })
+        .finally(() => {
+          setIsSaving(false)
+        }),
+      {
+        loading: 'Saving contact...',
+        success: 'Contact saved successfully!',
+        error: err => `Failed to save contact: ${err.message || 'unknown error.'}`,
+      }
     )
   }
+
+  const trigger = isEditing ? (
+    <PersonaAvatar
+      personaId={persona.id}
+      personaName={persona.display_name}
+      onClick={() => setOpen(true)}
+    />
+  ) : (
+    showButton && (
+      <Label onClick={() => setOpen(true)} className="cursor-pointer">
+        <span>Add Contact</span>
+        <Plus className="w-4 h-4" />
+      </Label>
+    )
+  )
+
+  return (
+    <>
+      {trigger}
+      <Credenza open={open || freshProfile} onOpenChange={handleOpenChange} preventClose={freshProfile}>
+        <CredenzaContent showCloseButton={!freshProfile}>
+          <CredenzaHeader>
+            <CredenzaTitle>{isEditing ? 'Edit Contact' : 'Add New Contact'}</CredenzaTitle>
+          </CredenzaHeader>
+          <CredenzaBody>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} id="persona-form" className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Their name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Model</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="gpt-4-turbo" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="prompt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prompt</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={6} placeholder="The prompt for the contact" className="resize-none" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                    control={form.control}
+                    name="temperature"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Temperature</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.1" min="0" max="2" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                <FormField
+                  control={form.control}
+                  name="messaging_platform"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Messaging Platforms</FormLabel>
+                      <FormControl>
+                        <MessagingPlatformField value={field.value} onChange={field.onChange} />
+                      </FormControl>
+                      <FormDescription>
+                        What platforms can they use to message you?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CredenzaBody>
+          <CredenzaFooter>
+            <div className="flex w-full gap-4 justify-between">
+              <div>
+                {isEditing && (
+                  <PersonaDestructiveButton
+                    personaId={persona.id}
+                    setEditingPersonaId={() => handleOpenChange(false)}
+                  />
+                )}
+              </div>
+              <Button
+                type="submit"
+                form="persona-form"
+                disabled={isSaving || !form.formState.isDirty}
+              >
+                {isSaving ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          </CredenzaFooter>
+        </CredenzaContent>
+      </Credenza>
+    </>
+  )
 }
 
 export function PersonaDestructiveButton({

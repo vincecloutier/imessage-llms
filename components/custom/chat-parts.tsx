@@ -40,7 +40,7 @@ export const DisplayMessage = ({
       >
         {!isUser && (
           <div className="flex-shrink-0 mr-2 self-end -mb-4">
-            <PersonaAvatar personaId={persona.id} personaName={persona.attributes.name as string} />
+            <PersonaAvatar personaId={persona.id} personaName={persona.display_name} />
           </div>
         )}
         <div className={cx('flex flex-col gap-1 max-w-[80%]', isUser && 'items-end')}>
@@ -84,7 +84,7 @@ export const TypingMessage = ({ persona }: { persona: Persona }) => {
   return (
     <div className="px-4 my-3 flex justify-start" data-role="assistant">
       <div className="flex-shrink-0 mr-2 self-end -mb-4">
-        <PersonaAvatar personaId={persona.id} personaName={persona.attributes.name as string} />
+        <PersonaAvatar personaId={persona.id} personaName={persona.display_name} />
       </div>
       <div className="flex flex-col gap-1 max-w-[80%]">
         <div className="flex-1">

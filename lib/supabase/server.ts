@@ -51,7 +51,7 @@ export const getCachedPersonas = cache(async (userId: string): Promise<Persona[]
     .from('personas')
     .select('*')
     .eq('user_id', userId)
-    .order('attributes->name')
+    .order('display_name')
   if (error) {
     console.error('Error fetching personas:', error)
     return []
@@ -86,7 +86,7 @@ export const getCachedConversations = cache(async (userId: string) => {
             *,
             personas:persona_id (
                 id,
-                attributes
+                display_name
             )
         `
     )
@@ -107,7 +107,7 @@ export const getCachedConversations = cache(async (userId: string) => {
       if (!acc[personaId]) {
         acc[personaId] = {
           id: personaId,
-          name: message.personas?.attributes?.name || 'Unknown',
+          name: message.personas?.display_name || 'Unknown',
           lastMessage: message.content,
           lastMessageTime: message.created_at,
           is_unread: false,

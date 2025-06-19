@@ -17,7 +17,7 @@ export default async function DefaultPersonas() {
 
   const personas = await getCachedPersonas(user.id)
   if (personas.length === 0)
-    return <PersonaForm persona={null} showButton={false} freshProfile={true} />
+    return <PersonaForm user={user} persona={null} showButton={false} freshProfile={true} />
 
   const conversations = await getCachedConversations(user.id)
 

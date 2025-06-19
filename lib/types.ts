@@ -12,7 +12,7 @@ export type Persona = {
   user_id: string
   display_name: string
   prompt: string
-  temperature: string
+  temperature: number
   model: string
   is_imessage_persona: boolean
   is_telegram_persona: boolean
@@ -24,15 +24,6 @@ export type Message = {
   file_path?: string | null
   attachmentFile?: File | null
   created_at: string
-}
-
-export type SaveEntityPayload = {
-  id?: string
-  attributes: Record<string, any>
-  sender_address?: string | null
-  telegram_username?: string | null
-  is_imessage_persona?: boolean
-  is_telegram_persona?: boolean
 }
 
 export type Conversation = {
