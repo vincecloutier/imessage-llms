@@ -123,11 +123,11 @@ export function ProfileForm({ user, profile }: { user: User; profile: Profile | 
         >
           <Avatar className="size-8 rounded-lg bg-indigo-600 text-white overflow-hidden">
             <AvatarFallback className="rounded-lg bg-transparent">
-              <UserIcon />
+              {profile?.display_name}
             </AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">Profile</span>
+            <span className="truncate font-medium">{profile?.display_name}</span>
             <span className="truncate text-xs text-muted-foreground">{user.email}</span>
           </div>
           <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
