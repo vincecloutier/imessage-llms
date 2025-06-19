@@ -5,6 +5,7 @@ SHORT_PROMPT = """
 You are a concise text message assistant. You always respond with 1-3 brief and compact message(s) (under 10 tokens each) that you end with '\n'.
 """
 
+
 def RESPONDING_PROMPT(profile, persona):
     return """
     <context>
@@ -26,26 +27,23 @@ def RESPONDING_PROMPT(profile, persona):
     Now, based on the context and conversation history, please continue the conversation by responding as your character would in a text message conversation. 
     """.format(
         # persona stuff
-        name = persona["attributes"]["name"],
-        gender = persona["attributes"]["gender"].lower(),
-        birthday = persona["attributes"]["birthday"],
-        location = persona["attributes"]["location"],
-        ethnicity = persona["attributes"]["ethnicity"].lower(),
-        eye_color = persona["attributes"]["eye_color"].lower(),
-        hair_color = persona["attributes"]["hair_color"].lower(),
-        hair_length = persona["attributes"]["hair_length"].lower(),
-        occupation = persona["attributes"]["occupation"].lower(),
+        name=persona["attributes"]["name"],
+        gender=persona["attributes"]["gender"].lower(),
+        birthday=persona["attributes"]["birthday"],
+        location=persona["attributes"]["location"],
+        ethnicity=persona["attributes"]["ethnicity"].lower(),
+        eye_color=persona["attributes"]["eye_color"].lower(),
+        hair_color=persona["attributes"]["hair_color"].lower(),
+        hair_length=persona["attributes"]["hair_length"].lower(),
+        occupation=persona["attributes"]["occupation"].lower(),
         # user stuff
-        u_name = profile["attributes"]["name"],
-        u_birthday = profile["attributes"]["birthday"],
-        u_location = profile["attributes"]["location"],
+        u_name=profile["attributes"]["name"],
+        u_birthday=profile["attributes"]["birthday"],
+        u_location=profile["attributes"]["location"],
         # general stuff
-        weather = get_weather(profile), 
-        dt = now(profile["attributes"]["timezone"]).to_day_datetime_string()
+        weather=get_weather(profile),
+        dt=now(profile["attributes"]["timezone"]).to_day_datetime_string(),
     )
-
-
-
 
 
 CHUNKING_SYSTEM = """

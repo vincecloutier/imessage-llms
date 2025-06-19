@@ -7,9 +7,17 @@ from decimal import Decimal, ROUND_HALF_UP
 
 TOOL_MAPPING = {}
 
+
 def tool(func):
     """A decorator that automatically generates a JSON schema for a function's input from its signature."""
-    type_map = {str: "string", int: "integer", float: "number", bool: "boolean", list: "array", dict: "object"}
+    type_map = {
+        str: "string",
+        int: "integer",
+        float: "number",
+        bool: "boolean",
+        list: "array",
+        dict: "object",
+    }
     sig = signature(func)
     hints = get_type_hints(func, include_extras=True)
     properties, required = {}, []
@@ -30,11 +38,12 @@ def tool(func):
                 "type": "object",
                 "properties": properties,
                 "required": required,
-            }
-        }
+            },
+        },
     }
     TOOL_MAPPING[func.__name__] = func
     return func
+
 
 def handle_tool_call(user_id, persona_id, tool_call):
     try:
@@ -51,24 +60,38 @@ def handle_tool_call(user_id, persona_id, tool_call):
     except Exception as e:
         content = "Error: " + str(e)
     print(f"Tool call for {tool_name} returned {content}")
-    return {"role": "tool", "tool_call_id": tool_call.id, "name": tool_name, "content": content}
+    return {
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "name": tool_name,
+        "content": content,
+    }
+
 
 def round_to_precision(n, precision=1):
-    return float(Decimal(str(n)).quantize(Decimal(f'1.{"0"*precision}'), rounding=ROUND_HALF_UP))
+    return float(
+        Decimal(str(n)).quantize(Decimal(f'1.{"0"*precision}'), rounding=ROUND_HALF_UP)
+    )
+
 
 def sanitize_response(text):
-    text = re.sub(r'\(.*?\)|\[.*?\]|\{.*?\}', '', text) # removed bracketed content
-    pattern = r'[^a-zA-Z0-9.,!?/\s\'"%\-]+' # remove any unwanted characters
-    text = re.sub(pattern, '', text)
-    text = text.replace(" .", " ") # remove any anachronistic punctuation
-    text = text.replace("xoxo", "") # remove any xoxo's
+    text = re.sub(r"\(.*?\)|\[.*?\]|\{.*?\}", "", text)  # removed bracketed content
+    pattern = r'[^a-zA-Z0-9.,!?/\s\'"%\-]+'  # remove any unwanted characters
+    text = re.sub(pattern, "", text)
+    text = text.replace(" .", " ")  # remove any anachronistic punctuation
+    text = text.replace("xoxo", "")  # remove any xoxo's
     return text.lower().strip()
 
+
 def is_within_wait(timestamp: str, minutes: int = 0, hours: int = 0):
-    return now() - pendulum.parse(timestamp) <= pendulum.duration(minutes=minutes, hours=hours)
+    return now() - pendulum.parse(timestamp) <= pendulum.duration(
+        minutes=minutes, hours=hours
+    )
+
 
 def parse_time(base_time, base_tz="UTC", target_tz="UTC"):
     return pendulum.parse(base_time, tz=base_tz).in_timezone(target_tz)
+
 
 def now(tz="UTC"):
     return pendulum.now(tz)

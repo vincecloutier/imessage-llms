@@ -9,12 +9,13 @@ import uuid
 import requests
 from backend.dbp import get_server_address
 
+
 class Messaging:
     def __init__(self):
         self.MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024
         self.MAX_MESSAGE_LENGTH = 500
         self.MAX_ATTACHMENTS = 1
-        self.headers = {'Content-Type': 'application/json'}
+        self.headers = {"Content-Type": "application/json"}
 
     def parse(self, request):
         """Parse the request and return (error, user_id, chat_id, message, attachment_data)"""
@@ -32,6 +33,7 @@ class Messaging:
         """Download and process attachments"""
         raise NotImplementedError("Subclasses must implement download_attachment()")
 
+
 class Web(Messaging):
     def __init__(self):
         super().__init__()
@@ -42,7 +44,15 @@ class Web(Messaging):
         chat_id = data.get("persona_id")
         message = data.get("message")
         attachment_file = request.files.get("attachment")
-        attachment_data = {"name": attachment_file.filename, "bytes": attachment_file.read(), "mime_type": attachment_file.mimetype} if attachment_file else None
+        attachment_data = (
+            {
+                "name": attachment_file.filename,
+                "bytes": attachment_file.read(),
+                "mime_type": attachment_file.mimetype,
+            }
+            if attachment_file
+            else None
+        )
 
         # we don't check for errors in web as it's all handled by the frontend
 
@@ -58,10 +68,11 @@ class Web(Messaging):
     def download_attachment(self, attachment_data):
         pass
 
+
 class BlueBubbles(Messaging):
     def __init__(self):
         super().__init__()
-        self.params = {'password': os.getenv('BBL_API_KEY')}
+        self.params = {"password": os.getenv("BBL_API_KEY")}
 
     def parse(self, request):
         # parse request
@@ -80,34 +91,47 @@ class BlueBubbles(Messaging):
         if len(message) > self.MAX_MESSAGE_LENGTH:
             error = "Message too long. Please keep it under 500 characters."
         elif len(attachments) > self.MAX_ATTACHMENTS:
-            error = "Too many attachments. Please only send one image/audio file at a time."
+            error = (
+                "Too many attachments. Please only send one image/audio file at a time."
+            )
         if error:
             self.send_message(chat_id, error)
 
         # return parsed request
-        return error, user_id, chat_id, message, self.download_attachment(attachments) 
-    
+        return error, user_id, chat_id, message, self.download_attachment(attachments)
+
     def send_message(self, chat_guid, message):
-        url = f'{get_server_address()}/api/v1/message/text'
-        data = json.dumps({'chatGuid': chat_guid, 'tempGuid': str(uuid.uuid4()), 'message': message})
-        requests.post(url, headers=self.headers, data=data, params=self.params, timeout=30)
+        url = f"{get_server_address()}/api/v1/message/text"
+        data = json.dumps(
+            {"chatGuid": chat_guid, "tempGuid": str(uuid.uuid4()), "message": message}
+        )
+        requests.post(
+            url, headers=self.headers, data=data, params=self.params, timeout=30
+        )
 
     def send_typing_indicator(self, chat_guid):
-        url = f'{get_server_address()}/api/v1/chat/{chat_guid}/typing'
+        url = f"{get_server_address()}/api/v1/chat/{chat_guid}/typing"
         requests.post(url, headers=self.headers, params=self.params, timeout=30)
 
     def download_attachment(self, attachments):
         if not attachments:
             return None
         attachment_id, mime_type = attachments[0]["guid"], attachments[0]["mimeType"]
-        url = f'{get_server_address()}/api/v1/attachment/{attachment_id}/download'
-        response = requests.get(url, headers=self.headers, params=self.params, timeout=30)
-        return {"name": attachment_id, "bytes": response.content, "mime_type": mime_type}
+        url = f"{get_server_address()}/api/v1/attachment/{attachment_id}/download"
+        response = requests.get(
+            url, headers=self.headers, params=self.params, timeout=30
+        )
+        return {
+            "name": attachment_id,
+            "bytes": response.content,
+            "mime_type": mime_type,
+        }
+
 
 class Telegram(Messaging):
     def __init__(self):
         super().__init__()
-        self.api_key = os.getenv('TELEGRAM_API_KEY')
+        self.api_key = os.getenv("TELEGRAM_API_KEY")
         self.url = f"https://api.telegram.org"
 
     def parse(self, request):
@@ -115,7 +139,11 @@ class Telegram(Messaging):
         data = request.json.get("message")
         user_id = data.get("from").get("username")
         chat_id = data.get("chat").get("id")
-        message = data.get("caption") if data.get("caption") is not None else data.get("text", "")
+        message = (
+            data.get("caption")
+            if data.get("caption") is not None
+            else data.get("text", "")
+        )
         attachments = data.get("photo", [])
 
         # check for errors
@@ -125,7 +153,9 @@ class Telegram(Messaging):
         elif len(message) > self.MAX_MESSAGE_LENGTH:
             error = "Message too long. Please keep it under 500 characters."
         elif len(attachments) > self.MAX_ATTACHMENTS:
-            error = "Too many attachments. Please only send one image/audio file at a time."
+            error = (
+                "Too many attachments. Please only send one image/audio file at a time."
+            )
         if error:
             self.send_message(chat_id, error)
 
@@ -133,8 +163,8 @@ class Telegram(Messaging):
         return error, user_id, chat_id, message, self.download_attachment(attachments)
 
     def send_message(self, chat_id, message):
-        url = f'{self.url}/bot{self.api_key}/sendMessage'
-        data = json.dumps({'chat_id': chat_id, 'text': message})
+        url = f"{self.url}/bot{self.api_key}/sendMessage"
+        data = json.dumps({"chat_id": chat_id, "text": message})
         requests.post(url, headers=self.headers, data=data, timeout=30)
 
     def send_typing_indicator(self, chat_id):
@@ -143,8 +173,25 @@ class Telegram(Messaging):
     def download_attachment(self, photo_sizes_list):
         if not photo_sizes_list:
             return None
-        photo = max(photo_sizes_list, key=lambda x: x.get("file_size", 0) if x.get("file_size") <= self.MAX_PHOTO_SIZE_BYTES else 0)
-        response_file_path = requests.get(f'{self.url}/bot{self.api_key}/getFile', params={'file_id': photo.get("file_id")}, timeout=10)
+        photo = max(
+            photo_sizes_list,
+            key=lambda x: (
+                x.get("file_size", 0)
+                if x.get("file_size") <= self.MAX_PHOTO_SIZE_BYTES
+                else 0
+            ),
+        )
+        response_file_path = requests.get(
+            f"{self.url}/bot{self.api_key}/getFile",
+            params={"file_id": photo.get("file_id")},
+            timeout=10,
+        )
         file_path = response_file_path.json().get("result").get("file_path")
-        response_bytes = requests.get(f'{self.url}/file/bot{self.api_key}/{file_path}', timeout=30)
-        return {"name": photo.get("file_id"), "bytes": response_bytes.content, "mime_type": "image/jpeg"}
+        response_bytes = requests.get(
+            f"{self.url}/file/bot{self.api_key}/{file_path}", timeout=30
+        )
+        return {
+            "name": photo.get("file_id"),
+            "bytes": response_bytes.content,
+            "mime_type": "image/jpeg",
+        }
