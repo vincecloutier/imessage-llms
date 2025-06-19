@@ -138,9 +138,6 @@ export function ProfileForm({ user, profile }: { user: User; profile: Profile | 
         <CredenzaContent showCloseButton={!forceAnswer}>
           <CredenzaHeader>
             <CredenzaTitle>Profile</CredenzaTitle>
-            <CredenzaDescription>
-              Your profile will not be passed to the personas, and can be changed at any time.
-            </CredenzaDescription>
           </CredenzaHeader>
           <CredenzaBody>
             <Form {...form}>
