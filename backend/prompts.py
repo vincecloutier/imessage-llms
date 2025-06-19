@@ -1,4 +1,3 @@
-from backend.dbp import get_weather
 from backend.utils import now
 
 SHORT_PROMPT = """
@@ -19,8 +18,7 @@ def RESPONDING_PROMPT(profile, persona):
     2. Information gathering: Before responding, gather all necessary information using the following tools in this order (you have access to all of these tools, and you can make a tool call up to 5 times):
         a. No matter what, call 'get_facts' to gather background information about your character and the user.
         b. Whenever any additional external information is needed, call 'search_internet'.
-        c. Whenever weather information is needed, use the fact that it currently {weather}.
-        d. Whenever you need to know the current time, use the fact that it's currently {dt} in {u_location}.
+        c. Whenever you need to know the current time, use the fact that it's currently {dt} in {u_location}.
     3. Tool usage: Never mention or acknowledge the use of any tools or information gathering methods in your responses.
     </instructions>
 
@@ -41,7 +39,6 @@ def RESPONDING_PROMPT(profile, persona):
         u_birthday=profile["attributes"]["birthday"],
         u_location=profile["attributes"]["location"],
         # general stuff
-        weather=get_weather(profile),
         dt=now(profile["attributes"]["timezone"]).to_day_datetime_string(),
     )
 
