@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import { cn } from '@/lib/utils';
-import { useControllableState } from '@radix-ui/react-use-controllable-state';
-import { Monitor, Moon, Sun } from 'lucide-react';
-import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils'
+import { useControllableState } from '@radix-ui/react-use-controllable-state'
+import { Monitor, Moon, Sun } from 'lucide-react'
+import { motion } from 'motion/react'
+import { useEffect, useState } from 'react'
 
 const themes = [
   {
@@ -22,14 +22,14 @@ const themes = [
     icon: Moon,
     label: 'Dark theme',
   },
-];
+]
 
 export type ThemeSwitcherProps = {
-  value?: 'light' | 'dark' | 'system';
-  onChange?: (theme: 'light' | 'dark' | 'system') => void;
-  defaultValue?: 'light' | 'dark' | 'system';
-  className?: string;
-};
+  value?: 'light' | 'dark' | 'system'
+  onChange?: (theme: 'light' | 'dark' | 'system') => void
+  defaultValue?: 'light' | 'dark' | 'system'
+  className?: string
+}
 
 export const ThemeSwitcher = ({
   value,
@@ -41,16 +41,16 @@ export const ThemeSwitcher = ({
     defaultProp: defaultValue,
     prop: value,
     onChange,
-  });
-  const [mounted, setMounted] = useState(false);
+  })
+  const [mounted, setMounted] = useState(false)
 
   // Prevent hydration mismatch
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   if (!mounted) {
-    return null;
+    return null
   }
 
   return (
@@ -61,7 +61,7 @@ export const ThemeSwitcher = ({
       )}
     >
       {themes.map(({ key, icon: Icon, label }) => {
-        const isActive = theme === key;
+        const isActive = theme === key
 
         return (
           <button
@@ -85,8 +85,8 @@ export const ThemeSwitcher = ({
               )}
             />
           </button>
-        );
+        )
       })}
     </div>
-  );
-};
+  )
+}

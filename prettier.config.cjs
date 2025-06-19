@@ -3,11 +3,11 @@ module.exports = {
   endOfLine: 'lf',
   semi: false,
   useTabs: false,
-  singleQuote: false,
+  singleQuote: true,
   tabWidth: 2,
-  trailingComma: 'none',
+  trailingComma: 'es5',
   printWidth: 100,
   bracketSpacing: true,
-  arrowParens: 'avoid',
-  proseWrap: 'preserve'
+  arrowParens: 'always',
+  proseWrap: 'preserve',
 }
