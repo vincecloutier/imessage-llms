@@ -2,14 +2,18 @@ export type { User } from '@supabase/supabase-js'
 
 export type Profile = {
   id: string
-  attributes: Record<string, unknown>
-  sender_address: string
-  telegram_username: string
+  display_name: string
+  imessage_address: string | null
+  telegram_address: string | null
 }
 
 export type Persona = {
   id: string
-  attributes: Record<string, unknown>
+  user_id: string
+  display_name: string
+  prompt: string
+  temperature: string
+  model: string
   is_imessage_persona: boolean
   is_telegram_persona: boolean
 }

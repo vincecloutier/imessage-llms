@@ -2,7 +2,7 @@
 
 import { cache } from 'react'
 
-import { SaveEntityPayload } from '@/lib/types'
+import { Profile, Persona } from '@/lib/types'
 import { createClient } from '@/lib/supabase/server'
 
 const SIGNED_URL_EXPIRY_SECONDS = 3600 // one hour
@@ -19,47 +19,25 @@ async function getSupabaseUser() {
   return { supabase, user }
 }
 
-export async function saveProfile(payload: SaveEntityPayload) {
-  const { supabase, user } = await getSupabaseUser()
-  const profile = {
-    id: user.id,
-    attributes: payload.attributes,
-    sender_address: payload.sender_address,
-    telegram_username: payload.telegram_username,
-  }
+export async function saveProfile(profile: Profile) {
+  const { supabase } = await getSupabaseUser()
   const { data, error } = await supabase.from('profiles').upsert(profile).select().single()
   if (error) throw new Error(error.message)
   return data
 }
 
-export async function savePersona(payload: SaveEntityPayload) {
+export async function savePersona(persona: Persona) {
   const { supabase, user } = await getSupabaseUser()
   // if this persona is being set as a platform persona, unset any existing platform personas (except for the current persona)
-  if (payload.is_imessage_persona) {
+  if (persona.is_imessage_persona) {
     await supabase.from('personas').update({ is_imessage_persona: false }).eq('user_id', user.id)
   }
 
-  if (payload.is_telegram_persona) {
+  if (persona.is_telegram_persona) {
     await supabase.from('personas').update({ is_telegram_persona: false }).eq('user_id', user.id)
   }
-
-  const query = !!payload.id
-    ? supabase
-        .from('personas')
-        .update({
-          attributes: payload.attributes,
-          is_imessage_persona: payload.is_imessage_persona,
-          is_telegram_persona: payload.is_telegram_persona,
-        })
-        .eq('id', payload.id)
-        .eq('user_id', user.id)
-    : supabase.from('personas').insert({
-        user_id: user.id,
-        attributes: payload.attributes,
-        is_imessage_persona: payload.is_imessage_persona,
-        is_telegram_persona: payload.is_telegram_persona,
-      })
-  const { data, error } = await query.select().single()
+  
+  const { data, error } = await supabase.from('personas').upsert(persona).select().single()
   if (error) throw new Error(error.message)
   return data
 }
