@@ -4,41 +4,13 @@ from flask import Flask, request, jsonify
 from backend.dbp import get_profile, save_message, get_messages, get_persona, update_server_address
 from backend.llm import llm_call
 from backend.utils import sanitize_response
-from backend.messaging import Messaging, BlueBubbles, Telegram
+from backend.messaging import Messaging, BlueBubbles, Telegram, Web
 
-BOTS: dict[str, Messaging] = {"imessage": BlueBubbles(), "telegram": Telegram()}
+BOTS: dict[str, Messaging] = {"imessage": BlueBubbles(), "telegram": Telegram(), "web": Web()}
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 app = Flask(__name__)
-
-@app.route('/api/frontend', methods=['GET', 'POST'])
-def frontend():
-    # parse request
-    data = request.form
-    user_id, persona_id, message, attachment_file = data.get("user_id"), data.get("persona_id"), data.get("message"), request.files.get("attachment")
-    attachment_data = {"name": attachment_file.filename, "bytes": attachment_file.read(), "mime_type": attachment_file.mimetype} if attachment_file else None
-
-    # get user profile
-    profile = get_profile("web", user_id)
-    
-    # get persona
-    persona = get_persona("web", user_id, persona_id)
-
-    # save user message
-    save_message(user_id, persona_id, "web", "user", message, attachment_data)
-
-    # call llm
-    response = llm_call(profile, persona, user_id, persona_id, get_messages(user_id, persona_id, "web"))
-
-    # parse the response
-    response = sanitize_response(response)
-
-    # send the response
-    save_message(user_id, persona_id, "web", "assistant", response)
-
-    return jsonify({"status": 200, "message": {"role": "assistant", "content": response}})
-
 
 @app.route('/api/responder', methods=['GET', 'POST'])
 def responder():
@@ -61,7 +33,7 @@ def responder():
     profile = get_profile(channel, user_id)
     
     # get persona
-    persona = get_persona(channel, profile["id"])
+    persona = get_persona(channel, profile["id"], chat_id)
     
     # save user message
     save_message(profile["id"], persona["id"], channel, "user", message, attachment_data)

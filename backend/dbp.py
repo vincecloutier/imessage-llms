@@ -41,9 +41,9 @@ def get_profile_personas(profile_id: str):
     resp = get_table("personas").select("*").eq("user_id", profile_id).execute()
     return resp.data if resp and resp.data else []
 
-def get_persona(channel: str, user_id: str, persona_id: str = None):
+def get_persona(channel: str, user_id: str, persona_id: str):
     query = get_table("personas").select("*").eq("user_id", user_id)
-    if persona_id:
+    if channel == "web":
         query = query.eq("id", persona_id)
     elif channel == "telegram":
         query = query.eq("is_telegram_persona", True)

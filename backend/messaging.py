@@ -31,7 +31,33 @@ class Messaging:
     def download_attachment(self, attachments):
         """Download and process attachments"""
         raise NotImplementedError("Subclasses must implement download_attachment()")
-    
+
+class Web(Messaging):
+    def __init__(self):
+        super().__init__()
+
+    def parse(self, request):
+        data = request.form
+        user_id = data.get("user_id")
+        chat_id = data.get("persona_id")
+        message = data.get("message")
+        attachment_file = request.files.get("attachment")
+        attachment_data = {"name": attachment_file.filename, "bytes": attachment_file.read(), "mime_type": attachment_file.mimetype} if attachment_file else None
+
+        # we don't check for errors in web as it's all handled by the frontend
+
+        # return parsed request
+        return None, user_id, chat_id, message, attachment_data
+
+    def send_message(self, chat_id, message):
+        pass
+
+    def send_typing_indicator(self, chat_id):
+        pass
+
+    def download_attachment(self, attachment_data):
+        pass
+
 class BlueBubbles(Messaging):
     def __init__(self):
         super().__init__()
@@ -110,6 +136,9 @@ class Telegram(Messaging):
         url = f'{self.url}/bot{self.api_key}/sendMessage'
         data = json.dumps({'chat_id': chat_id, 'text': message})
         requests.post(url, headers=self.headers, data=data, timeout=30)
+
+    def send_typing_indicator(self, chat_id):
+        pass
 
     def download_attachment(self, photo_sizes_list):
         if not photo_sizes_list:
