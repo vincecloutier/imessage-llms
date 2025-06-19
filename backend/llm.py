@@ -10,7 +10,6 @@ import requests
 
 from openai import OpenAI
 
-from backend.prompts import SHORT_PROMPT, RESPONDING_PROMPT
 from backend.tools import search_internet, get_facts
 from backend.utils import handle_tool_call
 
@@ -19,8 +18,7 @@ client = OpenAI(
 )
 
 
-def llm_call(profile, persona, profile_id, persona_id, msgs):
-    # msgs = [{"role": m["role"], "content": f"({parse_time(m['created_at'], 'UTC', profile['timezone']).strftime('%a %I:%M%p')})\n{m['content']}"} for m in msgs]
+def llm_call(persona, profile_id, persona_id, msgs):
     new_msgs = []
     for m in msgs:
         new_msgs.append({"role": m["role"], "content": m["content"]})
@@ -32,25 +30,18 @@ def llm_call(profile, persona, profile_id, persona_id, msgs):
                 }
             )
 
-    short_msg = {"role": "system", "content": SHORT_PROMPT}
-
     tools = [search_internet.spec, get_facts.spec]
-    system_msg = {"role": "system", "content": RESPONDING_PROMPT(profile, persona)}
-
-    new_msgs[:0] = [short_msg, system_msg]
+    new_msgs[:0] = [{"role": "system", "content": persona["prompt"]}]
 
     print(new_msgs)
 
-    for i in range(5):
-        # tool_choice = {"type": "function", "function": {"name": "get_facts"}} if (i == 0 and profile and persona) else "auto"
+    for _ in range(5):
         resp = client.chat.completions.create(
-            model="google/gemini-2.0-flash-001",
+            model=persona["model"],
             messages=new_msgs,
             tools=tools,
             tool_choice="auto",
-            temperature=1.5,
-            frequency_penalty=1,
-            presence_penalty=1,
+            temperature=persona["temperature"],
             max_tokens=100,
         )
         print("Full JSON:", resp)
@@ -103,24 +94,4 @@ def structured_call(model_id, messages, schema):
         },
     )
     print(response.json())
-    return json.loads(response.json()["choices"][0]["message"]["content"])
-
-
-def chat_completion(system_prompt, conv_history, model):
-    response = requests.post(
-        url="https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
-        },
-        data=json.dumps(
-            {
-                "model": "openai/o3",  # Optional
-                "messages": [{"role": "system", "content": system_prompt}]
-                + conv_history,
-            }
-        ),
-    )
-    print("Chat Completion Response:")
-    print(response.json())
-
     return json.loads(response.json()["choices"][0]["message"]["content"])

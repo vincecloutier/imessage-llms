@@ -56,9 +56,10 @@ const personaFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   prompt: z.string().min(1, 'Prompt is required'),
   model: z.string().min(1, 'Model is required'),
-  temperature: z.number().refine(val => !isNaN(val) && val >= 0 && val <= 2, {
-    message: "Temperature must be a number between 0 and 2",
-  }),
+  temperature: z.coerce
+    .number()
+    .min(0, 'Temperature must be at least 0')
+    .max(2, 'Temperature must be at most 2'),
   messaging_platform: messagingPlatformValueSchema,
 })
 
@@ -247,7 +248,7 @@ export function PersonaForm({
                       <FormItem>
                         <FormLabel>Model</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="gpt-4-turbo" />
+                          <Input {...field} placeholder="google/gemini-2.5-flash" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -259,9 +260,9 @@ export function PersonaForm({
                   name="prompt"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Prompt</FormLabel>
+                      <FormLabel>System Prompt</FormLabel>
                       <FormControl>
-                        <Textarea {...field} rows={6} placeholder="The prompt for the contact" className="resize-none" />
+                        <Textarea {...field} rows={6} placeholder="The system prompt for the contact" className="resize-none" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

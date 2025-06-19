@@ -8,7 +8,6 @@ import uuid
 import requests
 from supabase import create_client, Client
 
-from backend.utils import round_to_precision, is_within_wait
 
 supabase: Client = create_client(
     os.environ.get("SUPABASE_URL"), os.environ.get("SUPABASE_SERVICE_ROLE_KEY")

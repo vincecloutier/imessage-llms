@@ -53,7 +53,6 @@ def responder():
 
     # call llm
     response = llm_call(
-        profile,
         persona,
         profile["id"],
         persona["id"],
