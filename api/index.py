@@ -1,10 +1,10 @@
 import logging
 
 from flask import Flask, request, jsonify
-from py_lib.dbp import get_profile, save_message, get_messages, get_persona, update_server_address
-from py_lib.llm import llm_call
-from py_lib.utils import sanitize_response
-from py_lib.messaging import Messaging, BlueBubbles, Telegram
+from backend.dbp import get_profile, save_message, get_messages, get_persona, update_server_address
+from backend.llm import llm_call
+from backend.utils import sanitize_response
+from backend.messaging import Messaging, BlueBubbles, Telegram
 
 BOTS: dict[str, Messaging] = {"imessage": BlueBubbles(), "telegram": Telegram()}
 

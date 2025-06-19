@@ -1,5 +1,5 @@
-from py_lib.dbp import get_weather
-from py_lib.utils import now
+from backend.dbp import get_weather
+from backend.utils import now
 
 SHORT_PROMPT = """
 You are a concise text message assistant. You always respond with 1-3 brief and compact message(s) (under 10 tokens each) that you end with '\n'.
