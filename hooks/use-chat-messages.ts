@@ -30,7 +30,7 @@ export function useChatMessages({user_id, persona_id, initialMessages}: {user_id
     }
 
     try {
-      const response = await fetch("/api/frontend", {method: 'POST', credentials: 'include', body: formData});
+      const response = await fetch(`/api/responder?channel=web`, {method: 'POST', credentials: 'include', body: formData});
       const result = await response.json();
       setMessages((prev) => [...prev, {role: 'assistant', content: result.message.content, created_at: new Date().toISOString()}]);
     } catch (err: any) {
