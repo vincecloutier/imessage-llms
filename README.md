@@ -33,10 +33,10 @@ Follow these instructions to get a copy of the project up and runnning.
     3. Create another index called `memories-agent` with the same settings.
 
 4. **Create a Telegram Bot** <br>
- Go to [Telegram](https://telegram.org/) and create a bot and then save your API key and secret token somewhere.
+ Message [@BotFather](https://t.me/BotFather) and create a bot by messaging `/newbot` and picking a name and then save this bot's HTTP API key somewhere safe. You will also need a secret token to secure your webhook. You can invent something or generate a random one easily [here](https://randomkeygen.com). Save this secret token somewhere safe.
 
 5. **Setup iMessage with BlueBubbles:**
-
+Now go to [BlueBubbles](https://bluebubbles.app/install/) to download and setup the software we will use to handle iMessages from the bot. Make sure to follow the instructions and take note of the server password (we will refer to this password as the `BBL_API_KEY` from now on). Note that, our application does not rely on the google firebase part of this so you can safely skip that step. Further, make sure to follow the setup instructions for the Private API.
 
 6.  **Deploy to Vercel:**
     <div align="center">
@@ -44,10 +44,9 @@ Follow these instructions to get a copy of the project up and runnning.
         <img src="https://vercel.com/button" alt="Deploy with Vercel"/>
       </a>
     </div>
-    <p>Click the button to deploy. You will be prompted to enter the environment variables you saved from the previous steps.</p>
+    <p>Click the button to deploy. You will be prompted to enter the environment variables you saved from the previous steps. After deploying, you will need to take note of the base URL of your deployment.</p>
 
 7. **Setup a Supabase project and get the project URL and anon key.** <br>
- Go to [Supabase](https://supabase.com/) and sign up for an account and then save your project URL and anon key somewhere. This will be used to allow the model to store and retrieve user data.
 
 
 8. **Link Telegram Bot To Vercel** <br>
@@ -92,3 +91,10 @@ After deploying, you can run the application locally to test and develop.
     pnpm run dev
     ```
     The application will then be available at `http://localhost:3000`. <br> _Note that `vercel dev` will launch the frontend, but not the backend._
+
+
+### Troubleshooting
+1. **Messages takes a long time to be marked as delivered over iMessage.** <br>
+I struggled with this for a while. It has to do with the way the Apple's Push Notification service works, and nothing to do with Bluebubbles or this service. The good news is that it's an easy fix, you just need a way to increase your TCP timeout on your network. If you can't do this (thanks Rogers), you can buy a top tier TP-Link Router for very cheap.
+
+Feel free to let me know if you are having any other issues with this repo and I will try to help you out as best I can.
