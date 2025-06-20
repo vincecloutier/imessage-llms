@@ -15,6 +15,7 @@ import {
   SidebarHeader,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { PersonaAvatar } from '@/components/custom/form-persona'
 
 const commonStyles = {
   sidebarWidth: 'w-[calc(var(--sidebar-width-icon)+1px)]!',
@@ -38,6 +39,8 @@ export function AppSidebar({
 }) {
   const [chatStates, setChatStates] = React.useState<Conversation[]>(chats)
   const { isMobile, setOpenMobile } = useSidebar()
+  const [editingPersona, setEditingPersona] = React.useState<Persona | null>(null)
+  const [isAddContactOpen, setIsAddContactOpen] = React.useState(false)
 
   // compute unread status based on localStorage
   React.useEffect(() => {
@@ -86,7 +89,13 @@ export function AppSidebar({
         <div className="flex w-full items-center justify-between">
           <div className="text-foreground text-base font-medium">Contacts</div>
           <div className="pr-0">
-            <PersonaForm user={user} persona={null} />
+            <PersonaForm
+              user={user}
+              persona={null}
+              open={isAddContactOpen}
+              onOpenChange={setIsAddContactOpen}
+              showButton={true}
+            />
           </div>
         </div>
       </SidebarHeader>
@@ -123,9 +132,13 @@ export function AppSidebar({
                         onClick={(e) => {
                           e.preventDefault()
                           e.stopPropagation()
+                          setEditingPersona(currentPersona)
                         }}
                       >
-                        <PersonaForm user={user} persona={currentPersona} />
+                        <PersonaAvatar
+                          personaId={currentPersona.id}
+                          personaName={currentPersona.display_name}
+                        />
                       </div>
                     )}
                     <div className="flex flex-col w-full">
@@ -154,6 +167,18 @@ export function AppSidebar({
       <SidebarFooter className="p-0 border-t">
         <ProfileForm profile={profile} user={user} />
       </SidebarFooter>
+      {editingPersona && (
+        <PersonaForm
+          user={user}
+          persona={editingPersona}
+          open={!!editingPersona}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setEditingPersona(null)
+            }
+          }}
+        />
+      )}
     </Sidebar>
   )
 }

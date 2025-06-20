@@ -123,15 +123,22 @@ export function PersonaForm({
   persona,
   showButton = true,
   freshProfile = false,
+  open: controlledOpen,
+  onOpenChange: setControlledOpen,
 }: {
   user: User
   persona: Persona | null
   showButton?: boolean
   freshProfile?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }) {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const router = useRouter()
+
+  const open = controlledOpen ?? internalOpen
+  const setOpen = setControlledOpen ?? setInternalOpen
 
   const isEditing = !!persona
 
@@ -155,10 +162,10 @@ export function PersonaForm({
   })
 
   useEffect(() => {
-    if (open || freshProfile) {
+    if (open) {
       form.reset(defaultValues)
     }
-  }, [open, freshProfile, defaultValues, form])
+  }, [open, defaultValues, form])
 
   const handleOpenChange = (isOpen: boolean) => {
     if (freshProfile && !isOpen) {
@@ -169,7 +176,7 @@ export function PersonaForm({
 
   const onSubmit = async (data: PersonaFormValues) => {
     setIsSaving(true)
-
+    console.log(persona)
     await toast.promise(
       savePersona({
         id: persona?.id ?? uuidv4(),
@@ -202,11 +209,13 @@ export function PersonaForm({
   }
 
   const trigger = isEditing ? (
-    <PersonaAvatar
-      personaId={persona.id}
-      personaName={persona.display_name}
-      onClick={() => setOpen(true)}
-    />
+    showButton && (
+      <PersonaAvatar
+        personaId={persona.id}
+        personaName={persona.display_name}
+        onClick={() => setOpen(true)}
+      />
+    )
   ) : (
     showButton && (
       <Label onClick={() => setOpen(true)} className="cursor-pointer">
