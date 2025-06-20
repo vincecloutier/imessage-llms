@@ -8,7 +8,7 @@ create table public.profiles (
   imessage_address   text       unique,
   telegram_address   text       unique
 );
--- index on sender_address and telegram_username (for reverse lookup by phone or email)
+-- index on imessage_address and telegram_address (for reverse lookup by phone or email)
 create index on public.profiles(imessage_address);
 create index on public.profiles(telegram_address);
 

@@ -33,9 +33,9 @@ def get_profiles():
 def get_profile(channel: str, user_id: str):
     query = get_table("profiles").select("*")
     if channel == "telegram":
-        query = query.eq("telegram_username", user_id)
+        query = query.eq("telegram_address", user_id)
     elif channel == "imessage":
-        query = query.eq("sender_address", user_id)
+        query = query.eq("imessage_address", user_id)
     else:
         query = query.eq("id", user_id)
     resp = query.maybe_single().execute()
