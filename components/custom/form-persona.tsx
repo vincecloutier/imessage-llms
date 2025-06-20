@@ -78,7 +78,11 @@ const defaultColors = [
 ]
 
 const generateColorFromId = (id: string): string => {
-  const colorIndex = Math.abs(parseInt(id.slice(-1)) % defaultColors.length)
+  if (!id) {
+    return defaultColors[0]
+  }
+  const charCode = id.charCodeAt(id.length - 1)
+  const colorIndex = charCode % defaultColors.length
   return defaultColors[colorIndex]
 }
 
