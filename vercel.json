@@ -1,0 +1,33 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "version": 2,
+    "framework": "nextjs",
+    "buildCommand": "pnpm run build",
+    "devCommand": "pnpm run dev",
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/next"
+      }
+    ],
+  
+    "integrations": [
+      {
+        "id": "supabase",
+        "config": {
+          "env": {
+            "NEXT_PUBLIC_SUPABASE_URL": "project.url",
+            "NEXT_PUBLIC_SUPABASE_ANON_KEY": "project.anon_key" 
+          }
+        }
+      }
+    ],
+    "env": {
+      "BBL_API_KEY": "@bbl-api-key",
+      "EXA_API_KEY": "@exa-api-key",
+      "OPENROUTER_API_KEY": "@openrouter-api-key",
+      "PINECONE_API_KEY": "@pinecone-api-key",
+      "TELEGRAM_API_KEY": "@telegram-api-key",
+      "TELEGRAM_API_SECRET": "@telegram-api-secret"
+    }
+  }
