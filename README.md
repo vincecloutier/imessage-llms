@@ -20,10 +20,24 @@ Follow these instructions to get a copy of the project up and runnning.
 
 ### Deployment
 
-1. *Setup Exa, OpenRouter, Pinecone*
+1. **Setup Exa** <br>
+ Go to [Exa](https://dashboard.exa.ai/login?redirect=/home) and sign up for a free or paid account and then save your API key. This will be used to allow the model to search the web.
+
+2. **Setup OpenRouter** <br>
+ Go to [OpenRouter](https://openrouter.ai/models) and sign up for an account and then save your API key somewhere. This will be used to allow the model to access the OpenRouter API.
+
+3. **Setup Pinecone** <br>
+ Go to [Pinecone](https://www.pinecone.io/pricing) and sign up for a free or paid account and then save your API key somewhere. This will be used to allow the model to store and retrieve long-term memory. Note that here you will also need to create an index. 
+    1. Go to the [Pinecone dashboard](https://app.pinecone.io/login) and sign in.
+    2. Click on the "Create Index" button.
+    3. Create an index called `memories-user` that is configured to use the `llama-text-embed-v2` embedding model, in integrated-embedding serverless mode (not pods), and make sure the field map is set to `text`. The region and the cloud provider can be left as is. 
+    4. Create another index called `memories-agent` with the same settings.
+
+4. **Setup Telegram** <br>
+ Go to [Telegram](https://telegram.org/) and create a bot and then save your API key and secret token somewhere.
 
 
-2. *Setup a Supabase project and get the project URL and anon key.*
+2. **Setup a Supabase project and get the project URL and anon key.**
 
 3. *Setup Telegram Bot API key and secret token.*
 
