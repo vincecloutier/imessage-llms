@@ -67,23 +67,6 @@ After deploying, you can run the application locally to test and develop.
     The application will then be available at `http://localhost:3000`. <br> _Note that `vercel dev` will launch the frontend, but not the backend._
 
 
-## Environment Variables
-
-This project requires the following environment variables to be set in your `.env.local` file. You can create a `.env.example` file with the content below for reference.
-
-| Variable                      | Description                                                                 |
-| ----------------------------- | --------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`    | The URL for your Supabase project.                                          |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | The anonymous public key for your Supabase project.                       |
-| `SUPABASE_SERVICE_ROLE_KEY`   | The service role (secret) key for your Supabase project.                    |
-| `OPENROUTER_API_KEY`          | Your API key for OpenRouter.                                                |
-| `TELEGRAM_API_KEY`            | Your Telegram Bot API key.                                                  |
-| `TELEGRAM_API_SECRET`         | A secret token for validating Telegram webhooks.                            |
-| `PINECONE_API_KEY`            | Your API key for Pinecone.                                                  |
-| `EXA_API_KEY`                 | (Optional) Your API key for Exa for search capabilities.                    |
-| `BBL_API_KEY`                 | (Optional) Your API key for BeMyEyes.                                       |
-
-
 ### Telegram Webhook
 
 After deploying, you need to set the Telegram webhook to point to your Vercel deployment URL.
