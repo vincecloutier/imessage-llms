@@ -11,17 +11,6 @@
       }
     ],
   
-    "integrations": [
-      {
-        "id": "supabase",
-        "config": {
-          "env": {
-            "NEXT_PUBLIC_SUPABASE_URL": "project.url",
-            "NEXT_PUBLIC_SUPABASE_ANON_KEY": "project.anon_key" 
-          }
-        }
-      }
-    ],
     "env": {
       "BBL_API_KEY": "@bbl-api-key",
       "EXA_API_KEY": "@exa-api-key",
