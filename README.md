@@ -1,4 +1,4 @@
-# LLM's On iMessage, Telegram, and Web
+# LLM's On iMessage, Telegram, and the Web
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
