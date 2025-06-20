@@ -64,7 +64,10 @@ Run the following command to link the Telegram bot to Vercel.
     -F "secret_token=TELEGRAM_API_SECRET" \
     "https://api.telegram.org/botTELEGRAM_API_KEY/setWebhook"
     ```
-Make sure to replace the capitalized environment variables with the correct values!
+Make sure to replace the capitalized environment variables with the correct values! And now you should be able to send and receive messages from the bot over Telegram!
+
+9. **Link BlueBubbles To Vercel** <br>
+Launch the BlueBubbles server and go to the `API & Webhooks` tab. Select `Manage > Add Webhook` and then create one webhook for our responder that listens to `New Message` events and points to `VERCEL_BASE_URL/api/responder?channel=imessage` another one for `New Server URL` events and points to `VERCEL_BASE_URL/api/url_updater`. Now you should be able to send and receive messages from the bot over iMessage!
 
 ### Local Development
 After deploying, you can run the application locally to test and develop.
