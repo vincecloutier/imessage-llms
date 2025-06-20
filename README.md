@@ -51,6 +51,16 @@ Follow these instructions to get a copy of the project up and runnning.
 
 
 8. **Link Telegram Bot To Vercel** <br>
+Run the following command to link the Telegram bot to Vercel. 
+    ```bash
+    curl -X POST \
+    -F "url=VERCEL_BASE_URL/api/responder?channel=telegram" \
+    -F "allowed_updates=[\"message\"]" \
+    -F "max_connections=10" \
+    -F "secret_token=TELEGRAM_API_SECRET" \
+    "https://api.telegram.org/botTELEGRAM_API_KEY/setWebhook"
+    ```
+Make sure to replace the capitalized environment variables with the correct values!
 
 ### Local Development
 After deploying, you can run the application locally to test and develop.
@@ -82,18 +92,3 @@ After deploying, you can run the application locally to test and develop.
     pnpm run dev
     ```
     The application will then be available at `http://localhost:3000`. <br> _Note that `vercel dev` will launch the frontend, but not the backend._
-
-
-### Telegram Webhook
-
-After deploying, you need to set the Telegram webhook to point to your Vercel deployment URL.
-
-Run the setup script to configure the webhook:
-```bash
-bash ./setup.sh
-```
-Make sure your `.env.local` is configured with the correct `TELEGRAM_API_KEY` and `TELEGRAM_API_SECRET` before running the script. The script currently uses `https://april-python.vercel.app` as the webhook URL; you may need to update this in `setup.sh` to match your deployment's URL.
-
-## License
-
-This project is licensed under the MIT License. It is recommended to create a `LICENSE.md` file in your project with the license details.
