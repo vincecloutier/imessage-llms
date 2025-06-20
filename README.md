@@ -46,8 +46,13 @@ Now go to [BlueBubbles](https://bluebubbles.app/install/) to download and setup 
     </div>
     <p>Click the button to deploy. You will be prompted to enter the environment variables you saved from the previous steps. After deploying, you will need to take note of the base URL of your deployment.</p>
 
-7. **Setup a Supabase project and get the project URL and anon key.** <br>
-
+7. **Setup a Supabase Project** <br>
+Once your project is deployed to Vercel, select the `database` tab in your project, then click `Create Database > Supabase`, and leave all the settings as is and finally click `Connect` after your project is provisioned. Then select the `Open In Supabase` button, and once in your Supabase project, you will need to execute the [lib/supabase/setup.sql](lib/supabase/setup.sql) file in the `SQL Editor` tab. Then you will need to go to the `Authentication > Emails` tab and click the`Emails` subtab and then modify both the `Confirmation Sign Up` and `Magic Link` emails to: 
+    ```html
+    <h2>One Time Password (OTP): </h2>
+    <h3> {{ .Token }}</h3>
+    ```
+Now since we've connected Vercel to Supabase, we need to redeploy the project, so that the automatically populated Supabase environment variables are properly set. At this point, you should be able to login to the application and message the bots you create online!
 
 8. **Link Telegram Bot To Vercel** <br>
 Run the following command to link the Telegram bot to Vercel. 
