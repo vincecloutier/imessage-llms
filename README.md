@@ -33,21 +33,20 @@ Follow these instructions to get a copy of the project up and runnning.
     3. Create an index called `memories-user` that is configured to use the `llama-text-embed-v2` embedding model, in integrated-embedding serverless mode (not pods), and make sure the field map is set to `text`. The region and the cloud provider can be left as is. 
     4. Create another index called `memories-agent` with the same settings.
 
-4. **Setup Telegram** <br>
+4. **Create a Telegram Bot** <br>
  Go to [Telegram](https://telegram.org/) and create a bot and then save your API key and secret token somewhere.
 
-
-2. **Setup a Supabase project and get the project URL and anon key.**
-
-3. *Setup Telegram Bot API key and secret token.*
+5. **Setup iMessage with BlueBubbles:**
 
 
-4. *Setup iMessage with BlueBubbles:*
-
-
-5.  **Deploy to Vercel:** <br>
+6.  **Deploy to Vercel:** <br>
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vincecloutier/imessage-llms&env=BBL_API_KEY,EXA_API_KEY,OPENROUTER_API_KEY,PINECONE_API_KEY,TELEGRAM_API_KEY,TELEGRAM_API_SECRET)
 
+6. **Setup a Supabase project and get the project URL and anon key.** <br>
+ Go to [Supabase](https://supabase.com/) and sign up for an account and then save your project URL and anon key somewhere. This will be used to allow the model to store and retrieve user data.
+
+
+7. **Link Telegram Bot To Vercel** <br>
 
 ### Local Development
 After deploying, you can run the application locally to test and develop.
