@@ -43,8 +43,8 @@ Follow these instructions to get a copy of the project up and runnning.
       <a href="https://vercel.com/new/clone?repository-url=https://github.com/vincecloutier/imessage-llms&env=BBL_API_KEY,EXA_API_KEY,OPENROUTER_API_KEY,PINECONE_API_KEY,TELEGRAM_API_KEY,TELEGRAM_API_SECRET">
         <img src="https://vercel.com/button" alt="Deploy with Vercel"/>
       </a>
-      <p>Click the button to deploy. You will be prompted to enter the environment variables you saved from the previous steps.</p>
     </div>
+    <p>Click the button to deploy. You will be prompted to enter the environment variables you saved from the previous steps.</p>
 
 7. **Setup a Supabase project and get the project URL and anon key.** <br>
  Go to [Supabase](https://supabase.com/) and sign up for an account and then save your project URL and anon key somewhere. This will be used to allow the model to store and retrieve user data.
