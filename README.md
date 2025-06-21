@@ -4,7 +4,20 @@
 
 An application that lets you chat with large language models from [OpenRouter](https://openrouter.ai/models) in your browser, iMessage, or Telegram. Built with a Next.js frontend and a Python backend.
 
-![AI Companion Screenshot](https://place-hold.it/1280x720?text=App+Screenshot+Here)
+<div align="center">
+
+**Web App**
+| | |
+|:---:|:---:|
+| <img src="public/screenshots/web-demo-1.png" alt="Web Demo 1" width="400"/> | <img src="public/screenshots/web-demo-2.png" alt="Web Demo 2" width="400"/> |
+| <img src="public/screenshots/web-demo-3.png" alt="Web Demo 3" width="400"/> | <img src="public/screenshots/web-demo-4.png" alt="Web Demo 4" width="400"/> |
+
+**Mobile**
+| iMessage | Telegram |
+|:---:|:---:|
+| <img src="public/screenshots/imessage-demo.png" alt="iMessage Demo" width="400"/> | <img src="public/screenshots/telegram-demo.png" alt="Telegram Demo" width="400"/> |
+
+</div>
 
 ## Features
 - [x] **Authentication:** Secure user sign-up and login.
