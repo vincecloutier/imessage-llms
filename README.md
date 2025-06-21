@@ -119,3 +119,7 @@ After deploying, you can run the application locally to test and develop.
 I struggled with this for a while. It has to do with the way the Apple's Push Notification service works, and nothing to do with Bluebubbles or this service. The good news is that it's an easy fix, you just need a way to increase your TCP timeout on your network. If you can't do this (thanks Rogers), you can buy a top tier TP-Link Router for very cheap.
 
 Feel free to let me know if you are having any other issues with this repo and I will try to help you out as best I can.
+
+### Contributing
+
+Contributions are welcome! If you'd like to contribute, please feel free to fork the repository and submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
