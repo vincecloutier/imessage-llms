@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An application that lets you chat with large language models from [OpenRouter](https://openrouter.ai/models) in your browser, iMessage, or Telegram. Built with a Next.js frontend and a Python backend.
+An application that lets you chat with large language models from [OpenRouter](https://openrouter.ai/models) in your browser, iMessage, or Telegram. Built with a Next.js frontend and a Python backend. 
 
 <div align="center">
 
